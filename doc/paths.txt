@@ -1,0 +1,29 @@
+
+Old 6 Nov 2010 RDR h5 data, 145 files, restored from Paul's
+discovery
+
+  /asl/data/cris/rdr_proxy/hdf/2010/249
+
+Old 6 Nov 2010 RDR MIT matlab data, run off recently with the 
+MIT reader modified to return sweep dir
+
+  /asl/data/cris/rdr_proxy/mat/2010/249
+
+Old 6 Nov 2010 RDR NGAS matlab data moved to
+
+  /asl/data/cris/rdr_proxy/ng/2010/249
+
+New 6 Nov 2010 RDR h5 data
+
+  /asl/data/cris/rdr_proxy/hdf/2010/249v2
+
+New 6 Nov 2010 RDR MIT matlab data, from MITreader12a,
+script mit_run3.m, finished OK
+
+  /asl/data/cris/rdr_proxy/mat/2010/249v2
+
+New 6 Nov 2010 RDR NGAS matlab data, from reader_1.0,
+script ngas_batch4.m 
+
+  /asl/data/cris/rdr_proxy/ng/2010/249v2
+
