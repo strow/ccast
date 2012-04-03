@@ -6,8 +6,7 @@
 addpath /home/motteler/cris/rdr2spec5/asl
 
 % path to SDR and geo h5 data
-% gsrc = '/asl/data/cris/sdr60/hdf/2010/249';
-gsrc = '/asl/data/cris/sdr60/hdf/2012/046';
+gsrc = '/asl/data/cris/sdr60/hdf/2012/093';
 
 % output directory
 odir = '.';

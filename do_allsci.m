@@ -5,12 +5,16 @@
 % sci and eng data as a struct arrays, only adding eng records when
 % the values change.
 
+function do_allsci(doy)
+
 % path to Dave's temp and ICT procedures
 addpath /home/motteler/cris/rdr2spec5/davet2
 
-% matlab RDR data 
-% rdir = '/asl/data/cris/rdr_proxy/mat/2010/249';
-rdir = '/asl/data/cris/rdr60/mat/2012/046';
+% 2012 date as day of year
+% doy = '063';
+
+% matlab RDR directory
+rdir = ['/asl/data/cris/rdr60/mat/2012/', doy];
 
 % output directory
 % odir = rdir

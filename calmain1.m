@@ -18,14 +18,15 @@
 %   opt     - optional input parameters
 %
 % OUTPUTS
-%   rcal    - nchan x 9 x 34 x nscan, calibrated radiance
+%   rcal    - nchan x 9 x 30 x nscan, calibrated radiance
 %   vcal    - nchan x 1 frequency grid
 %   msc     - optional returned parameters
 %
 % DISCUSSION
 %
-%   calmain1 is a prototype with the old basic rad cal code
-%
+%   calmain1 does basic linear calibration.  It is very fast 
+%   (in comparison with the full calibration code) and mainly
+%   intended for code tests or a quick look the data.
 
 function [rcal, vcal, msc] = ...
      calmain1(band, vinst, rcnt, stime, avgIT, avgSP, sci, eng, opt);
@@ -58,8 +59,20 @@ for i = 1 : nscan   % loop on scans
 
   for j  = 1 : 30   % loop on ES
 
-    rcal(:,:,j,i) = rIT - (avgIT(:,:,1,i) - rcnt(:,:,j,i)) .* ...
-                    (rIT - rSP) ./ (avgIT(:,:,1,i) - avgSP(:,:,1,i));
+%   rcal(:,:,j,i) = rIT - (avgIT(:,:,1,i) - rcnt(:,:,j,i)) .* ...
+%                   (rIT - rSP) ./ (avgIT(:,:,1,i) - avgSP(:,:,1,i));
+
+    % match sweep directions and do the radiometric calibration
+%   if mod(j, 2) == 1   % for 2010 proxy data
+    if mod(j, 2) == 0   % for all real data
+
+      rcal(:,:,j,i) = rIT .* (rcnt(:,:,j,i) - avgSP(:,:,1,i)) ./ ...
+                           (avgIT(:,:,1,i) - avgSP(:,:,1,i));
+    else
+
+      rcal(:,:,j,i) = rIT .* (rcnt(:,:,j,i) - avgSP(:,:,2,i)) ./ ...
+                           (avgIT(:,:,2,i) - avgSP(:,:,2,i));
+    end
   end
 end
 

@@ -18,7 +18,7 @@
 %   opt     - optional input parameters
 %
 % OUTPUTS
-%   rcal    - nchan x 9 x 34 x nscan, calibrated radiance
+%   rcal    - nchan x 9 x 30 x nscan, calibrated radiance
 %   vcal    - nchan x 1 frequency grid
 %   msc     - optional returned parameters
 %
@@ -62,6 +62,7 @@ for si = 1 : nscan   % loop on scans
 
   for iFov = 1 : 9  % loop on FOVs
 
+    % apply nonlinearity correction to ICT and space views
     [sp_nlc1, extra] = ...
         cris_nlc_CCAST(band, iFov, vinst, ...
                        avgSP(:, iFov, 1, si), ...
@@ -88,7 +89,7 @@ for si = 1 : nscan   % loop on scans
 
     for iES = 1 : 30  % loop on ES
 
-      % Apply Nonlinearity correction to scene, ICT, and space views
+      % apply nonlinearity correction to each ES
       [es_nlc, extra] = ...
           cris_nlc_CCAST(band, iFov, vinst, ...
                          rcnt(:, iFov, iES, si), ...

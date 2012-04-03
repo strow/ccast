@@ -1,5 +1,5 @@
 %
-% rdr2spec5 -- process RDR data to calibrated spectra
+% rdr2specX -- process RDR data to calibrated spectra
 %
 % Major processing steps are:
 %   checkRDR   - validate the RDR data
@@ -20,14 +20,13 @@ addpath /home/motteler/cris/rdr2spec5
 addpath /home/motteler/cris/rdr2spec5/davet2
 
 % matlab RDR data directory
-% rdir = '/asl/data/cris/rdr_proxy/mat/2010/249';
-rdir = '/asl/data/cris/rdr60/mat/2012/055';
+rdir = '/asl/data/cris/rdr60/mat/2012/054';
 
 flist = dir(sprintf('%s/RDR*.mat', rdir));
 nfile = length(flist);
 
 % moving averages directory 
-adir = '/strowdata2/s2/motteler/cris/2012/055';
+adir = '/strowdata2/s2/motteler/cris/2012/038';
 
 % moving average span is 2 * mspan + 1
 mspan = 4;
@@ -41,7 +40,8 @@ allsci = struct([]);
 % -------------------------
 
 % for fi = 1 : nfile
-for fi = 40
+% for fi = 253 : nfile % for 22 Feb (doy 053) hi-res
+for fi = 20
 
   % --------------------------
   % load and validate MIT data
@@ -86,15 +86,19 @@ for fi = 40
     continue
   end
 
+  % get wlaser from the eng packet data
+  wlaser = cris_metlaser_CCAST(eng.NeonCal);
+
   % -----------------
   % get count spectra
   % -----------------
 
-  opts = struct;
-  opts.wlaser = 773.36596; % from Feb 08 laser test
-  [rcLW, freqLW, optsLW] = readspec6(igmLW, 'LW', opts);
-  [rcMW, freqMW, optsMW] = readspec6(igmMW, 'MW', opts);
-  [rcSW, freqSW, optsSW] = readspec6(igmSW, 'SW', opts);
+  opt = struct;
+  opt.wlaser = wlaser;
+
+  [rcLW, freqLW, optsLW] = readspecX(igmLW, 'LW', opt);
+  [rcMW, freqMW, optsMW] = readspecX(igmMW, 'MW', opt);
+  [rcSW, freqSW, optsSW] = readspecX(igmSW, 'SW', opt);
 
   [nchLW, m, n] = size(rcLW);
   [nchMW, m, n] = size(rcMW);
@@ -139,14 +143,22 @@ for fi = 40
   % calmain2 -- Dave's calibration code
 
   opt = struct;
+  opt.wlaser = wlaser;
+
   [rLW, vLW] = ...
-     calmain1('lw', freqLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opt);
+     calmainX('lw', freqLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opt);
 
   [rMW, vMW] = ...
-     calmain1('mw', freqMW, scMW, scTime, avgMWIT, avgMWSP, sci, eng, opt);
+     calmainX('mw', freqMW, scMW, scTime, avgMWIT, avgMWSP, sci, eng, opt);
 
   [rSW, vSW] = ...
-     calmain1('sw', freqSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opt);
+     calmainX('sw', freqSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opt);
+
+  % save data *** TEMPORARY *** 
+% save(['SDR_', rid], ...
+%      'rLW','vLW','rMW','vMW','rSW','vSW','scTime','sci','eng','rid')
+
+  continue % skip images *** TEMPORARY ***
 
   % ----------------
   % plots and images
@@ -162,13 +174,14 @@ for fi = 40
 % imagesc(img1')
 
   % all FOVs, 1-freq, need to get FOV tiling right
-  ch = 373;
+% ch = 373; % for LW
+  ch = 616; % for hi res SW
   img_re = zeros(90,3*nscan);
   img_im = zeros(90,3*nscan);
   for i = 1 : nscan
     for j = 1 : 30
-      t_re = reshape(squeeze(real(rLW(ch,:,j,i))), 3, 3);
-      t_im = reshape(squeeze(imag(rLW(ch,:,j,i))), 3, 3);
+      t_re = reshape(squeeze(real(rSW(ch,:,j,i))), 3, 3);
+      t_im = reshape(squeeze(imag(rSW(ch,:,j,i))), 3, 3);
       ix = 3*(j-1)+1;
       iy = 3*(i-1)+1;
       img_re(ix:ix+2, iy:iy+2) = t_re;
@@ -182,7 +195,7 @@ for fi = 40
   xlabel('cross track FOV')
   ylabel('along track FOV')
   colorbar
-% saveas(gcf, [rid(11:17), 'real'], 'fig')
+  saveas(gcf, [rid(11:17), 'real'], 'fig')
 
   figure(2)
   imagesc(img_im')
@@ -190,7 +203,7 @@ for fi = 40
   xlabel('cross track FOV')
   ylabel('along track FOV')
   colorbar
-% saveas(gcf, [rid(11:17), 'imag'], 'fig')
+  saveas(gcf, [rid(11:17), 'imag'], 'fig')
 
   rid
   pause(1)

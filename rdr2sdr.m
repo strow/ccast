@@ -1,33 +1,67 @@
 %
-% rdr2spec5 -- process RDR data to calibrated spectra
+% NAME
+%   rdr2sdr -- process RDR mat files to SDR mat files
 %
-% Major processing steps are:
-%   checkRDR   - validate the RDR data
-%   scipack    - process sci and eng packets
-%   readspec   - get count spectra
-%   scanorder  - group data into scans
-%   movavg_app - get moving averages
-%   calmain2   - radiometric calibration
+% SYNOPSIS
+%   [slist, msc] = rdr2sdr(flist, rdir, sdir, opts)
 %
-% Notes
-%   under development
+% INPUTS
+%   flist  - list of RDR mat files
+%   rdir   - directory for RDR input files
+%   sdir   - directory for SDR output files
+%   opts   - optional parameter struct
+%
+% optional parameters include
+%   adir   - directory for moving averages
+%   mspan  - span for local moving averages
+%   wlaser - metrology laser wavelength, nm
+%   d      - old driver struct (see discussion)
 %   
-% Author
-%   H. Motteler, 15 Nov 2011
+% OUTPUTS
+%   slist  - list of SDR mat files
+%   msc    - optional output struct
+%
+% DISCUSSION
+%
+% rdr2sdr is the main function for RDR to SDR processing.
+%
+% rdr2sdr is part of a processing chain in which the major
+% steps communicate by files, named as follows:
+%
+%   RDR_<rid>.mat  -- RDR mat files, from rdr2mat
+%   avg_<rid>.mat  -- moving average files, from movavg_pre
+%   SDR_<rid>.mat  -- SDR mat files, from this procedure
+%
+% where <rid> is a string of the form tYYYYMMDD_dHHMMSSS taken
+% from the original RDR HDF5 file.
+%
+% rdr2sdr does not directly load the filenames in flist, it builds
+% the expected names from <rid> and tries to load that.  This name
+% string could be checked further but the key idea is that anything
+% that fails to conform to the naming scheme is a fatal error.
+%
+% If we find pre-calculated moving average files in adir, we use
+% those instead of locally calculated values
+%
+% TEMPORARY: For now simply pass the "d" struct on to the
+% calibration procedures that expect it.
+%
+% VERY TEMPORARY:, mspan and wlaser are set inline here and
+% readspec6 is called instead of ifg2spectra.m--this is only until
+% the rest of Dave's rad cal code is brought in.
+%
+% NOTE: no parameter overrides yet, candidates for this include
+% wlaser, mspan, and some of the fields from the "d" struct
 %
 
-addpath /home/motteler/cris/rdr2spec5
-addpath /home/motteler/cris/rdr2spec5/davet2
+function [slist, msc] = rdr2sdr(flist, rdir, sdir, opts);
 
-% matlab RDR data directory
-% rdir = '/asl/data/cris/rdr_proxy/mat/2010/249';
-rdir = '/asl/data/cris/rdr60/mat/2012/055';
+% TEMPORARY working paths
+addpath /home/motteler/cris/bcast
+addpath /home/motteler/cris/bcast/davet2
 
-flist = dir(sprintf('%s/RDR*.mat', rdir));
+% number of RDR files to process
 nfile = length(flist);
-
-% moving averages directory 
-adir = '/strowdata2/s2/motteler/cris/2012/055';
 
 % moving average span is 2 * mspan + 1
 mspan = 4;
@@ -40,8 +74,7 @@ allsci = struct([]);
 % loop on MIT RDR mat files
 % -------------------------
 
-% for fi = 1 : nfile
-for fi = 40
+for fi = 1 : nfile
 
   % --------------------------
   % load and validate MIT data
@@ -131,72 +164,28 @@ for fi = 40
     [avgSWSP, avgSWIT] = movavg_app(scSW(:, :, 31:34, :), mspan);
   end
 
+% continue  % ******************** TEMP **************************
+
   % -----------------------
   % radiometric calibration
   % -----------------------
 
-  % calmain1 -- simple fast linear calibration
+  % calmain1 -- prototype with old code
   % calmain2 -- Dave's calibration code
 
   opt = struct;
   [rLW, vLW] = ...
-     calmain1('lw', freqLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opt);
+     calmain2('lw', freqLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opt);
 
   [rMW, vMW] = ...
-     calmain1('mw', freqMW, scMW, scTime, avgMWIT, avgMWSP, sci, eng, opt);
+     calmain2('mw', freqMW, scMW, scTime, avgMWIT, avgMWSP, sci, eng, opt);
 
   [rSW, vSW] = ...
-     calmain1('sw', freqSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opt);
+     calmain2('sw', freqSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opt);
 
-  % ----------------
-  % plots and images
-  % ----------------
+  % remaining ccast rad cal code goes here
 
-  % note for raw images: the data is in column and time order, with
-  % rows individual ES FORs and columns successive scans.  Typically
-  % we'd want to transpose this for an image, with the FORs in rows
-  % going east/west and the scans in columns going north/south.
-
-% % basic 1-FOV 1-freq image
-% img1 = squeeze(real(rLW(400,5,:,:)));
-% imagesc(img1')
-
-  % all FOVs, 1-freq, need to get FOV tiling right
-  ch = 373;
-  img_re = zeros(90,3*nscan);
-  img_im = zeros(90,3*nscan);
-  for i = 1 : nscan
-    for j = 1 : 30
-      t_re = reshape(squeeze(real(rLW(ch,:,j,i))), 3, 3);
-      t_im = reshape(squeeze(imag(rLW(ch,:,j,i))), 3, 3);
-      ix = 3*(j-1)+1;
-      iy = 3*(i-1)+1;
-      img_re(ix:ix+2, iy:iy+2) = t_re;
-      img_im(ix:ix+2, iy:iy+2) = t_im;
-    end
-  end
-
-  figure (1)
-  imagesc(img_re')
-  title([rid(2:9), ' ', rid(12:17), ' real'])
-  xlabel('cross track FOV')
-  ylabel('along track FOV')
-  colorbar
-% saveas(gcf, [rid(11:17), 'real'], 'fig')
-
-  figure(2)
-  imagesc(img_im')
-  title([rid(2:9), ' ', rid(12:17), ' imag'])
-  xlabel('cross track FOV')
-  ylabel('along track FOV')
-  colorbar
-% saveas(gcf, [rid(11:17), 'imag'], 'fig')
-
-  rid
-  pause(1)
-
-% % quick check to compare versions
-% sum(real(rLW(~isnan(rLW(:)))))
+  % save to SDR mat file goes here
 
 end
 
