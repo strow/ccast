@@ -4,7 +4,7 @@
 %
 % SYNOPSIS
 %   [rcal, vcal, msc] = ...
-%      calmain2(band, vinst, rcnt, stime, avgIT, avgSP, sci, eng, opt);
+%      calmain1(inst, rcnt, stime, avgIT, avgSP, sci, eng, opt);
 %
 % INPUTS
 %   band    - 'lw', 'mw', or 'sw'
@@ -29,7 +29,10 @@
 %   intended for code tests or a quick look the data.
 
 function [rcal, vcal, msc] = ...
-     calmain1(band, vinst, rcnt, stime, avgIT, avgSP, sci, eng, opt);
+     calmain1(inst, rcnt, stime, avgIT, avgSP, sci, eng, opt);
+
+vinst = inst.freq;
+band = inst.band;
 
 % space temperature
 spt = 2.7279;

@@ -25,6 +25,14 @@
 %
 % rdr2sdr is the main function for RDR to SDR processing.
 %
+% major processing steps are
+%   checkRDR   - validate the RDR data
+%   scipack    - process sci and eng packets
+%   readspec   - take igms to count spectra
+%   scanorder  - group data into scans
+%   movavg_app - calculate or load moving averages
+%   calmain[n] - radiometric and spectral calibration
+%
 % rdr2sdr is part of a processing chain in which the major
 % steps communicate by files, named as follows:
 %
@@ -36,22 +44,31 @@
 % from the original RDR HDF5 file.
 %
 % rdr2sdr does not directly load the filenames in flist, it builds
-% the expected names from <rid> and tries to load that.  This name
-% string could be checked further but the key idea is that anything
-% that fails to conform to the naming scheme is a fatal error.
+% the expected names from <rid> and tries to load that.  The idea is
+% that anything that fails to conform to the naming scheme should be
+% a fatal error.
 %
 % If we find pre-calculated moving average files in adir, we use
 % those instead of locally calculated values
 %
-% TEMPORARY: For now simply pass the "d" struct on to the
-% calibration procedures that expect it.
+% NOTES/TO-DO
 %
-% VERY TEMPORARY:, mspan and wlaser are set inline here and
-% readspec6 is called instead of ifg2spectra.m--this is only until
-% the rest of Dave's rad cal code is brought in.
+%  - using readspecX and calmainX for initial tests
 %
-% NOTE: no parameter overrides yet, candidates for this include
-% wlaser, mspan, and some of the fields from the "d" struct
+%  - using readspec6/X to set interferometric parameters
+%
+%  - no parameter overrides yet; wlaser is from the eng packet,
+%    mspan is set inline here
+%
+%  - common vs individual opts structs?
+%
+%  - in ccast branch for now simply pass the "d" struct on to the
+%    calibration procedures that expect it.
+%
+%  - output structs slist and msc are temporarily set to empty
+%
+% AUTHOR
+%  H. Motteler, 20 Feb 2012
 %
 
 function [slist, msc] = rdr2sdr(flist, rdir, sdir, opts);
@@ -70,6 +87,10 @@ mspan = 4;
 eng1 = struct([]);
 allsci = struct([]);
 
+% initialize output structs
+msc = struct;
+slist = struct([]);
+
 % -------------------------
 % loop on MIT RDR mat files
 % -------------------------
@@ -87,7 +108,7 @@ for fi = 1 : nfile
 
   % moving average filenames
   atmp = ['AVG_', rid, '.mat'];
-  afile = [adir, '/', atmp];
+  afile = [opts.adir, '/', atmp];
 
   % skip processing if no matlab RDR file
   if ~exist(rfile, 'file')
@@ -103,7 +124,7 @@ for fi = 1 : nfile
   [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR5f(d1, rid);
 
   if isempty(igmTime)
-    fprintf(1, '[main]: no valid data, skipping file %s\n', rid)
+    fprintf(1, 'rdr2sdr: no valid data, skipping file %s\n', rid)
     continue
   end
 
@@ -115,19 +136,31 @@ for fi = 1 : nfile
 
   % skip to next file if we don't have any science packets
   if isempty(sci)
-    fprintf(1, '[main]: no science packets, skipping file %s\n', rid)
+    fprintf(1, 'rdr2sdr: no science packets, skipping file %s\n', rid)
     continue
   end
+
+  % get wlaser from the eng packet data
+  wlaser = cris_metlaser_CCAST(eng.NeonCal);
 
   % -----------------
   % get count spectra
   % -----------------
 
-  opts = struct;
-  opts.wlaser = 773.36596; % from Feb 08 laser test
-  [rcLW, freqLW, optsLW] = readspec6(igmLW, 'LW', opts);
-  [rcMW, freqMW, optsMW] = readspec6(igmMW, 'MW', opts);
-  [rcSW, freqSW, optsSW] = readspec6(igmSW, 'SW', opts);
+% ropt = struct;
+% ropt.wlaser = wlaser;
+%
+% [rcLW, freqLW, optsLW] = readspec6(igmLW, 'LW', ropt);
+% [rcMW, freqMW, optsMW] = readspec6(igmMW, 'MW', ropt);
+% [rcSW, freqSW, optsSW] = readspec6(igmSW, 'SW', ropt);
+%
+  [instLW, userLW] = inst_params('LW', wlaser);
+  [instMW, userMW] = inst_params('MW', wlaser);
+  [instSW, userSW] = inst_params('SW', wlaser);
+
+  rcLW = igm2spec(igmLW, 'LW', instLW);
+  rcMW = igm2spec(igmMW, 'MW', instMW);
+  rcSW = igm2spec(igmSW, 'SW', instSW);
 
   [nchLW, m, n] = size(rcLW);
   [nchMW, m, n] = size(rcMW);
@@ -164,28 +197,30 @@ for fi = 1 : nfile
     [avgSWSP, avgSWIT] = movavg_app(scSW(:, :, 31:34, :), mspan);
   end
 
-% continue  % ******************** TEMP **************************
-
   % -----------------------
   % radiometric calibration
   % -----------------------
 
-  % calmain1 -- prototype with old code
-  % calmain2 -- Dave's calibration code
+  % calmain1 -- quick look rudimentary calibration
+  % calmain2 -- Dave's calibration code from ccast
+  % calmain3 -- all-res code derived from calmainX
+  % calmainX -- temporary high-res-only code
 
-  opt = struct;
+  opt3 = struct;
+  opt3.wlaser = wlaser;
+  
   [rLW, vLW] = ...
-     calmain2('lw', freqLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opt);
+     calmain3(instLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opt3);
 
   [rMW, vMW] = ...
-     calmain2('mw', freqMW, scMW, scTime, avgMWIT, avgMWSP, sci, eng, opt);
+     calmain3(instMW, scMW, scTime, avgMWIT, avgMWSP, sci, eng, opt3);
 
   [rSW, vSW] = ...
-     calmain2('sw', freqSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opt);
+     calmain3(instSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opt3);
 
-  % remaining ccast rad cal code goes here
-
-  % save to SDR mat file goes here
+  % save data as an SDR mat file
+  save(['SDR_', rid], ...
+        'rLW','vLW','rMW','vMW','rSW','vSW','scTime','sci','eng','rid')
 
 end
 

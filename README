@@ -1,72 +1,100 @@
 
-main files and scripts, 20 Feb 2012
------------------------------------
+major processing steps
 
-rdr2spec5 -- process RDR data to calibrated spectra
+  rdr2mat    - wrapper for the MIT reader
+  movavg_pre - moving averages preprocessor
+  rdr2sdr    - main function for RDR to SDR processing
 
-  Major processing steps are:
-    checkRDR   - validate the RDR data
-    scipack    - process sci and eng packets
-    readspec   - get count spectra
-    scanorder  - group data into scans
-    movavg_app - get moving averages
-    calmain2   - radiometric calibration
+a family of proposed procedures for output processing
 
-rdr2mat -- read RDR h5 files with the MIT matlab reader
+  sdr2rtp    - save SDRs as RTP files
+  sdr2netcdf - save SDRs as netcdf files
+  sdr2map    - tile SDRs for fancy maps, data QC, etc.
 
-ngas_batch3 -- read RDR h5 files with the NGAS matlab reader
+For example sdr2rtp would
+ 
+  - load the SDR data
+  - read any metadata needed from the hdf rdr file
+  - do geolocation (calculated or maybe from GCRSO* files)
+  - do time matching for sci, eng, geo (if from a file), meta data,
+    and things like stats flags
+  - loop on spectral data in time order and write the RTP files
 
-do_allsci -- save sci and eng data from RDR mat files
+sdr2netcdf would be similar but might also do tiling, depending on
+how you want to organize the netcdf data.
 
-  do_allsci takes a directory and matlab RDR file list and saves
-  sci and eng data as a struct arrays, only adding eng records when
-  the values change.
+These procedures communicate thru files
 
-plot_allsci -- sample plot of sci and eng data w/ metlaser calc
+  RDR_<rid>.mat  -- RDR mat files, from rdr2mat
+  avg_<rid>.mat  -- moving average files, from movavg_pre
+  SDR_<rid>.mat  -- SDR mat files, from this rdr2sdr
 
-scancat -- concatenat scan blocks from RDRs
+where <rid> is a string of the form tYYYYMMDD_dHHMMSSS taken from
+the RDR HDF5 file.  What goes into the SDR mat files is whatever we
+want--all the things we discussed that might be useful for the RTP
+files, for starters.
 
-scancat3 -- concatenate 3 x 3 scan blocks from RDRs
+For now the sdr2rtp stuff is just an outline.  I need a usable
+version of rdr2sdr, the main function for RDR to SDR processing,
+before we can do anything else.
 
-ntail -- find the non-NaN end a vector or array
 
-ztail -- find the nonzero end a vector or array
+old design overview for the RDR to SDR processing  
+--------------------------------------------------
 
-sftab1 -- tabulate non-zero scan flags (w/ my MIT reader mod)
+Preliminary
 
-do_allgeo -- accumulate a day's worth of geo data
+  run MIT reader on RDR HDF files
+  (probably an entirely separate process)
 
-movavg_pre -- preprocess moving averages
+  specify a path and list of RDR mat files
 
-atest<1-5> -- moving average test codes
+  set any structure and/or file parameters
 
-checkRDR5 -- validate MIT RDR data 
 
-  checkRDR5 loops on MIT RDR mat files.  Merges all 81 timelines 
-  (9 fovs x 3 bands x 3 obs types) to a single sorted list of unique
-  times, does some QC on this list, and fits all obs to the merged
-  timeline.  Compares MIT and NGAS igms for a selected band and FOV.
+Loop on RDR mat files (moving average loop)
 
-testNGAS4 -- compare MIT and NGAS RDR ES, IT, and SP data
+  calculate moving averages with a 3-file moving window, details
+  are similar to (1-5) below (movavg_pre.m)
 
-  This script steps thru the NGAS files for a selected band and FOV.  
-  The MIT array sizes are set to the min of the MIT FOR arrays and
-  the corresponding NGAS sizes.  The MIT and NGAS data is sorted by
-  time, in the MIT case by the associated FOV time.
 
-testSDR2 -- SDR and RDR matchup test
+Loop on RDR mat files (main loop)
 
-  this version starts with an RDR file, finds a matching SDR file
-  and then the geo file, and gives start times and spans for the RDR
-  and geo files
+  (1) load a 60-scan matlab RDR file
+  
+  (2) organize the data as nchan x 9 x nobs arrays, in column and
+      time order, and do some validation checks (checkRDRf.m)
 
-testMIT<1-3> -- short, early scripts to check MIT reader
+  (3) read and process sci and eng data, get ICT temps and 
+      current met laser value (scipack.m)
 
-testNGAS<2,3> -- early NGAS validation, loops on NGAS files
+  (4) translate the RDR pseudo-interferograms to count spectra
+      (ifg2spectra.m/readspec6.m)
 
-testNGAS5 -- version of testNGAS4 to validate MIT time units
+  (5) organize the data into scans, as nchan x 9 x 34 x nscan arrays,
+      and do some more validation checks (scanorder.m)
 
-checkRDR<1-4> -- intermediate versions of checkRDR3, above
+  (6) if available load file-spanning calibration averages, else
+      calculate single-file moving averages (movavg_app.m)
 
-testload -- load selected MIT and NGAS records by rid string
+  (7) non-linearity correction (calmain2.m)
+
+  (8) self apodization correction (selfApodCorr.m)
+
+  (9) radiometric calibration (radcal.m)
+
+  (10) resample to user wavenumber grid and resolution
+       (applyResampling.m)
+
+  (11) save calibrated SDR data as mat files
+
+
+Loop on SDR mat files (archival loop)
+
+  (1) do geolocation
+  
+  (2) for netCDF or HDF archives, reshape data so files always
+      begins with ES 1.  This needs at least a 2-file moving window
+
+  (3) save SDR files in archival format (netCDF, HDF, or RTP files)
 

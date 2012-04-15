@@ -1,14 +1,13 @@
 %
 % NAME
-%   calmain1 - main calibration procedure
+%   calmain3 - main calibration procedure
 %
 % SYNOPSIS
 %   [rcal, vcal, msc] = ...
-%      calmain2(band, vinst, rcnt, stime, avgIT, avgSP, sci, eng, opt);
+%      calmain3(inst, rcnt, stime, avgIT, avgSP, sci, eng, opt);
 %
 % INPUTS
-%   band    - 'lw', 'mw', or 'sw'
-%   vinst   - nchan x 1 frequency grid, 
+%   inst    - instrument params struct
 %   rcnt    - nchan x 9 x 34 x nscan, rad counts
 %   stime   - 34 x nscan, rad count times
 %   avgIT   - nchan x 9 x 2 x nscan, moving avg IT rad count
@@ -24,13 +23,18 @@
 %
 % DISCUSSION
 %
+%   general purpose version derived from hi-res only calmainX
+%
 %   this version of calmain implements the calibration equation as
 %   rICT*(SA-1*(ES-SP)/(ICT-SP).  It is modified to work with high
 %   res spectra.
 %
 
 function [rcal, vcal, msc] = ...
-     calmain1(band, vinst, rcnt, stime, avgIT, avgSP, sci, eng, opt)
+     calmain3(inst, rcnt, stime, avgIT, avgSP, sci, eng, opt)
+
+vinst = inst.freq;
+band = inst.band;
 
 % space temperature
 % spt = 2.7279;
@@ -44,13 +48,13 @@ function [rcal, vcal, msc] = ...
 
 % *** TEMPORARY *** set SRF file and band edges
 switch band
-  case 'lw'
+  case 'LW'
     sfile = 'hiresX/SRF_v1_LW.mat';
     uv1 = 650; uv2 = 1095; udv = 0.625;
-  case 'mw'
+  case 'MW'
     sfile = 'hiresX/SRF_v1_MW.mat';
     uv1 = 1210; uv2 = 1750; udv = 0.625;
-  case 'sw'
+  case 'SW'
     sfile = 'hiresX/SRF_v1_SW.mat';
     uv1 = 2155; uv2 = 2550; udv = 0.625;
 end
@@ -64,7 +68,7 @@ pv1 = uv1;
 pv2 = uv2;
 
 % get SA-1 for the current wlaser
-Smat = getSRFwl(opt.wlaser, sfile);
+Smat = getSRFwl(inst.wlaser, sfile);
 
 Sinv = zeros(nchan, nchan, 9);
 for i = 1 : 9

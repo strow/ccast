@@ -3,26 +3,33 @@
 %   mkSRFwl -  build SRF matrix tables for interpolation
 %
 % SYNOPSIS
-%   function mkSRFwl(bstr, wlist, ffile, sfile)
+%   function mkSRFwl(band, wlist, sfile)
 %
 % INPUTS
-%   bstr    - band string, 'LW', 'MW', or 'SW'
-%   wlist   - list of wlaser tabulation points
-%   ffile   - focal plane input file 
-%   sfile   - output file for SRF matrix tables 
+%   band   - band string, 'LW', 'MW', or 'SW'
+%   wlist  - list of wlaser tabulation points
+%   sfile  - output file for SRF matrix tables 
 %
 % OUTPUT
-%   a mat file containing a structure array "s" with fields
+%   mat file containing a structure array "s" with fields
 %     s().stab    - tabulated SRF matrices
 %     s().vobs    - corresponding frequency scales
 %     s().wlaser  - corresponding wlaser values
-%   and a structure "f" with the focal plane parameters
+%   and the "inst" struct from the last wlaser value
 %
 % NOTES
-%   need to check that wlist is in sorted order
+%   paired with getSRFwl
+%
+%   derived from FM2008/mkSRFwl, modified to use instrument specs
+%   struct and dropped default focal plane values
+%
+%   works with either oaffov2 or computeIls
 %
 
-function mkSRFwl(bstr, wlist, ffile, sfile)
+function mkSRFwl(band, wlist, sfile)
+
+band = upper(band);
+wlist = sort(wlist(:));
 
 % ------------------
 % default parameters
@@ -34,30 +41,6 @@ efrq = 20;
 % oaffov fixed parameters
 nslice = 2001;
 
-% default FOV off-axis angles
-foax = [ 
-   0.027150951288746
-   0.019198621771938
-   0.027150951288746
-   0.019198621771938
-                   0
-   0.019198621771938
-   0.027150951288746
-   0.019198621771938
-   0.027150951288746 ];
-
-% default FOV radius
-frad = ones(9,1) * 0.008403361344538;
-
-% FOV deltas
-doax = zeros(9,1);  % off-axis difference from foax
-drad = zeros(9,1);  % radius difference from frad
-
-% load a specified focal plane file
-if ~isempty(ffile)
-  load(ffile, 'foax', 'frad')
-end
-
 % initialize output struct
 s = struct([]);
 
@@ -67,14 +50,14 @@ s = struct([]);
 
 for wi = 1 : length(wlist)
 
-  % call readspec3() to calculate interferometric parameters
-  opt1.nospec = 1;
-  opt1.wlaser = wlist(wi);
-  [stmp, vobs, opt2] = readspecX('nofile', bstr, opt1);
-  dv     = opt2.dv;
-  vlaser = opt2.vlaser;
-  npts   = opt2.npts;
-  opd    = opt2.mpd;
+  % calculate interferometric parameters
+  inst = inst_params(band, wlist(wi));
+  dv   = inst.dv;
+  npts = inst.npts;
+  opd  = inst.opd;
+  vobs = inst.freq;
+  foax = inst.foax;
+  frad = inst.frad;
 
   % extra points for the band edges
   epts = floor(efrq / dv);
@@ -109,12 +92,12 @@ for wi = 1 : length(wlist)
     for j = 1 : 9
 
       % FOV dependent oaffov params
-      thetac = foax(j) + doax(j);
-      hfov = frad(j) + drad(j);
+      thetac = foax(j);
+      hfov = frad(j);
 
       % call oaffov2
-      [oafreq,oasrf] = oaffov2(v1,fchan,opd,thetac,hfov,nslice);
-      % [oasrf,t1,t2] = computeIls(v1,fchan,opd,thetac,hfov);
+      [oafreq, oasrf] = oaffov2(v1, fchan, opd, thetac, hfov, nslice);
+      % [oasrf, t1, t2] = computeIls(v1, fchan, opd, thetac, hfov);
 
       % save convolutions in column order
       smat(:, i, j) = oasrf(iobs);
@@ -131,12 +114,6 @@ for wi = 1 : length(wlist)
 
 end
 
-% save focal plane parameters
-f.foax = foax;
-f.frad = frad;
-f.doax = doax;
-f.drad = drad;
-
 % save the output struct
-save(sfile, 's', 'f');
+save(sfile, 's', 'inst');
 
