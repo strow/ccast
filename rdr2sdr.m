@@ -9,13 +9,12 @@
 %   flist  - list of RDR mat files
 %   rdir   - directory for RDR input files
 %   sdir   - directory for SDR output files
-%   opts   - optional parameter struct
+%   opts   - for now, everything else
 %
-% optional parameters include
-%   adir   - directory for moving averages
-%   mspan  - span for local moving averages
-%   wlaser - metrology laser wavelength, nm
-%   d      - old driver struct (see discussion)
+% opts fields
+%   avgdir   - directory for moving averages
+%   mvspan   - span for local moving averages
+%   sfileLW, MW, SW  - SRF matrix file by band
 %   
 % OUTPUTS
 %   slist  - list of SDR mat files
@@ -48,17 +47,13 @@
 % that anything that fails to conform to the naming scheme should be
 % a fatal error.
 %
-% If we find pre-calculated moving average files in adir, we use
+% If we find pre-calculated moving average files in avgdir, we use
 % those instead of locally calculated values
 %
 % NOTES/TO-DO
 %
-%  - using readspecX and calmainX for initial tests
-%
-%  - using readspec6/X to set interferometric parameters
-%
 %  - no parameter overrides yet; wlaser is from the eng packet,
-%    mspan is set inline here
+%    mvspan is set inline here
 %
 %  - common vs individual opts structs?
 %
@@ -80,8 +75,8 @@ addpath /home/motteler/cris/bcast/davet2
 % number of RDR files to process
 nfile = length(flist);
 
-% moving average span is 2 * mspan + 1
-mspan = 4;
+% moving average span is 2 * mvspan + 1
+mvspan = 4;
 
 % initialize sci and eng packet struct's
 eng1 = struct([]);
@@ -108,7 +103,7 @@ for fi = 1 : nfile
 
   % moving average filenames
   atmp = ['AVG_', rid, '.mat'];
-  afile = [opts.adir, '/', atmp];
+  afile = [opts.avgdir, '/', atmp];
 
   % skip processing if no matlab RDR file
   if ~exist(rfile, 'file')
@@ -121,7 +116,7 @@ for fi = 1 : nfile
 
   % RDR validation.  checkRDR returns data as nchan x 9 x nobs
   % arrays, ordered by time
-  [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR5f(d1, rid);
+  [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDRf(d1, rid);
 
   if isempty(igmTime)
     fprintf(1, 'rdr2sdr: no valid data, skipping file %s\n', rid)
@@ -143,24 +138,18 @@ for fi = 1 : nfile
   % get wlaser from the eng packet data
   wlaser = cris_metlaser_CCAST(eng.NeonCal);
 
-  % -----------------
-  % get count spectra
-  % -----------------
-
-% ropt = struct;
-% ropt.wlaser = wlaser;
-%
-% [rcLW, freqLW, optsLW] = readspec6(igmLW, 'LW', ropt);
-% [rcMW, freqMW, optsMW] = readspec6(igmMW, 'MW', ropt);
-% [rcSW, freqSW, optsSW] = readspec6(igmSW, 'SW', ropt);
-%
+  % get instrument and user grid parameters
   [instLW, userLW] = inst_params('LW', wlaser);
   [instMW, userMW] = inst_params('MW', wlaser);
   [instSW, userSW] = inst_params('SW', wlaser);
 
-  rcLW = igm2spec(igmLW, 'LW', instLW);
-  rcMW = igm2spec(igmMW, 'MW', instMW);
-  rcSW = igm2spec(igmSW, 'SW', instSW);
+  % -----------------
+  % get count spectra
+  % -----------------
+
+  rcLW = igm2spec(igmLW, instLW);
+  rcMW = igm2spec(igmMW, instMW);
+  rcSW = igm2spec(igmSW, instSW);
 
   [nchLW, m, n] = size(rcLW);
   [nchMW, m, n] = size(rcMW);
@@ -179,7 +168,7 @@ for fi = 1 : nfile
   % starts with FOR 1, this is just a reshape.
 
   [scLW, scMW, scSW, scTime, scFOR] = ...
-           scanorder2(rcLW, rcMW, rcSW, igmTime, igmFOR, igmSDR, rid);
+           scanorder(rcLW, rcMW, rcSW, igmTime, igmFOR, igmSDR, rid);
 
   [m, n, k, nscan] = size(scLW);
 
@@ -192,31 +181,23 @@ for fi = 1 : nfile
   if exist(afile) == 2
     load(afile)
   else
-    [avgLWSP, avgLWIT] = movavg_app(scLW(:, :, 31:34, :), mspan);
-    [avgMWSP, avgMWIT] = movavg_app(scMW(:, :, 31:34, :), mspan);
-    [avgSWSP, avgSWIT] = movavg_app(scSW(:, :, 31:34, :), mspan);
+    [avgLWSP, avgLWIT] = movavg_app(scLW(:, :, 31:34, :), mvspan);
+    [avgMWSP, avgMWIT] = movavg_app(scMW(:, :, 31:34, :), mvspan);
+    [avgSWSP, avgSWIT] = movavg_app(scSW(:, :, 31:34, :), mvspan);
   end
 
   % -----------------------
   % radiometric calibration
   % -----------------------
 
-  % calmain1 -- quick look rudimentary calibration
-  % calmain2 -- Dave's calibration code from ccast
-  % calmain3 -- all-res code derived from calmainX
-  % calmainX -- temporary high-res-only code
-
-  opt3 = struct;
-  opt3.wlaser = wlaser;
-  
   [rLW, vLW] = ...
-     calmain3(instLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opt3);
+     calmain3(instLW, userLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opts);
 
   [rMW, vMW] = ...
-     calmain3(instMW, scMW, scTime, avgMWIT, avgMWSP, sci, eng, opt3);
+     calmain3(instMW, userMW, scMW, scTime, avgMWIT, avgMWSP, sci, eng, opts);
 
   [rSW, vSW] = ...
-     calmain3(instSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opt3);
+     calmain3(instSW, userSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opts);
 
   % save data as an SDR mat file
   save(['SDR_', rid], ...

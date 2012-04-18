@@ -73,18 +73,18 @@ switch band
 
   case 'MW'
     df = 20;       % decimation factor
-%   npts = 528;    % number of decimated points
-%   c1ind = 420;   % first channel index
-    npts = 1037;   % hi res decimated points
-    c1ind = 824;   % hi res first channel index
+    npts = 528;    % number of decimated points
+    c1ind = 420;   % first channel index
+%   npts = 1037;   % hi res decimated points
+%   c1ind = 824;   % hi res first channel index
     vbase = 1;     % alias offset
 
   case 'SW'
     df = 26;       % decimation factor
-%   npts = 200;    % number of decimated points
-%   c1ind = 48;    % first channel index
-    npts = 797;    % hi res decimated points
-    c1ind = 192;   % hi res first channel index
+    npts = 200;    % number of decimated points
+    c1ind = 48;    % first channel index
+%   npts = 797;    % hi res decimated points
+%   c1ind = 192;   % hi res first channel index
     vbase = 4;     % alias offset
 
   otherwise

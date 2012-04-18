@@ -1,9 +1,9 @@
 %
 % NAME
-%   checkRDR5f.m - validate RDR data from the MIT reader
+%   checkRDRf.m - validate RDR data from the MIT reader
 %
 % SYNOPSIS
-%   [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR5f(d1, rid);
+%   [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDRf(d1, rid);
 %
 % INPUTS
 %   d1  - output structure from MIT reader
@@ -51,7 +51,7 @@
 %   H. Motteler, 26 Nov 2011
 %
 
-function [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR5f(d1, rid);
+function [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDRf(d1, rid);
 
 % factor to convert MIT time to IET, t_mit * mwt = t_ngas
 mwt = 8.64e7;

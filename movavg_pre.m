@@ -65,7 +65,7 @@ for fi = 1 : nfile
 
   % RDR validation.  checkRDR returns data as nchan x 9 x nobs
   % arrays, ordered by time
-  [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR5f(d1, rid);
+  [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDRf(d1, rid);
 
   % this frees up a big chunk of memory
   clear d1

@@ -4,7 +4,7 @@
 %
 % SYNOPSIS
 %   [rcal, vcal, msc] = ...
-%      calmain3(inst, rcnt, stime, avgIT, avgSP, sci, eng, opt);
+%      calmain3(inst, rcnt, stime, avgIT, avgSP, sci, eng, opts);
 %
 % INPUTS
 %   inst    - instrument params struct
@@ -14,7 +14,7 @@
 %   avgSP   - nchan x 9 x 2 x nscan, moving avg SP rad count
 %   sci     - struct array, data from 8-sec science packets
 %   eng     - struct, most recent engineering packet
-%   opt     - optional input parameters
+%   opts    - for now, everything else
 %
 % OUTPUTS
 %   rcal    - nchan x 9 x 30 x nscan, calibrated radiance
@@ -26,50 +26,50 @@
 %   general purpose version derived from hi-res only calmainX
 %
 %   this version of calmain implements the calibration equation as
-%   rICT*(SA-1*(ES-SP)/(ICT-SP).  It is modified to work with high
-%   res spectra.
+%   rICT*(SA-1*(ES-SP)/(ICT-SP).
 %
 
 function [rcal, vcal, msc] = ...
-     calmain3(inst, rcnt, stime, avgIT, avgSP, sci, eng, opt)
-
-vinst = inst.freq;
-band = inst.band;
+     calmain3(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, opts)
 
 % space temperature
 % spt = 2.7279;
 
-% get key dimensions
-[nchan, n, k, nscan] = size(rcnt);
+% sensor grid params
+vinst = inst.freq;
+wlaser = inst.wlaser;
+band = upper(inst.band);
 
-% --------------------
-% set up the SA matrix
-% --------------------
-
-% *** TEMPORARY *** set SRF file and band edges
+% get SRF tabulation file
 switch band
   case 'LW'
-    sfile = 'hiresX/SRF_v1_LW.mat';
-    uv1 = 650; uv2 = 1095; udv = 0.625;
+    sfile = opts.sfileLW;
   case 'MW'
-    sfile = 'hiresX/SRF_v1_MW.mat';
-    uv1 = 1210; uv2 = 1750; udv = 0.625;
+    sfile = opts.sfileMW;
   case 'SW'
-    sfile = 'hiresX/SRF_v1_SW.mat';
-    uv1 = 2155; uv2 = 2550; udv = 0.625;
+    sfile = opts.sfileSW;
 end
 
-% set the pre-transform passband.  This is applied to the ratio
-% (ES-SP)/(ICT-SP) before applying the SA-1 matrix.
-iv1 = vinst(1); iv2 = vinst(end);
+% user grid specs
+uv1 = user.v1;   % final passband lower bound
+uv2 = user.v2;   % final passband upper bound
+udv = user.dv;   % user-grid dv (for interpolation)
+
+% set the pre-transform passband.  This is applied to the 
+% ratio (ES-SP)/(ICT-SP) before applying the SA-1 matrix.
+% iv1 = vinst(1); iv2 = vinst(end);
 % pv1 = max(iv1, iv1 + (uv1 - iv1) / 2);
 % pv2 = min(iv2, iv2 - (iv2 - uv2) / 2);
 pv1 = uv1;
 pv2 = uv2;
 
-% get SA-1 for the current wlaser
-Smat = getSRFwl(inst.wlaser, sfile);
+% get key dimensions
+[nchan, n, k, nscan] = size(rcnt);
 
+% get SRF matrix for the current wlaser
+Smat = getSRFwl(wlaser, sfile);
+
+% take the inverse after interpolation
 Sinv = zeros(nchan, nchan, 9);
 for i = 1 : 9
   Sinv(:,:,i) = inv(squeeze(Smat(:,:,i)));

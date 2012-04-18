@@ -2,12 +2,12 @@
 % build SRF matrices
 
 wlist = [773.1300, 773.1305]
-sfile = 'SRF_v2_LW.mat';
+sfile = 'data/SRF_v33a_LW.mat';
 mkSRFwl('LW', wlist, sfile)
 
-sfile = 'SRF_v2_MW.mat';
+sfile = 'data/SRF_v33a_MW.mat';
 mkSRFwl('MW', wlist, sfile)
 
-sfile = 'SRF_v2_SW.mat';
+sfile = 'data/SRF_v33a_SW.mat';
 mkSRFwl('SW', wlist, sfile)
 

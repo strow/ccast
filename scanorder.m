@@ -3,14 +3,15 @@
 %   scanorder - use FOR values to group data into scans
 %
 % SYNOPSIS
-%   [swLW, swMW, swSW, swTime, swFOR] = ...
-%                scanorder(rcLW, rcMW, rcSW, igmTime, igmFOR, rid);
+%   [swLW, swMW, swSW, swTime, swSDR] = ...
+%         scanorder(rcLW, rcMW, rcSW, igmTime, igmFOR, igmSDR, rid);
 % INPUTS
 %   rcLW    - nchan x 9 x nobs, LW rad counts
 %   rcMW    - nchan x 9 x nobs, MW rad counts
 %   rcSW    - nchan x 9 x nobs, SW rad counts
 %   igmTime - nobs x 1, igm/rad count times
 %   igmFOR  - nobs x 1, igm/rad count FORs
+%   igmSDR  - nobs x 1, igm/rad count sweep direction
 %   rid     - file date and time ID
 %
 % OUTPUTS
@@ -18,7 +19,7 @@
 %   swMW   - nchan x 9 x 34 x nscan, MW rad counts
 %   swSW   - nchan x 9 x 34 x nscan, SW rad counts
 %   swTime - 34 x nscan, rad count times
-%   swFOR  - 34 x nscan, rad count FORs
+%   swSDR  - 34 x nscan, rad count SDRs
 %
 % DISCUSSION
 %
@@ -35,8 +36,8 @@
 %   H. Motteler, 30 Oct 2011
 %
 
-function [swLW, swMW, swSW, swTime, swFOR] = ...
-                scanorder(rcLW, rcMW, rcSW, igmTime, igmFOR, rid);
+function [swLW, swMW, swSW, swTime, swSDR] = ...
+          scanorder(rcLW, rcMW, rcSW, igmTime, igmFOR, igmSDR, rid);
 
 [nchLW, m, n] = size(rcLW);
 [nchMW, m, n] = size(rcMW);
@@ -68,6 +69,7 @@ swLW = ones(nchLW, 9, 34, nscan) * NaN;
 swMW = ones(nchMW, 9, 34, nscan) * NaN;
 swSW = ones(nchSW, 9, 34, nscan) * NaN;
 swFOR = ones(34, nscan) * NaN;
+swSDR = ones(34, nscan) * NaN;
 swTime = ones(34, nscan) * NaN;
 
 % ----------------------------
@@ -83,26 +85,32 @@ for si = 1 : nscan
   iIT = ix(igmFOR(ix) == 0);
   iSP = ix(igmFOR(ix) == 31);
 
-  % assign ES data for this swath by its FOR indices
-  swLW(:, :, igmFOR(iES), si) = rcLW(:, :, iES);
-  swMW(:, :, igmFOR(iES), si) = rcMW(:, :, iES);
-  swSW(:, :, igmFOR(iES), si) = rcSW(:, :, iES);
-  swFOR(igmFOR(iES), si) = igmFOR(iES);  
-  swTime(igmFOR(iES), si) = igmTime(iES);  
+  % assign ES data for the swath by FOR indices
+  itmp = igmFOR(iES);
+  swLW(:, :, itmp, si) = rcLW(:, :, iES);
+  swMW(:, :, itmp, si) = rcMW(:, :, iES);
+  swSW(:, :, itmp, si) = rcSW(:, :, iES);
+  swFOR(itmp, si) = itmp;  
+  swSDR(itmp, si) = igmSDR(iES);  
+  swTime(itmp, si) = igmTime(iES);  
 
-  % assign SP and IT data by position
-  itmp = 31:(30+length(iSP));
+  % assign SP and IT data by sweep direction
+% itmp = 31 + igmSDR(iSP);
+  itmp = 31 + (1 - igmSDR(iSP));
   swLW(:, :, itmp, si) = rcLW(:, :, iSP);
   swMW(:, :, itmp, si) = rcMW(:, :, iSP);
   swSW(:, :, itmp, si) = rcSW(:, :, iSP);
   swFOR(itmp, si) = igmFOR(iSP);  
+  swSDR(itmp, si) = igmSDR(iSP);  
   swTime(itmp, si) = igmTime(iSP);  
 
-  itmp = 33:(32+length(iIT));
+% itmp = 33 + igmSDR(iIT);
+  itmp = 33 + (1 - igmSDR(iIT));
   swLW(:, :, itmp, si) = rcLW(:, :, iIT);
   swMW(:, :, itmp, si) = rcMW(:, :, iIT);
   swSW(:, :, itmp, si) = rcSW(:, :, iIT);
   swFOR(itmp, si) = igmFOR(iIT);  
+  swSDR(itmp, si) = igmSDR(iIT);  
   swTime(itmp, si) = igmTime(iIT);  
 
   % check ES time steps
@@ -113,26 +121,32 @@ for si = 1 : nscan
   swTmin1 = min(diff(tmpTime));
 
   if swTmax1 > 210
-    fprintf(1, 'ES time step %.0f too big, swath %d file %s\n', ...
+    fprintf(1, 'scanorder: ES time step %.0f too big, scan %d file %s\n', ...
             swTmax1, si, rid);
   end
   if swTmin1 < 190
-     fprintf(1, 'ES time step %.1f too small, swath %d file %s\n', ...
+     fprintf(1, 'scanorder: ES time step %.1f too small, scan %d file %s\n', ...
              swTmin1, si, rid);
   end
 end 
 
-% ---------------------------------------
-% sanity checks of FOR and time sequences
-% ---------------------------------------
+% ---------------------------------------------
+% sanity checks of FOR, SDR, and time sequences
+% ---------------------------------------------
 
 tmpFOR = swFOR(~isnan(swFOR));
 if ~isequal(igmFOR, tmpFOR)
-   fprintf(1, 'FOR sequence mismatch, file %s\n', rid);
+   fprintf(1, 'scanorder: FOR sequence mismatch, file %s\n', rid);
+end
+
+tmpSDR = swSDR(~isnan(swSDR));
+if ~isequal(igmSDR, tmpSDR)
+   fprintf(1, 'scanorder: SDR sequence mismatch, file %s\n', rid);
+%  keyboard
 end
 
 tmpTime = swTime(~isnan(swTime));
 if ~isequal(igmTime, tmpTime)
-   fprintf(1, 'Time sequence mismatch, file %s\n', rid);
+   fprintf(1, 'scanorder: Time sequence mismatch, file %s\n', rid);
 end
  

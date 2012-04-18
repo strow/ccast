@@ -1,5 +1,5 @@
 %
-% checkRDR5 -- validate MIT RDR data 
+% checkRDR -- validate MIT RDR data 
 %
 % Loops on MIT RDR mat files.  Merges all 81 timelines (9 fovs x 3
 % bands x 3 obs types) to a single sorted list of unique times, does

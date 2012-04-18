@@ -1,19 +1,21 @@
 %
 % NAME
-%   igm2spec - get spectra from a CrIS RDR interferogram
+%   igm2spec - take interferograms to uncalibrated spectra
 %
 % SYNOPSIS
-%   spec = igm2spec(igm, band, inst);
+%   spec = igm2spec(igm, inst);
 %
 % INPUTS
-%   igm   - matlab IGM struct
-%   band  - 'LW', 'MW', or 'SW'
-%   inst  - instrument grid specs
+%   igm   - nchan x 9 x nobs interferograms
+%   inst  - instrument interferometric specs
 % 
 % OUTPUTS
-%   spec  - nchan x nsamp x 9 radiance data
+%   spec  - nchan x 9 x nobs count spectra
 %
 % DISCUSSION
+%   the input array actually has nchan+2 points in the first
+%   dimension, but the first and last are "guard points" are
+%   simply dropped here.
 %
 %   derived from readspecX and the ccast function ifg2spectra.m
 %   with parameter calc's split off into inst_params.m
@@ -25,7 +27,9 @@
 %   H. Motteler, 10 Apr 2012
 %
 
-function spec = igm2spec(igm, band, inst)
+function spec = igm2spec(igm, inst)
+
+band = upper(inst.band);
 
 % shape of input data
 [m,n,nifg] = size(igm);
