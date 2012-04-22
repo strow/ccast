@@ -201,6 +201,7 @@ for fi = 1 : nfile
 
   % save data as an SDR mat file
   save(['SDR_', rid], ...
+        'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
         'rLW','vLW','rMW','vMW','rSW','vSW','scTime','sci','eng','rid')
 
 end

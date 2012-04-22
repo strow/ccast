@@ -114,18 +114,17 @@ for si = 1 : nscan   % loop on scans
 
     rtmp = squeeze(real(rcal(:,fi,:,si)));  
 
-    rtmp = bandpass(rtmp, vinst, pv1, pv2);
+    rtmp = bandpass(vinst, rtmp, pv1, pv2);
 
     rtmp = rIT .* (Sinv(:,:,fi) * rtmp);
 
-    rtmp = bandpass(rtmp, vinst, pv1, pv2);
+    rtmp = bandpass(vinst, rtmp, pv1, pv2);
 
     [rtmp, vcal] = finterp(rtmp, vinst, udv);
 
-    rtmp = bandpass(rtmp, vcal, uv1, uv2);
+    rtmp = bandpass(vcal, rtmp, uv1, uv2);
 
-    % this is temporary, eventually we should trim rcal to match 
-    % the final bandpass
+    % save the current nchan x 30 chunk
     [n,k] = size(rtmp);
     n = min(n, nchan);
     rcal(1:n,fi,:,si) = rtmp(1:n, :);
@@ -133,7 +132,8 @@ for si = 1 : nscan   % loop on scans
   end
 end
 
-% vcal = vinst;
+% trim to interpolated channel set
 vcal = vcal(1:n);
+rcal = rcal(1:n, :, :, :);
 msc = struct;
 

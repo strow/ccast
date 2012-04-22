@@ -8,6 +8,7 @@ rdir = '/asl/data/cris/rdr60/mat/2012/056';
 % RDR file list
 flist = dir(sprintf('%s/RDR*.mat', rdir));
 flist = flist(61:64);
+% flist = flist(71:72);
 
 % SDR mat files
 sdir = '.';      
@@ -20,10 +21,10 @@ opts.sfileLW = 'data/SRF_v33a_LW.mat';  % LW SRF table
 opts.sfileMW = 'data/SRF_v33a_MW.mat';  % MW SRF table
 opts.sfileSW = 'data/SRF_v33a_SW.mat';  % SW SRF table
 
-% profile clear
-% profile on
+profile clear
+profile on
 
 [slist, msc] = rdr2sdr(flist, rdir, sdir, opts);
 
-% profile viewer
+profile viewer
 
