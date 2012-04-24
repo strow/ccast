@@ -1,100 +1,52 @@
 
-major processing steps
+Some of the main procedures 
+-----------------------------
 
-  rdr2mat    - wrapper for the MIT reader
-  movavg_pre - moving averages preprocessor
-  rdr2sdr    - main function for RDR to SDR processing
+rdr2mat     - process RDR h5 files to mat files
 
-a family of proposed procedures for output processing
+rdr2sdr     - process RDR mat files to SDR mat files
+scipack     - process sci and eng packets
+checkRDRf   - validate the RDR data
+scanorder   - group data into scans
+calmain2    - main calibration procedure, Dave T. version
+calmain3    - main calibration procedure, new hi res branch
 
-  sdr2rtp    - save SDRs as RTP files
-  sdr2netcdf - save SDRs as netcdf files
-  sdr2map    - tile SDRs for fancy maps, data QC, etc.
+igm2spec    - take interferograms to uncalibrated spectra
+inst_params - set selected instrument parameters
+movavg_pre  - preprocess moving averages
+movavg_app  - calculate or load moving averages
 
-For example sdr2rtp would
- 
-  - load the SDR data
-  - read any metadata needed from the hdf rdr file
-  - do geolocation (calculated or maybe from GCRSO* files)
-  - do time matching for sci, eng, geo (if from a file), meta data,
-    and things like stats flags
-  - loop on spectral data in time order and write the RTP files
+oaffov2     - spectral space SRF, Scott & Dave
+mkSRFwl     - build SRF matrix tables for interpolation
+getSRFwl    - wlaser SRF matrix interpolation
+finterp     - fourier interpolation for FTIR data
+bandpass    - spectral domain bandpass filter
 
-sdr2netcdf would be similar but might also do tiling, depending on
-how you want to organize the netcdf data.
+sdr2rtp     - process SDR mat files to RTP files
 
-These procedures communicate thru files
+davet/  - Dave's procedures (mostly from dcast) go here temporarily,
+          as needed, after they are checked out to be compatible with 
+          current version of the code.  mostly called by calmain2
 
-  RDR_<rid>.mat  -- RDR mat files, from rdr2mat
-  avg_<rid>.mat  -- moving average files, from movavg_pre
-  SDR_<rid>.mat  -- SDR mat files, from this rdr2sdr
-
-where <rid> is a string of the form tYYYYMMDD_dHHMMSSS taken from
-the RDR HDF5 file.  What goes into the SDR mat files is whatever we
-want--all the things we discussed that might be useful for the RTP
-files, for starters.
-
-For now the sdr2rtp stuff is just an outline.  I need a usable
-version of rdr2sdr, the main function for RDR to SDR processing,
-before we can do anything else.
+davet2/ - Earlier versions of Dave's code, before the 20 Dec fork.
 
 
-old design overview for the RDR to SDR processing  
---------------------------------------------------
+To Do List
+-----------
 
-Preliminary
+bring Dave's "science core" from dcast into the current calmain2.
+the main task remaining is to update the old calmain2 interface
 
-  run MIT reader on RDR HDF files
-  (probably an entirely separate process)
+test out the file-spanning moving averages with the new code.
+I haven't looked at this for a while
 
-  specify a path and list of RDR mat files
+integrate the geo struct from do_allgeo.m.  probably want to call
+this from the wrapper.  Can't simply pass in a list of rid string
+since this uses the IDPS SDR naming scheme.  Could simply process a
+day at a time.
 
-  set any structure and/or file parameters
+add Dave's non-linearity correction and ICT radiance modeling to
+the calmain3 branch
 
-
-Loop on RDR mat files (moving average loop)
-
-  calculate moving averages with a 3-file moving window, details
-  are similar to (1-5) below (movavg_pre.m)
-
-
-Loop on RDR mat files (main loop)
-
-  (1) load a 60-scan matlab RDR file
-  
-  (2) organize the data as nchan x 9 x nobs arrays, in column and
-      time order, and do some validation checks (checkRDRf.m)
-
-  (3) read and process sci and eng data, get ICT temps and 
-      current met laser value (scipack.m)
-
-  (4) translate the RDR pseudo-interferograms to count spectra
-      (ifg2spectra.m/readspec6.m)
-
-  (5) organize the data into scans, as nchan x 9 x 34 x nscan arrays,
-      and do some more validation checks (scanorder.m)
-
-  (6) if available load file-spanning calibration averages, else
-      calculate single-file moving averages (movavg_app.m)
-
-  (7) non-linearity correction (calmain2.m)
-
-  (8) self apodization correction (selfApodCorr.m)
-
-  (9) radiometric calibration (radcal.m)
-
-  (10) resample to user wavenumber grid and resolution
-       (applyResampling.m)
-
-  (11) save calibrated SDR data as mat files
-
-
-Loop on SDR mat files (archival loop)
-
-  (1) do geolocation
-  
-  (2) for netCDF or HDF archives, reshape data so files always
-      begins with ES 1.  This needs at least a 2-file moving window
-
-  (3) save SDR files in archival format (netCDF, HDF, or RTP files)
+add some documentation
 

@@ -1,3 +1,4 @@
 # initial git ignore file
 *.fig   # no fig files
 *.mat   # no mat files
+*~      # no backup files

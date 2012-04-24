@@ -37,7 +37,7 @@ function [rlist, msc] = sdr2rtp(flist, sdir, rdir, opts);
 
 % Temporary working paths
 addpath /home/motteler/cris/bcast
-addpath /home/motteler/cris/bcast/davet2
+addpath /home/motteler/cris/bcast/davet
 
 % number of SDR files to process
 nfile = length(flist);

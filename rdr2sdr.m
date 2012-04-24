@@ -70,7 +70,7 @@ function [slist, msc] = rdr2sdr(flist, rdir, sdir, opts);
 
 % TEMPORARY working paths
 addpath /home/motteler/cris/bcast
-addpath /home/motteler/cris/bcast/davet2
+addpath /home/motteler/cris/bcast/davet
 
 % number of RDR files to process
 nfile = length(flist);
@@ -136,7 +136,7 @@ for fi = 1 : nfile
   end
 
   % get wlaser from the eng packet data
-  wlaser = cris_metlaser_CCAST(eng.NeonCal);
+  wlaser = metlaser(eng.NeonCal);
 
   % get instrument and user grid parameters
   [instLW, userLW] = inst_params('LW', wlaser);

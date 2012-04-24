@@ -8,7 +8,7 @@
 function do_allsci(doy)
 
 % path to Dave's temp and ICT procedures
-addpath /home/motteler/cris/rdr2spec5/davet2
+addpath /home/motteler/cris/bcast/davet
 
 % 2012 date as day of year
 % doy = '063';

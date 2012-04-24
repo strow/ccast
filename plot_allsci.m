@@ -17,7 +17,7 @@ mlaser = zeros(n, 1);
 % loop on eng records
 for i = 1 : n
   % mtime is time from Neon Cal fields, matlab units?
-  [mlaser(i), mtime(i)] = cris_metlaser_CCAST(alleng(i).NeonCal);
+  [mlaser(i), mtime(i)] = metlaser(alleng(i).NeonCal);
 
   % eng packet start time, in milliseconds since 1958
   ptime(i) = alleng(i).four_min_eng.time(1);
