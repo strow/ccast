@@ -191,13 +191,13 @@ for fi = 1 : nfile
   % -----------------------
 
   [rLW, vLW] = ...
-     calmain3(instLW, userLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opts);
+     calmain4(instLW, userLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opts);
 
   [rMW, vMW] = ...
-     calmain3(instMW, userMW, scMW, scTime, avgMWIT, avgMWSP, sci, eng, opts);
+     calmain4(instMW, userMW, scMW, scTime, avgMWIT, avgMWSP, sci, eng, opts);
 
   [rSW, vSW] = ...
-     calmain3(instSW, userSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opts);
+     calmain4(instSW, userSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opts);
 
   % save data as an SDR mat file
   save(['SDR_', rid], ...

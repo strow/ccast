@@ -35,7 +35,15 @@ To Do List
 -----------
 
 bring Dave's "science core" from dcast into the current calmain2.
-the main task remaining is to update the old calmain2 interface
+this is a 3-way merge of calmain3 initial parts, the old current
+calmain2 here, and calmain2 from dcast.
+
+current calmain2 -- prototype for dcast version; this has the sweep
+direction fix and my initial setup for calls to ICTradModel, nlc, and 
+nlc params load w/ sweep direction fix
+
+current calmain3 -- history is calmain1 -> calmainX -> calmain3;
+has my spectral cal but needs needs emiss and nonlinearity code
 
 test out the file-spanning moving averages with the new code.
 I haven't looked at this for a while

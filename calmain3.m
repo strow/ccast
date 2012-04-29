@@ -23,11 +23,16 @@
 %
 % DISCUSSION
 %
-%   general purpose version derived from hi-res only calmainX
+%   general purpose version derived from hi-res calmainX, which
+%   in turn was derived from calmain1
 %
 %   this version of calmain implements the calibration equation as
-%   rICT*(SA-1*(ES-SP)/(ICT-SP).
+%   rICT*(SA-1*(ES-SP)/(ICT-SP).  it works with both regular and
+%   hi-res data but doesn't include ICT radiance modeling or the
+%   onlinearity correction.
 %
+% AUTHOR
+%   H. Motteler, 20 Apr 2012
 
 function [rcal, vcal, msc] = ...
      calmain3(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, opts)
