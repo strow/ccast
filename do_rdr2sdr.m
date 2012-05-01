@@ -2,13 +2,19 @@
 % call rdr2sdr on regular data
 %
 
+% set bcast paths
+addpath /home/motteler/cris/bcast
+addpath /home/motteler/cris/bcast/davet
+
 % RDR mat files
-rdir = '/asl/data/cris/rdr60/mat/2012/056';
+% rdir = '/asl/data/cris/rdr60/mat/2012/056';
+rdir = '/asl/data/cris/rdr60/mat/2012/118';
 
 % RDR file list
 flist = dir(sprintf('%s/RDR*.mat', rdir));
-flist = flist(61:64);
-% flist = flist(71:72);
+% flist = flist(61:64);
+flist = flist(81:84);
+% flist = flist(65:68);
 
 % SDR mat files
 sdir = '.';      

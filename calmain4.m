@@ -50,6 +50,11 @@ control.NF = control.NF.NF;
 % initialize the output array
 rcal = ones(nchan, 9, 30, nscan) * NaN;
 
+% initialize working arrays
+es_nlc = ones(nchan, 1) * NaN;
+sp_nlc = ones(nchan, 2) * NaN;
+it_nlc = ones(nchan, 2) * NaN;
+
 % local names for some sensor grid params
 vinst = inst.freq;
 wlaser = inst.wlaser;
@@ -110,45 +115,36 @@ for si = 1 : nscan   % loop on scans
   rIT = B.total(:) * ones(1, 30);
 
   for iFov = 1 : 9  % loop on FOVs
+    for k = 1 : 2   % loop on sweep directions
+ 
+      % do the ICT and space look nonlinearity corrections
+      [sp_nlc(:, k), extra] = nlc(band, iFov, vinst, ...
+                                  avgSP(:, iFov, k, si), ...
+                                  avgSP(:, iFov, k, si), ...
+                                  eng.PGA_Gain, control);   
 
-    % apply nonlinearity correction to ICT and space views
-    % *** NOTE: fold this into 2 cases w/ loop, 2 elem arrays ***
-    [sp_nlc1, extra] = nlc(band, iFov, vinst, ...
-                           avgSP(:, iFov, 1, si), ...
-                           avgSP(:, iFov, 1, si), ...
-                           eng.PGA_Gain, control);   
-
-    [sp_nlc2, extra] = nlc(band, iFov, vinst, ...
-                           avgSP(:, iFov, 2, si), ...
-                           avgSP(:, iFov, 2, si), ...
-                           eng.PGA_Gain, control);   
-
-    [it_nlc1, extra] = nlc(band, iFov, vinst, ...
-                           avgIT(:, iFov, 1, si), ...
-                           avgSP(:, iFov, 1, si), ...
-                           eng.PGA_Gain, control);   
-
-    [it_nlc2, extra] = nlc(band, iFov, vinst, ...
-                           avgIT(:, iFov, 2, si), ...
-                           avgSP(:, iFov, 2, si), ...
-                           eng.PGA_Gain, control);   
+      [it_nlc(:, k), extra] = nlc(band, iFov, vinst, ...
+                                  avgIT(:, iFov, k, si), ...
+                                  avgSP(:, iFov, k, si), ...
+                                  eng.PGA_Gain, control);   
+    end    
 
     for iES = 1 : 30  % loop on ES
 
-      % apply nonlinearity correction to each ES
-      % *** NOTE: this needs cases by sweep dir for SP look match ***
+      % match ES and cal sweep directions.  The ES and cal indices
+      % have opposite parity for real instrument (vs 2010 test) data
+%     k = 2 - mod(iES, 2);  % same parity for 2010 proxy data
+      k = mod(iES, 2) + 1;  % opposite parity for all real data
+
+      % do the ES nonlinearity correction
       [es_nlc, extra] = nlc(band, iFov, vinst, ...
                             rcnt(:, iFov, iES, si), ...
-                            avgSP(:, iFov, 1, si), ...
+                            avgSP(:, iFov, k, si), ...
                             eng.PGA_Gain, control);   
 
-      % match sweep direction and do the radiometric calibration
-%     if mod(iES, 2) == 1   % for 2010 proxy data
-      if mod(iES, 2) == 0   % for all real data
-        rcal(:, iFov, iES, si) = (es_nlc - sp_nlc1)./(it_nlc1 - sp_nlc1);
-      else
-        rcal(:, iFov, iES, si) = (es_nlc - sp_nlc2)./(it_nlc2 - sp_nlc2);
-      end
+      % calculate (ES-SP)/(ICT-SP), accounting for sweep direction
+      rcal(:, iFov, iES, si) = ...
+              (es_nlc - sp_nlc(:,k)) ./ (it_nlc(:,k) - sp_nlc(:,k));
 
     end     % loop on ES
   end       % loop on FOVs

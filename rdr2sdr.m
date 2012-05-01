@@ -68,10 +68,6 @@
 
 function [slist, msc] = rdr2sdr(flist, rdir, sdir, opts);
 
-% TEMPORARY working paths
-addpath /home/motteler/cris/bcast
-addpath /home/motteler/cris/bcast/davet
-
 % number of RDR files to process
 nfile = length(flist);
 
