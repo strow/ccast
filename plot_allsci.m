@@ -1,18 +1,34 @@
+% 
+% sample plots of sci and eng data
 %
-% sample plot of sci and eng data
-%
+%   - enter a date
+%   - read allsci<yyyymmdd>.mat for that date
+%   - plot ICT temperatures 1 & 2 vs time (hours)
+%   - plot metrology laser wavelength vs time (hours)
+% 
 
-% factor to convert MIT time to IET, t_mit * mwt = t_ngas
+% factor to convert MIT to IET time
 mwt = 8.64e7;
 
-load('allsci20120209')   % allsci source file
-dstr = '9 Feb 2012';    % date for plot title
-fstr = strrep(dstr, ' ', '_');  % date string for save files
+% path to allsci data
+daily_mat = '/home/motteler/cris/data/2012/daily';  
+
+% get matlab date number
+dnum = datenum(input('date > ', 's'));
+
+% load the allsci file
+tmp = datestr(dnum, 30);
+scifile = fullfile(daily_mat, ['allsci', tmp(1:8), '.mat']);
+load(scifile)
+
+dstr = datestr(dnum, 1);   % date for plot title 
+fstr = tmp(1:8);           % date string for save files
 
 n = length(alleng);
-etime = zeros(n, 1);
-mtime = zeros(n, 1);
+etime  = zeros(n, 1);
+mtime  = zeros(n, 1);
 mlaser = zeros(n, 1);
+ptime  = zeros(n, 1);
 
 % loop on eng records
 for i = 1 : n
@@ -34,7 +50,6 @@ xlabel('hour')
 ylabel('met laser wavelength')
 grid
 saveas(gcf, ['met_', fstr], 'fig')
-
 
 % plot ICT temps vs eng packet time
 figure(2)

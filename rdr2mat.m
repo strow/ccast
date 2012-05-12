@@ -1,36 +1,55 @@
-
-% process RDR h5 files to mat files
+% 
+% NAME
+%   rdr2mat - process RDR h5 files to mat files 
 %
-% This version is for 60-scan granules.  It drops files smaller than
-% 6 Mb, those are probably 4-scan files.  When duplicate rid strings
-% (date and start times) are found, the most recent version is used.
+% SYNOPSIS
+%   rdr2mat(doy, hdir, mdir)
+%
+% INPUTS
+%   doy   - day-of-year directory, a 3-char string
+%   hdir  - path to HDF RDR year (input)
+%   mdir  - path to matlab RDR year (output)
+%
+% OUTPUT
+%   a mat file RDR_<rid>.mat containing structs d1 and m1, as read
+%   and organized by the MIT RDR reader
+%
+% DISCUSSION
+%   This version is for 60-scan granules.  It drops files smaller than
+%   6 Mb, those are probably 4-scan files.  When duplicate rid strings
+%   (date and start times) are found, the most recent version is used.
+%
+%   The MIT reader has been modified to return sweep direction and to
+%   be slightly less verbose
+%
 
-function rdr2mat(doy)
+function rdr2mat(doy, hdir, mdir)
 
-more off
-% clear all
-
-% addpath /home/motteler/cris/MITreader341
-% addpath /home/motteler/cris/MITreader341/CrIS
-% addpath /home/motteler/cris/MITreader351
-% addpath /home/motteler/cris/MITreader351/CrIS
+% path to MIT readers
 addpath /home/motteler/cris/MITreader380
 addpath /home/motteler/cris/MITreader380/CrIS
 
-% 2012 date as day of year
-% doy = '064';
+% default path to HDF RDR year
+if nargin < 2
+  hdir = '/asl/data/cris/rdr60/hdf/2012/';
+end
 
-% h5 RDR data source
-hdir = ['/asl/data/cris/rdr60/hdf/2012/', doy];
+% default path to matlab RDR year
+if nargin < 3
+  mdir = '/asl/data/cris/rdr60/mat/2012/';
+end
 
-% matlab RDR output directory
-rdir = ['/asl/data/cris/rdr60/mat/2012/', doy];
+% full path to RDR h5 data source
+hsrc = fullfile(hdir, doy);
+
+% full path for matlab RDR output
+mout = fullfile(mdir, doy);
 
 % make sure the RDR directory exists
-unix(['mkdir -p ', rdir]);
+unix(['mkdir -p ', mout]);
 
 % get initial list of HDF RDR files
-hlist = dir(sprintf('%s/RCRIS-RNSCA_npp*.h5', hdir));
+hlist = dir(fullfile(hsrc, 'RCRIS-RNSCA_npp*.h5'));
 
 % drop small files
 ix = find([hlist.bytes] > 6000000);
@@ -55,12 +74,12 @@ hlist = hlist(ix);
 for ix = 1 : length(hlist)
 
   % HDF RDR file
-  hfile = [hdir, '/', hlist(ix).name];
+  hfile = fullfile(hsrc, hlist(ix).name);
 
   % matlab RDR file
   rid = hlist(ix).name(17:34);
   rtmp = ['RDR_', rid, '.mat'];
-  rfile = [rdir, '/', rtmp];
+  rfile = fullfile(mout, rtmp);
 
   % check if the matlab RDR file already exists
   if exist(rfile) == 2
@@ -84,3 +103,4 @@ for ix = 1 : length(hlist)
   save(rfile, 'd1', 'm1');
 
 end
+

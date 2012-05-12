@@ -32,8 +32,8 @@
 %   movavg_app - calculate or load moving averages
 %   calmain[n] - radiometric and spectral calibration
 %
-% rdr2sdr is part of a processing chain in which the major
-% steps communicate by files, named as follows:
+% rdr2sdr is part of a processing chain in which the major steps
+% communicate by files, with the following naming scheme
 %
 %   RDR_<rid>.mat  -- RDR mat files, from rdr2mat
 %   avg_<rid>.mat  -- moving average files, from movavg_pre
@@ -82,6 +82,14 @@ allsci = struct([]);
 msc = struct;
 slist = struct([]);
 
+% load geo data, defines structs allgeo, allgid
+if exist(opts.geofile, 'file')
+  load(opts.geofile)
+else
+  fprintf(1, 'rdr2sdr: no geo file %s\n', opts.geofile)
+  return
+end
+
 % -------------------------
 % loop on MIT RDR mat files
 % -------------------------
@@ -95,15 +103,22 @@ for fi = 1 : nfile
   % MIT matlab RDR data file
   rid = flist(fi).name(5:22);
   rtmp = ['RDR_', rid, '.mat'];
-  rfile = [rdir, '/', rtmp];
+  rfile = fullfile(rdir, rtmp);
+
+  % our matlab SDR output file
+  stmp = ['SDR_', rid, '.mat'];
+  sfile = fullfile(sdir, stmp);
 
   % moving average filenames
   atmp = ['AVG_', rid, '.mat'];
-  afile = [opts.avgdir, '/', atmp];
+  afile = fullfile(opts.avgdir, atmp);
 
-  % skip processing if no matlab RDR file
-  if ~exist(rfile, 'file')
-    fprintf(1, 'RDR file missing, index %d file %s\n', fi, rid)
+  % print a short status message
+  if exist(rfile, 'file')
+    fprintf(1, 'rdr2sdr: processing index %d file %s\n', fi, rid)
+  else
+    % skip processing if no matlab RDR file
+    fprintf(1, 'rdr2sdr: RDR file missing, index %d file %s\n', fi, rid)
     continue
   end
 
@@ -170,6 +185,11 @@ for fi = 1 : nfile
 
   clear rcLW rcMW rcSW
 
+  % match geo data to scanorder grid
+  geo = geo_match(allgeo, scTime);
+
+  continue  % ******* TEMP for geo tests TEMP *******
+
   % ----------------------------------------------
   % get moving averages of SP and IT count spectra
   % ----------------------------------------------
@@ -186,6 +206,7 @@ for fi = 1 : nfile
   % radiometric calibration
   % -----------------------
 
+  
   [rLW, vLW] = ...
      calmain4(instLW, userLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opts);
 
@@ -196,7 +217,7 @@ for fi = 1 : nfile
      calmain4(instSW, userSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opts);
 
   % save data as an SDR mat file
-  save(['SDR_', rid], ...
+  save(sfile, ...
         'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
         'rLW','vLW','rMW','vMW','rSW','vSW','scTime','sci','eng','rid')
 
