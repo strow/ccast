@@ -4,16 +4,18 @@
 %
 % SYNOPSIS
 %   [rcal, vcal, msc] = ...
-%      calmain4(inst, rcnt, stime, avgIT, avgSP, sci, eng, opts);
+%      calmain4(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
 %
 % INPUTS
 %   inst    - instrument params struct
+%   user    - user grid params struct
 %   rcnt    - nchan x 9 x 34 x nscan, rad counts
 %   stime   - 34 x nscan, rad count times
 %   avgIT   - nchan x 9 x 2 x nscan, moving avg IT rad count
 %   avgSP   - nchan x 9 x 2 x nscan, moving avg SP rad count
 %   sci     - struct array, data from 8-sec science packets
 %   eng     - struct, most recent engineering packet
+%   geo     - struct, GCRSO fields from geo_match
 %   opts    - for now, everything else
 %
 % OUTPUTS
@@ -37,7 +39,7 @@
 %   H. Motteler, 26 Apr 2012
 
 function [rcal, vcal, msc] = ...
-     calmain4(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, opts)
+     calmain4(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts)
 
 % load parameters for nlc()
 control = load(opts.DClevel_file);

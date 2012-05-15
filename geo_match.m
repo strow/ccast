@@ -44,6 +44,9 @@ if m1 ~= 30 || m2 ~= 34
   error('bad input size')
 end
 
+% 18 char filler for missing gid 
+gfill = 'xxxxxxxxxxxxxxxxxx';
+
 % RDR offset from SDR time, in ms
 dtRDR = 1817;
 
@@ -66,6 +69,9 @@ geo_out.SatelliteZenithAngle  = ones(9, 30, nscan2) * NaN;
 geo_out.SolarAzimuthAngle     = ones(9, 30, nscan2) * NaN;
 geo_out.SolarZenithAngle      = ones(9, 30, nscan2) * NaN;
 geo_out.StartTime             = ones(nscan2, 1) * NaN;
+
+geo_out.sdr_gid = char(ones(nscan2, 1) * double(gfill));
+geo_out.sdr_ind = ones(nscan2, 1) * NaN;
 
 %-------------------
 % geo time and index
@@ -170,13 +176,12 @@ geo_out.SolarAzimuthAngle(:,:,rind)     = double(geo_in.SolarAzimuthAngle(:,:,si
 geo_out.SolarZenithAngle(:,:,rind)      = double(geo_in.SolarZenithAngle(:,:,sind));
 geo_out.StartTime(rind)      = double(geo_in.StartTime(sind));
 
-% tmp1 = ones(30, nscan2) * NaN;
-% tmp1(:, rind) = double(geo_in.FORTime(:, sind)) / 1000;
+geo_out.sdr_gid(rind,:) = geo_in.sdr_gid(sind,:);
+geo_out.sdr_ind(rind)   = geo_in.sdr_ind(sind);
 
 %------------------
 % time sanity check
 %------------------
-
 tmp1 = geo_out.FORTime / 1000;
 tmp2 = swTime(1:30, :) + dtRDR;
 % plot(tmp1(:) - tmp2(:))
@@ -193,7 +198,7 @@ if dtout > 0.002 || dtint > 0.002
 end
 
 % this is still only a 1 ms error, but for now check it out
-if max(dtout) > 1
-  keyboard
-end
+% if max(dtout) > 1
+%   keyboard
+% end
 

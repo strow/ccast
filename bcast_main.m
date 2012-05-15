@@ -28,11 +28,13 @@ rdir = fullfile(RDR_mat, doy);
 % full path to matlab SDR files
 sdir = fullfile(SDR_mat, doy);
 
+% create the matlab SDR directory, if necessary
+unix(['mkdir -p ', sdir]);
+
 % get matlab RDR file list
 flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(61:64);
 % flist = flist(2:(end-1));
-flist = flist(26:end);
 
 % initialize opts
 opts = struct;

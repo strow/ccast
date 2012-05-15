@@ -188,8 +188,6 @@ for fi = 1 : nfile
   % match geo data to scanorder grid
   geo = geo_match(allgeo, scTime);
 
-  continue  % ******* TEMP for geo tests TEMP *******
-
   % ----------------------------------------------
   % get moving averages of SP and IT count spectra
   % ----------------------------------------------
@@ -205,21 +203,21 @@ for fi = 1 : nfile
   % -----------------------
   % radiometric calibration
   % -----------------------
-
   
-  [rLW, vLW] = ...
-     calmain4(instLW, userLW, scLW, scTime, avgLWIT, avgLWSP, sci, eng, opts);
+  [rLW, vLW] = calmain4(instLW, userLW, scLW, scTime, ...
+                        avgLWIT, avgLWSP, sci, eng, geo, opts);
 
-  [rMW, vMW] = ...
-     calmain4(instMW, userMW, scMW, scTime, avgMWIT, avgMWSP, sci, eng, opts);
+  [rMW, vMW] = calmain4(instMW, userMW, scMW, scTime, ...
+                        avgMWIT, avgMWSP, sci, eng, geo, opts);
 
-  [rSW, vSW] = ...
-     calmain4(instSW, userSW, scSW, scTime, avgSWIT, avgSWSP, sci, eng, opts);
+  [rSW, vSW] = calmain4(instSW, userSW, scSW, scTime, ...
+                        avgSWIT, avgSWSP, sci, eng, geo, opts);
 
   % save data as an SDR mat file
   save(sfile, ...
-        'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
-        'rLW','vLW','rMW','vMW','rSW','vSW','scTime','sci','eng','rid')
+       'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
+       'rLW', 'vLW', 'rMW', 'vMW', 'rSW', 'vSW', 'scTime', ...
+       'sci', 'eng', 'geo', 'rid')
 
 end
 

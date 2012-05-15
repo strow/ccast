@@ -1,9 +1,9 @@
 % 
 % NAME
-%   sci_cat -- save sci and eng data from RDR mat files
+%   sci_daily -- save sci and eng data from RDR mat files
 %
 % SYNOPSIS
-%   sci_cat(doy, rdir, odir)
+%   sci_daily(doy, rdir, odir)
 %
 % INPUTS
 %   doy   - directory of RDR mat files, typically doy
@@ -16,11 +16,12 @@
 %
 % DISCUSSION
 % 
-%   sci_cat takes a directory and matlab RDR file list and saves
+%   sci_daily takes a directory and matlab RDR file list and saves
 %   sci and eng data as a struct arrays, only adding eng records when
-%   the values change.
+%   the values change.  Most of the work is done by scipack.m
+%
 
-function sci_cat(doy, rdir, odir)
+function sci_daily(doy, rdir, odir)
 
 % set paths here, for now
 addpath /home/motteler/cris/bcast

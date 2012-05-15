@@ -1,9 +1,9 @@
 % 
 % NAME
-%   geo_cat - save a day's worth of GCRSO data in a mat file
+%   geo_daily - save a day's worth of GCRSO data in a mat file
 %
 % SYNOPSIS
-%   geo_cat(doy, gdir, odir)
+%   geo_daily(doy, gdir, odir)
 %
 % INPUTS
 %   doy    - directory of GCRSO files, typically doy
@@ -12,8 +12,8 @@
 %
 % OUTPUT
 %
-%  A matfile odir/allgeoYYYYMMDD.mat containing a struct allgeo with
-%  fields
+%   A matfile odir/allgeoYYYYMMDD.mat containing a struct allgeo
+%   with fields
 %                FORTime: [30 x N int64]
 %                 Height: [9 x 30 x N single]
 %               Latitude: [9 x 30 x N single]
@@ -31,29 +31,30 @@
 %       SolarZenithAngle: [9 x 30 x N single]
 %              StartTime: [N x 1 int64]
 %
-%  and a struct array allgid with fields "file", the GCRSO filename,
-%  and nscan, the number of scans in that file.  Note that N in the
-%  description above is total scans for all GCRSO files
+%                sdr_gid: [10560x18 char]
+%                sdr_ind: [10560x1 double]
+%
+%   The first 16 fields are from the GCRSO files.  The last two are
+%   added by geo_daily so we can find a GCRSO or SDR file from the
+%   scan index.  Note that N in the description above is total scans
+%   for all GCRSO files, typically a day's worth of data.
 %
 % DISCUSSION
 %
-%  somewhat ad hoc, probably geo_match should read the GCRSO data
-%  directly
+%   somewhat ad hoc, probably geo_match should read the GCRSO data
+%   directly
 %
-%  this version is for 60-scan files, is uses a test for file size.
+%  this version is for 60-scan files and uses a test for file size.
 %  When duplicate rid strings (date and start times) are found, the
-%  most recent version is used.
+%  most recent version is used.  It should work with other sizes,
+%  the test is just intended for the situation where we might have
+%  a mix of 4 and 60 scan files.
 %
-%  for a single allgeo file the allgid field nscan should always be
-%  either 4 or 60, if we are reading all either 4- or 60-scan GCRSO
-%  files.  Then for example if nscan = 60 then for scan i, 1<=i<=n,
-%  the allgid filename index is floor((i-1)/60)+1
-% 
 % AUTHOR
 %   H. Motteler, 8 May 2012
 %
 
-function geo_cat(doy, gdir, odir)
+function geo_daily(doy, gdir, odir)
 
 % path to readsdr_rawgeo
 addpath /home/motteler/cris/bcast/asl
@@ -79,7 +80,7 @@ ix = find([glist.bytes] > 700000);
 glist = glist(ix);
 
 if isempty(glist)
-  fprintf(1, 'geo_cat: WARNING: no 60-scan files for doy %s\n', doy)
+  fprintf(1, 'geo_daily: WARNING: no 60-scan files for doy %s\n', doy)
   return
 end
 
@@ -106,13 +107,14 @@ for gi = 1 : length(glist);
   % get scans in this file
   [m, nscan] = size(geo.FORTime);
 
-  % save current filename and nscan 
-  allgid(gi).file = glist(gi).name;
-  allgid(gi).nscan = nscan;
-
   % no concatenation at first step
   if gi == 1
     allgeo = geo;
+
+    % add file id string gid and scan index   
+    allgeo.sdr_gid = char(ones(nscan,1) * double(gid));
+    allgeo.sdr_ind = (1:nscan)';
+
     continue
   end
 
@@ -153,9 +155,15 @@ for gi = 1 : length(glist);
 
   allgeo.StartTime  = cat(1, allgeo.StartTime, geo.StartTime);
 
+
+  % add file date string gid and scan index   
+  stmp = char(ones(nscan,1) * double(gid));
+  allgeo.sdr_gid = cat(1, allgeo.sdr_gid, stmp);
+  allgeo.sdr_ind = cat(1, allgeo.sdr_ind, (1:nscan)');
+
 end
 
 % save the results
 dstr = gid(2:9);
-save(fullfile(odir, ['allgeo', dstr]), 'allgeo', 'allgid')
+save(fullfile(odir, ['allgeo', dstr]), 'allgeo')
 
