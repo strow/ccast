@@ -48,7 +48,8 @@ end
 gfill = 'xxxxxxxxxxxxxxxxxx';
 
 % RDR offset from SDR time, in ms
-dtRDR = 1817;
+% dtRDR = 1817;
+dtRDR = 1817 + 4 * 8000;
 
 %-------------------
 % initialize outputs

@@ -75,18 +75,18 @@ udv = user.dv;   % user-grid dv (for interpolation)
 pv1 = uv1;
 pv2 = uv2;
 
-% get the SRF tabulation file for this band
+% select band-specific options
 switch band
   case 'LW'
-    sfile = opts.sfileLW;
+    bopt = opts.LW;
   case 'MW'
-    sfile = opts.sfileMW;
+    bopt = opts.MW;
   case 'SW'
-    sfile = opts.sfileSW;
+    bopt = opts.SW;
 end
 
 % get SRF matrix for the current wlaser
-Smat = getSRFwl(wlaser, sfile);
+Smat = getSRFwl(wlaser, bopt.sfile);
 
 % take the inverse after interpolation
 Sinv = zeros(nchan, nchan, 9);
@@ -109,9 +109,8 @@ for si = 1 : nscan   % loop on scans
   T_ICT = (sci(ix).T_PRT1 + sci(ix).T_PRT2) / 2;
 
   % Compute predicted radiance from ICT
-  B = ICTradModel(band, vinst, T_ICT, ...
-                  sci(ix), eng.ICT_Param, ...
-                  1, NaN, 1, NaN);
+  B = ICTradModel(band, vinst, T_ICT, sci(ix), eng.ICT_Param, ...
+                  opts.eFlag, bopt.eICT, 1, NaN);
 
   % copy rIT across 30 columns
   rIT = B.total(:) * ones(1, 30);
@@ -157,15 +156,15 @@ for si = 1 : nscan   % loop on scans
 
     rtmp = squeeze(real(rcal(:,fi,:,si)));  
 
-    rtmp = bandpass(vinst, rtmp, pv1, pv2);
+    rtmp = bandpass(vinst, rtmp, pv1, pv2, 20);
 
     rtmp = rIT .* (Sinv(:,:,fi) * rtmp);
 
-    rtmp = bandpass(vinst, rtmp, pv1, pv2);
+    rtmp = bandpass(vinst, rtmp, pv1, pv2, 20);
 
     [rtmp, vcal] = finterp(rtmp, vinst, udv);
 
-    rtmp = bandpass(vcal, rtmp, uv1, uv2);
+    rtmp = bandpass(vcal, rtmp, uv1, uv2, 20);
 
     % save the current nchan x 30 chunk
     [n,k] = size(rtmp);
