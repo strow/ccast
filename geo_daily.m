@@ -56,9 +56,6 @@
 
 function geo_daily(doy, gdir, odir)
 
-% path to readsdr_rawgeo
-addpath /home/motteler/cris/bcast/asl
-
 % default path to geo year
 if nargin < 2
   gdir = '/asl/data/cris/sdr60/hdf/2012/';
@@ -102,7 +99,7 @@ for gi = 1 : length(glist);
 
   % read the next geo file
   gfile = fullfile(gsrc, glist(gi).name); 
-  geo = readsdr_rawgeo(gfile);
+  geo = read_GCRSO(gfile);
 
   % get scans in this file
   [m, nscan] = size(geo.FORTime);
