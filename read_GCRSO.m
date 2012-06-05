@@ -9,7 +9,7 @@
 %   gfile  - h5 GCRSO filename
 %
 % OUTPUT
-%   geo  - struct with GCRSO data fields and selected attributes
+%   geo  - struct with GCRSO data fields
 %
 % DISCUSSION
 %   this version uses the new h5 calls.  it sets h5 group paths and

@@ -50,18 +50,6 @@
 % If we find pre-calculated moving average files in avgdir, we use
 % those instead of locally calculated values
 %
-% NOTES/TO-DO
-%
-%  - no parameter overrides yet; wlaser is from the eng packet,
-%    mvspan is set inline here
-%
-%  - common vs individual opts structs?
-%
-%  - in ccast branch for now simply pass the "d" struct on to the
-%    calibration procedures that expect it.
-%
-%  - output structs slist and msc are temporarily set to empty
-%
 % AUTHOR
 %  H. Motteler, 20 Feb 2012
 %
@@ -81,6 +69,7 @@ allsci = struct([]);
 % initialize output structs
 msc = struct;
 slist = struct([]);
+nout = 0;
 
 % load geo data, defines structs allgeo, allgid
 if exist(opts.geofile, 'file')
@@ -218,6 +207,10 @@ for fi = 1 : nfile
        'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
        'rLW', 'vLW', 'rMW', 'vMW', 'rSW', 'vSW', 'scTime', ...
        'sci', 'eng', 'geo', 'rid')
+  
+  % keep a list of the SDR files
+  nout = nout + 1;
+  slist(nout).file = sfile;
 
 end
 

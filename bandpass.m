@@ -18,8 +18,13 @@
 % NOTES
 %   the rolloff is a cosine, fit to the rolloff width
 %
-%   if the rolloff width vr is not specified, the rolloff 
-%   is from vin(1) to v1 and from v2 to vin(end)
+%   if the rolloff width vr is not specified, the rolloff is from
+%   vin(1) to v1 and from v2 to vin(end).  If vr is specified and
+%   v1 - vr < vin(1), then vin(1) is the low end of the rolloff,
+%   similarly if vin(end) < v2 + vr then vin(end) is the high end.
+%
+%   the passband is taken as the smallest interval at the vin grid
+%   points that spans [v1, v2].  
 %
 % AUTHOR
 %    H. Motteler, 20 Apr 2012

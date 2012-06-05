@@ -66,6 +66,7 @@ band = upper(inst.band);
 uv1 = user.v1;   % final passband lower bound
 uv2 = user.v2;   % final passband upper bound
 udv = user.dv;   % user-grid dv (for interpolation)
+uvr = user.vr;   % user-grid rolloff
 
 % set the pre-transform passband.  This is applied to the 
 % ratio (ES-SP)/(ICT-SP) before applying the SA-1 matrix.
@@ -156,15 +157,15 @@ for si = 1 : nscan   % loop on scans
 
     rtmp = squeeze(real(rcal(:,fi,:,si)));  
 
-    rtmp = bandpass(vinst, rtmp, pv1, pv2, 20);
+    rtmp = bandpass(vinst, rtmp, pv1, pv2, uvr);
 
     rtmp = rIT .* (Sinv(:,:,fi) * rtmp);
 
-    rtmp = bandpass(vinst, rtmp, pv1, pv2, 20);
+    rtmp = bandpass(vinst, rtmp, pv1, pv2, uvr);
 
     [rtmp, vcal] = finterp(rtmp, vinst, udv);
 
-    rtmp = bandpass(vcal, rtmp, uv1, uv2, 20);
+    rtmp = bandpass(vcal, rtmp, uv1, uv2, uvr);
 
     % save the current nchan x 30 chunk
     [n,k] = size(rtmp);

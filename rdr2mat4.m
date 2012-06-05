@@ -1,9 +1,9 @@
 % 
 % NAME
-%   rdr2mat - process RDR h5 files to mat files 
+%   rdr2mat4 - process 4-scan RDR h5 files to mat files 
 %
 % SYNOPSIS
-%   rdr2mat(doy, hdir, mdir)
+%   rdr2mat4(doy, hdir, mdir)
 %
 % INPUTS
 %   doy   - day-of-year directory, a 3-char string
@@ -15,7 +15,7 @@
 %   and organized by the MIT RDR reader
 %
 % DISCUSSION
-%   This version is for 60-scan granules.  It drops files smaller than
+%   This version is for 4-scan granules.  It drops files smaller than
 %   6 Mb, those are probably 4-scan files.  When duplicate rid strings
 %   (date and start times) are found, the most recent version is used.
 %
@@ -23,7 +23,7 @@
 %   be slightly less verbose
 %
 
-function rdr2mat(doy, hdir, mdir)
+function rdr2mat4(doy, hdir, mdir)
 
 % path to MIT readers
 addpath /home/motteler/cris/MITreader380
@@ -31,12 +31,12 @@ addpath /home/motteler/cris/MITreader380/CrIS
 
 % default path to HDF RDR year
 if nargin < 2
-  hdir = '/asl/data/cris/rdr60/hdf/2012/';
+  hdir = '/asl/data/cris/rdr4/hdf/2012/';
 end
 
 % default path to matlab RDR year
 if nargin < 3
-  mdir = '/asl/data/cris/rdr60/mat/2012/';
+  mdir = '/asl/data/cris/rdr4/mat/2012/';
 end
 
 % full path to RDR h5 data source
@@ -51,12 +51,12 @@ unix(['mkdir -p ', mout]);
 % get initial list of HDF RDR files
 hlist = dir(fullfile(hsrc, 'RCRIS-RNSCA_npp*.h5'));
 
-% drop 4-scan or smaller files
-ix = find([hlist.bytes] > 7e6);
+% drop anything too big or too small
+ix = find(6e6 < [hlist.bytes] & [hlist.bytes] < 7e6);
 hlist = hlist(ix);
 
 if isempty(hlist)
-  fprintf(1, 'rdr2mat WARNING: no 60-scan files for doy %s\n', doy)
+  fprintf(1, 'rdr2mat4 WARNING: no 4-scan files for doy %s\n', doy)
   return
 end
 
