@@ -4,16 +4,16 @@
 
 % select day-of-the-year
 % doy = '054';  % high-res 2nd day
-% doy = '136';
+doy = '136';
 % doy = '140';
-doy = '141';
+% doy = '141';
 
 % set bcast paths
 addpath /home/motteler/cris/bcast
 % addpath /home/motteler/cris/bcast/davet
 
 % set RDR and SDR base paths
-RDR_HDF = '/asl/data/cris/rdr4/hdf/2012/';
+% RDR_HDF = '/asl/data/cris/rdr4/hdf/2012/';
 RDR_mat = '/asl/data/cris/rdr4/mat/2012/';
 
 % full path to matlab RDR files
@@ -23,7 +23,6 @@ rdir = fullfile(RDR_mat, doy);
 flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(61:64);
 % flist = flist(2:(end-1));
-% flist = flist(21:30);
 
 % profile clear
 % profile on
