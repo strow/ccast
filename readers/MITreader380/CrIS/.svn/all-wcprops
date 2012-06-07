@@ -1,0 +1,203 @@
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/LLAC/!svn/ver/347/trunk/ATMS/Readers/CrIS
+END
+read_packet_HK.m
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/LLAC/!svn/ver/332/trunk/ATMS/Readers/CrIS/read_packet_HK.m
+END
+read_packet_LEOandA.m
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/LLAC/!svn/ver/332/trunk/ATMS/Readers/CrIS/read_packet_LEOandA.m
+END
+bit_unpack_LW.mexa64
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/LLAC/!svn/ver/257/trunk/ATMS/Readers/CrIS/bit_unpack_LW.mexa64
+END
+read_packet_LWIT_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/347/trunk/ATMS/Readers/CrIS/read_packet_LWIT_data.m
+END
+bit_unpack_MW.mexa64
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/LLAC/!svn/ver/257/trunk/ATMS/Readers/CrIS/bit_unpack_MW.mexa64
+END
+read_packet_to_end.m
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/LLAC/!svn/ver/332/trunk/ATMS/Readers/CrIS/read_packet_to_end.m
+END
+read_packet_MWIT_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/347/trunk/ATMS/Readers/CrIS/read_packet_MWIT_data.m
+END
+BitsToIntN.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/257/trunk/ATMS/Readers/CrIS/BitsToIntN.m
+END
+read_packet_four_min_eng_data_rev11.m
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/LLAC/!svn/ver/332/trunk/ATMS/Readers/CrIS/read_packet_four_min_eng_data_rev11.m
+END
+read_packet_LWSP_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/347/trunk/ATMS/Readers/CrIS/read_packet_LWSP_data.m
+END
+bit_unpack_SW.mexa64
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/LLAC/!svn/ver/257/trunk/ATMS/Readers/CrIS/bit_unpack_SW.mexa64
+END
+read_packet_SWIT_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/347/trunk/ATMS/Readers/CrIS/read_packet_SWIT_data.m
+END
+read_packet_MWSP_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/347/trunk/ATMS/Readers/CrIS/read_packet_MWSP_data.m
+END
+read_packet_SWSP_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/347/trunk/ATMS/Readers/CrIS/read_packet_SWSP_data.m
+END
+read_packet_MWDIA_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/LLAC/!svn/ver/334/trunk/ATMS/Readers/CrIS/read_packet_MWDIA_data.m
+END
+bit_unpack_LW.mexw64
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/LLAC/!svn/ver/257/trunk/ATMS/Readers/CrIS/bit_unpack_LW.mexw64
+END
+read_packet_body.m
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/LLAC/!svn/ver/332/trunk/ATMS/Readers/CrIS/read_packet_body.m
+END
+bit_unpack_MW.mexw64
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/LLAC/!svn/ver/257/trunk/ATMS/Readers/CrIS/bit_unpack_MW.mexw64
+END
+read_packet_SWDIA_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/LLAC/!svn/ver/334/trunk/ATMS/Readers/CrIS/read_packet_SWDIA_data.m
+END
+read_packet_LWES_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/347/trunk/ATMS/Readers/CrIS/read_packet_LWES_data.m
+END
+bit_unpack_SW.mexw64
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/LLAC/!svn/ver/257/trunk/ATMS/Readers/CrIS/bit_unpack_SW.mexw64
+END
+read_packet_MWES_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/347/trunk/ATMS/Readers/CrIS/read_packet_MWES_data.m
+END
+initialize_packet_structures.m
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/LLAC/!svn/ver/346/trunk/ATMS/Readers/CrIS/initialize_packet_structures.m
+END
+read_packet_SWES_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/347/trunk/ATMS/Readers/CrIS/read_packet_SWES_data.m
+END
+read_packet_headers.m
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/LLAC/!svn/ver/335/trunk/ATMS/Readers/CrIS/read_packet_headers.m
+END
+SBCDToDecimal.m
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/LLAC/!svn/ver/257/trunk/ATMS/Readers/CrIS/SBCDToDecimal.m
+END
+read_packet_eight_sec_science_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/LLAC/!svn/ver/332/trunk/ATMS/Readers/CrIS/read_packet_eight_sec_science_data.m
+END
+UBCDToDecimal.m
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/LLAC/!svn/ver/257/trunk/ATMS/Readers/CrIS/UBCDToDecimal.m
+END
+read_packet_HK_Tel_dwell_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/LLAC/!svn/ver/332/trunk/ATMS/Readers/CrIS/read_packet_HK_Tel_dwell_data.m
+END
+read_packet_SSM_Tel_dwell_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/LLAC/!svn/ver/332/trunk/ATMS/Readers/CrIS/read_packet_SSM_Tel_dwell_data.m
+END
+read_packet_IM_Tel_dwell_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/LLAC/!svn/ver/332/trunk/ATMS/Readers/CrIS/read_packet_IM_Tel_dwell_data.m
+END
+read_packet_LWDIA_data.m
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/LLAC/!svn/ver/334/trunk/ATMS/Readers/CrIS/read_packet_LWDIA_data.m
+END
+BinReadBCD.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/257/trunk/ATMS/Readers/CrIS/BinReadBCD.m
+END

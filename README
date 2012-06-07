@@ -1,0 +1,13 @@
+
+Top level directories
+
+  docs   - documentation
+  source - main source directory
+  motmsc - my dev, utils, and junk
+  hires  - high res code and params
+  davet  - Dave's code
+  strow  - Larrabee's code
+  readers   - MIT readers with local mods
+  inst_data - ILS, nonlinearity, emissivity data
+  demo      - end-to-end demo with small dataset
+

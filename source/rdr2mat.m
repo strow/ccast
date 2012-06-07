@@ -26,8 +26,8 @@
 function rdr2mat(doy, hdir, mdir)
 
 % path to MIT readers
-addpath /home/motteler/cris/MITreader380
-addpath /home/motteler/cris/MITreader380/CrIS
+addpath ../readers/MITreader380
+addpath ../readers/MITreader380/CrIS
 
 % default path to HDF RDR year
 if nargin < 2
@@ -56,7 +56,7 @@ ix = find([hlist.bytes] > 7e6);
 hlist = hlist(ix);
 
 if isempty(hlist)
-  fprintf(1, 'rdr2mat WARNING: no 60-scan files for doy %s\n', doy)
+  fprintf(1, 'rdr2mat: no 60-scan files for doy %s\n', doy)
   return
 end
 
@@ -87,11 +87,11 @@ for ix = 1 : length(hlist)
   end
 
   % call the MIT RDR reader
-  fprintf(1, 'processing %s...\n', rid)
+  fprintf(1, 'rdr2mat: processing %s...\n', rid)
   try
     [d1, m1] = read_cris_hdf5_rdr(hfile);
   catch me
-    fprintf(1, 'processing failed\n')
+    fprintf(1, 'rdr2mat: processing failed\n')
     fclose('all');
     continue
   end

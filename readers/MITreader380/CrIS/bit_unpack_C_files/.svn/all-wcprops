@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/LLAC/!svn/ver/340/trunk/ATMS/Readers/CrIS/bit_unpack_C_files
+END
+bit_unpack_LW.c
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/LLAC/!svn/ver/340/trunk/ATMS/Readers/CrIS/bit_unpack_C_files/bit_unpack_LW.c
+END
+bit_unpack_MW.c
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/LLAC/!svn/ver/340/trunk/ATMS/Readers/CrIS/bit_unpack_C_files/bit_unpack_MW.c
+END
+bit_unpack_SW.c
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/LLAC/!svn/ver/340/trunk/ATMS/Readers/CrIS/bit_unpack_C_files/bit_unpack_SW.c
+END

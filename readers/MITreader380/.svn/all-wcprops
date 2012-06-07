@@ -1,0 +1,311 @@
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/LLAC/!svn/ver/347/trunk/ATMS/Readers
+END
+cleanup_LEOandA_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/cleanup_LEOandA_packets.m
+END
+read_packet_201.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_201.m
+END
+read_packet_213_EDU.m
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_213_EDU.m
+END
+read_packet_202.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_202.m
+END
+cleanup_engineering_h_and_s_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/cleanup_engineering_h_and_s_packets.m
+END
+read_packet_203.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/317/trunk/ATMS/Readers/read_packet_203.m
+END
+read_packet_204.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/321/trunk/ATMS/Readers/read_packet_204.m
+END
+read_packet_205.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_205.m
+END
+read_multiple_ccsds_logs.m
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_multiple_ccsds_logs.m
+END
+read_packet_206.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_206.m
+END
+read_packet_00B.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/274/trunk/ATMS/Readers/read_packet_00B.m
+END
+read_npp_hdf5_tdr_sdr_rsdr_geo.m
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/LLAC/!svn/ver/315/trunk/ATMS/Readers/read_npp_hdf5_tdr_sdr_rsdr_geo.m
+END
+initialize_diary_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svn/LLAC/!svn/ver/274/trunk/ATMS/Readers/initialize_diary_packets.m
+END
+initialize_science_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/initialize_science_packets.m
+END
+cleanup_diagnostic_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/320/trunk/ATMS/Readers/cleanup_diagnostic_packets.m
+END
+read_packet_20B.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_20B.m
+END
+initialize_hotcal_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/LLAC/!svn/ver/320/trunk/ATMS/Readers/initialize_hotcal_packets.m
+END
+read_packet_20C.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_20C.m
+END
+initialize_cte_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/initialize_cte_packets.m
+END
+read_packet_for_SN.m
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_for_SN.m
+END
+cleanup_calibration_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/cleanup_calibration_packets.m
+END
+read_packet_201_EDU.m
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_201_EDU.m
+END
+initialize_housekeeping_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/initialize_housekeeping_packets.m
+END
+read_atms_ccsds_data_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/LLAC/!svn/ver/335/trunk/ATMS/Readers/read_atms_ccsds_data_packets.m
+END
+read_packet_210.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/295/trunk/ATMS/Readers/read_packet_210.m
+END
+read_packet_spacecraft_diary.m
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/LLAC/!svn/ver/338/trunk/ATMS/Readers/read_packet_spacecraft_diary.m
+END
+read_packet_211.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_211.m
+END
+read_utc.m
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_utc.m
+END
+read_packet_212.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_212.m
+END
+read_packet_206_EDU.m
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_206_EDU.m
+END
+initialize_thermal_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/315/trunk/ATMS/Readers/initialize_thermal_packets.m
+END
+extract_hdf5_rdr.m
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/LLAC/!svn/ver/327/trunk/ATMS/Readers/extract_hdf5_rdr.m
+END
+extract_hdf5_rdr_granules.m
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/LLAC/!svn/ver/333/trunk/ATMS/Readers/extract_hdf5_rdr_granules.m
+END
+read_packet_213.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_213.m
+END
+cleanup_science_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/LLAC/!svn/ver/287/trunk/ATMS/Readers/cleanup_science_packets.m
+END
+cleanup_hotcal_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/cleanup_hotcal_packets.m
+END
+cleanup_cte_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/cleanup_cte_packets.m
+END
+initialize_LEOandA_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/initialize_LEOandA_packets.m
+END
+initialize_engineering_h_and_s_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/initialize_engineering_h_and_s_packets.m
+END
+read_packet_0004.m
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/LLAC/!svn/ver/316/trunk/ATMS/Readers/read_packet_0004.m
+END
+cleanup_housekeeping_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/cleanup_housekeeping_packets.m
+END
+convert_to_temp.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/312/trunk/ATMS/Readers/convert_to_temp.m
+END
+read_packet_21C.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_21C.m
+END
+read_cris_hdf5_rdr.m
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/LLAC/!svn/ver/335/trunk/ATMS/Readers/read_cris_hdf5_rdr.m
+END
+read_atms_hdf5_rdr.m
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/LLAC/!svn/ver/321/trunk/ATMS/Readers/read_atms_hdf5_rdr.m
+END
+cleanup_thermal_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/LLAC/!svn/ver/315/trunk/ATMS/Readers/cleanup_thermal_packets.m
+END
+initialize_diagnostic_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/LLAC/!svn/ver/320/trunk/ATMS/Readers/initialize_diagnostic_packets.m
+END
+read_unknown_packet.m
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/LLAC/!svn/ver/274/trunk/ATMS/Readers/read_unknown_packet.m
+END
+read_packet_100.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_100.m
+END
+initialize_calibration_packets.m
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/initialize_calibration_packets.m
+END
+read_packet_200.m
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/LLAC/!svn/ver/236/trunk/ATMS/Readers/read_packet_200.m
+END
