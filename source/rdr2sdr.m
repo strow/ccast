@@ -30,7 +30,7 @@
 %   readspec   - take igms to count spectra
 %   scanorder  - group data into scans
 %   movavg_app - calculate or load moving averages
-%   calmain[n] - radiometric and spectral calibration
+%   calmain    - radiometric and spectral calibration
 %
 % rdr2sdr is part of a processing chain in which the major steps
 % communicate by files, with the following naming scheme
@@ -193,13 +193,13 @@ for fi = 1 : nfile
   % radiometric calibration
   % -----------------------
   
-  [rLW, vLW] = calmain4(instLW, userLW, scLW, scTime, ...
+  [rLW, vLW] = calmain(instLW, userLW, scLW, scTime, ...
                         avgLWIT, avgLWSP, sci, eng, geo, opts);
 
-  [rMW, vMW] = calmain4(instMW, userMW, scMW, scTime, ...
+  [rMW, vMW] = calmain(instMW, userMW, scMW, scTime, ...
                         avgMWIT, avgMWSP, sci, eng, geo, opts);
 
-  [rSW, vSW] = calmain4(instSW, userSW, scSW, scTime, ...
+  [rSW, vSW] = calmain(instSW, userSW, scSW, scTime, ...
                         avgSWIT, avgSWSP, sci, eng, geo, opts);
 
   % save data as an SDR mat file

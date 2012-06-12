@@ -1,5 +1,26 @@
-# initial git ignore file
-*.fig   # no fig files
-*.mat   # no mat files
-*.bak   # no backup files
-*~      # no backup files
+# bcast git ignore file
+
+# data & misc
+*.h5              # no h5 files
+*.mat             # no mat files
+!inst_data/*.mat  # except for instrument data
+
+*.fig             # no fig files
+*.log             # no log files
+*.core            # no coredumps
+
+# archives and packages
+*.gz
+*.tgz
+*.tar
+*.zip
+
+# libs and object files
+*.a
+*.o
+*.so
+
+# backup files
+*.bak
+*~
+

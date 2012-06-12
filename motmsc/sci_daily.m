@@ -24,8 +24,8 @@
 function sci_daily(doy, rdir, odir)
 
 % set paths here, for now
-addpath /home/motteler/cris/bcast
-addpath /home/motteler/cris/bcast/davet
+addpath ../source
+addpath ../davet
 
 % default path to matlab RDR year
 if nargin < 2

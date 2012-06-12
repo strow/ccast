@@ -1,13 +1,92 @@
 
-Top level directories
+bcast v 0.5, test release  
+--------------------------
 
-  docs   - documentation
-  source - main source directory
-  motmsc - my dev, utils, and junk
-  hires  - high res code and params
-  davet  - Dave's code
-  strow  - Larrabee's code
-  readers   - MIT readers with local mods
-  inst_data - ILS, nonlinearity, emissivity data
-  demo      - end-to-end demo with small dataset
+H. Motteler, 12 June 2012
+
+
+Overview
+---------
+
+This is an "alpha" release.  The key procedures rdr2mat, geo_daily,
+and rdr2sdr, which together take HDF RDR to Matlab SDR data, have
+been tested extensively, but the wrappers and user environment are
+still evolving.  
+
+Major steps remaining include: integrate the old file-spanning
+moving average code, integrate Dave's radiometric calibration code
+from the old ccast, and write routines to translate the Matlab SDR
+data to more useful formats.
+
+
+Top level directories
+----------------------
+
+  docs    - documentation
+  source  - main source directory
+  motmsc  - my dev, utils, and junk
+  hires   - high res code and params
+  davet   - Dave's code
+  strow   - Larrabee's code
+  readers - MIT readers with local mods
+  inst_data - instrument data: ILS, nonlinearity, emissivity, etc.
+  demo    - end-to-end demo with a small dataset
+
+
+Matlab and data paths 
+----------------------
+
+I'd like to allow for a limited set of different versions of some
+procedures by careful management of matlab path.  This lets us have
+things like a highres/inst_params.m and a source/inst_params.m, or 
+a source/calmain.m and a davet/calmain.m.  Mostly this just means if
+you're working in your own directory you can, as an option, run your
+own version of some of the code.  But you have to be careful with
+this.
+
+The search order for matlab procedures is the current directory and
+then the reverse order they are set with addpath.  So for example if
+you do
+
+     addpath ../davet
+     addpath ../source
+
+and then run in motmsc, files there will take precence, then files
+from source, and finally files from davet.
+
+matlab paths here are relative, they assume you are running one
+level below the bcast installation home.  Paths to data are set up
+as ../yyyy/doy/ but that's just a convention, doy can be any subset
+of the day's data.  The only restriction is that the current setup
+uses doy to match the geo daily summary, so doy can't be subset that
+spans days.
+
+
+Main processing steps
+----------------------
+
+  rdr2mat    - wrapper and some QC for the MIT reader
+  geo_daily  - save a day of GCRSO data in a mat file
+  avg_daily  - optional moving average preprocessing
+  rdr2sdr    - main function for RDR to SDR processing
+
+currently rdr2mat and geo_daily are called once a day after the
+RDR HDF data has been downloaded, as a separate processing step.
+bcast_main is a wrapper for rdr2sd4 that sets paths, files, and
+options.
+
+The use of the geo summary file is probably temporary, the
+geo_match procedure could be modified to read the GCRSO files
+directly.  But it only takes a couple of minutes to build the
+summary file for a day's worth of data.
+
+The moving average preprocessing (to allow moving averages to span
+the 60-scan RDR files) has been tested with earlier versions of the
+code but is not yet integrated with the current release.
+
+The following are mostly vaporware
+
+  sdr2rtp    - save SDRs as RTP files
+  sdr2netcdf - save SDRs as netcdf files
+  sdr2map    - tile SDRs for fancy maps, data QC, etc.
 

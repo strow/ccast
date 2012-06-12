@@ -1,10 +1,10 @@
 %
 % NAME
-%   calmain4 - main calibration procedure
+%   calmain - main calibration procedure
 %
 % SYNOPSIS
 %   [rcal, vcal, msc] = ...
-%      calmain4(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
+%      calmain(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
 %
 % INPUTS
 %   inst    - instrument params struct
@@ -39,7 +39,7 @@
 %   H. Motteler, 26 Apr 2012
 
 function [rcal, vcal, msc] = ...
-     calmain4(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts)
+     calmain(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts)
 
 % load parameters for nlc()
 control = load(opts.DClevel_file);
