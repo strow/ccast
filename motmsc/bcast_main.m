@@ -36,7 +36,7 @@
 
 % select day-of-the-year
 % doy = '054';  % high-res 2nd day
-doy = '142';
+doy = '143';
 
 % set bcast paths
 addpath ../davet
