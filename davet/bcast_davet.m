@@ -39,8 +39,9 @@
 doy = '136';
 
 % set bcast paths
-addpath ../davet
+addpath ../motmsc
 addpath ../source
+addpath ../davet
 
 % for high-res ONLY
 % addpath ../hires
@@ -49,7 +50,10 @@ addpath ../source
 RDR_mat = '/asl/data/cris/rdr60/mat/2012/';
 
 % path to matlab SDR output by day-of-year
-SDR_mat = '/home/motteler/cris/data/2012/';  
+% dt11 is resample_mode = 1, calmode = 1
+% dt12 is resample_mode = 1, calmode = 2
+% dt22 is resample_mode = 2, calmode = 2
+SDR_mat = '/home/motteler/cris/data/2012dt12/';  
 
 % path to allgeo (and allsci) data
 dailydir = '/home/motteler/cris/data/2012/daily';  
@@ -83,9 +87,9 @@ opts.avgdir = '.';   % moving avg working directory
 opts.mvspan = 4;     % moving avg span is 2*mvspan + 1
 
 % instrument SRF files
-opts.LW.sfile = '../inst_data/SRF_v33a_LW.mat';  % LW SRF table
-opts.MW.sfile = '../inst_data/SRF_v33a_MW.mat';  % MW SRF table
-opts.SW.sfile = '../inst_data/SRF_v33a_SW.mat';  % SW SRF table
+% opts.LW.sfile = '../inst_data/SRF_v33a_LW.mat';  % LW SRF table
+% opts.MW.sfile = '../inst_data/SRF_v33a_MW.mat';  % MW SRF table
+% opts.SW.sfile = '../inst_data/SRF_v33a_SW.mat';  % SW SRF table
 
 % high-res SRF files
 % opts.LW.sfile = '../inst_data/SRF_v33aHR_LW.mat';  % LW SRF table
@@ -108,6 +112,35 @@ opts.SW.eICT = NaN;  % no SW eICT value read when eFlag is 1
 % opts.LW.eICT = dd.e1hi;  % LW hi res emissivity
 % opts.MW.eICT = dd.e2hi;  % MW hi res emissivity
 % opts.SW.eICT = dd.e3hi;  % SW hi res emissivity
+
+% do Dave's ISA calc, as needed 
+wlaser = 773.1301;
+isa_file = '../inst_data/ISA_7731301.mat';
+if exist(isa_file)
+  % load the current ISA file
+  load(isa_file, 'isa');
+else
+  % calculate ISA and save the results
+  fprintf(1, 'bcast_main: calculating ISA matrix\n')
+  [utmp, sensor.lw] = spectral_params('LW', wlaser);
+  [utmp, sensor.mw] = spectral_params('MW', wlaser);
+  [utmp, sensor.sw] = spectral_params('SW', wlaser);
+  isa = struct;
+  for iFov = 1:9
+    [isa.lw(iFov).isa] = computeISA(sensor.lw, iFov);
+    [isa.mw(iFov).isa] = computeISA(sensor.mw, iFov);
+    [isa.sw(iFov).isa] = computeISA(sensor.sw, iFov);
+  end
+  save(isa_file, 'isa');  
+end
+
+% for now, pass the ISA data in via the opts struct
+opts.isa = isa;
+clear isa
+
+% set control parameters
+opts.resample_mode = 1;
+opts.calmode = 2;
 
 % process matlab RDR to SDR data 
 

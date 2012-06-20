@@ -58,8 +58,8 @@ matlab paths here are relative, they assume you are running one
 level below the bcast installation home.  Paths to data are set up
 as ../yyyy/doy/ but that's just a convention, doy can be any subset
 of the day's data.  The only restriction is that the current setup
-uses doy to match the geo daily summary, so doy can't be subset that
-spans days.
+uses doy to match the geo daily summary, so doy can't be a subset
+that spans days.
 
 
 Main processing steps
