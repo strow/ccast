@@ -1,5 +1,5 @@
 
-addpath /home/motteler/cris/bcast/asl
+addpath /home/motteler/cris/bcast/motmsc/asl
 
 % IDPS SDR channel frequencies
 wn_lw = linspace(650-0.625*2,1095+0.625*2,717)';
@@ -8,7 +8,9 @@ wn_sw = linspace(2155-2.50*2,2550+2.50*2,163)';
 
 % load a bcast SDR file
 % load /home/motteler/cris/data/2012/128/SDR_d20120507_t0207314.mat
-load /home/motteler/cris/data/2012/128/SDR_d20120507_t2039251.mat
+% load /home/motteler/cris/data/2012/128/SDR_d20120507_t2039251.mat
+% load /home/motteler/cris/data/2012dt12/136/SDR_d20120515_t0446257.mat
+load /home/motteler/cris/data/2012/136/SDR_d20120515_t0446257.mat
 
 % select a bcast scan index
 bi = 31;
@@ -18,7 +20,7 @@ gid = geo.sdr_gid(bi, :);
 si = geo.sdr_ind(bi, :);  
 
 % get the IDPS SDR path and filename
-sdir = '/asl/data/cris/sdr60/hdf/2012/128';
+sdir = '/asl/data/cris/sdr60/hdf/2012/136';
 slist = dir(fullfile(sdir, ['SCRIS_npp_', gid, '*.h5']));
 sfile = fullfile(sdir, slist(end).name);
 
