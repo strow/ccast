@@ -11,11 +11,8 @@
 %   rdir   - directory for RTP output files
 %   opts   - optional parameter struct
 %
-% optional parameters include
-%   d      - old driver struct (see discussion)
-%   
 % OUTPUTS
-%   rlist  - list of RTP mat filenames
+%   rlist  - list of RTP mat files
 %   msc    - optional output struct
 %
 % DISCUSSION
@@ -35,12 +32,13 @@
 
 function [rlist, msc] = sdr2rtp(flist, sdir, rdir, opts);
 
-% Temporary working paths
-addpath /home/motteler/cris/bcast
-addpath /home/motteler/cris/bcast/davet
-
 % number of SDR files to process
 nfile = length(flist);
+
+% initialize output structs
+msc = struct;
+rlist = struct([]);
+nout = 0;
 
 % ---------------------
 % loop on SDR mat files
@@ -57,22 +55,26 @@ for fi = 1 : nfile
   stmp = ['SDR_', rid, '.mat'];
   sfile = [sdir, '/', stmp];
 
-  % skip processing if no matlab RDR file
+  % RTP output filename
+  rtmp = ['RTP_', rid, '.mat'];
+  rfile = fullfile(rdir, rtmp);
+
+  % skip processing if no matlab SDR file
   if ~exist(sfile, 'file')
     fprintf(1, 'SDR file missing, index %d file %s\n', fi, rid)
     continue
   end
 
-  % load the SDR data
+  % load the SDR data, defines variables instLW, instMW, instSW,
+  % userLW, userMW, userSW, rLW, vLW, rMW, vMW, rSW, vSW, scTime,
+  % sci, eng, geo, rid
+  load(sfile)
+  
+  keyboard
 
-  % load any needed meta data directly from hdf rdr file
-
-  % do geolocation (calc or from files)
-
-  % do time matching for sci, eng, geo (if from a file), meta data
-  % and things like stats flags from the RDR mat file
-
-  % loop on spec data in time order & write the RTP files
+  % keep a list of the rtp files
+  nout = nout + 1;
+  rlist(nout).file = sfile;
 
 end
 

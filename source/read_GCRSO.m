@@ -3,7 +3,7 @@
 %   read_GCRSO - read CrIS GCRSO geo data and attributes
 %
 % SYNOPSIS
-%   [geo, agatt, attr4] = read_GCRSO(gfile)
+%   [geo, agatt, attr4] = read_GCRSO(gfile, ndset)
 %
 % INPUT
 %   gfile    - h5 GCRSO (CrIS geo) filename
@@ -34,7 +34,7 @@
 
 function [geo, agatt, attr4] = read_GCRSO(gfile, ndset)
 
-% default 15 for a 60-scan file
+% ndset default is 15 for a 60-scan file
 if nargin < 2
   ndset = 15;
 end

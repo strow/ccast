@@ -1,4 +1,11 @@
 
+% compare bcast and IDPS spectra.  
+%
+% specify a bcast SDR file and scan index, find the corresponding
+% IDPS file and scan, and compare selected spectra.  This is simple
+% because the bcast SDR files include the gid string from the GCRSO
+% file, which is also an identifier for the IDPS SDR files.
+
 addpath /home/motteler/cris/bcast/motmsc/asl
 
 % IDPS SDR channel frequencies

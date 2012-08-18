@@ -18,8 +18,14 @@ function [prof, pattr] = readsdr_rtp(pdfile);
 
 % Created: 20 January 2011, Scott Hannon
 % Update: 01 Mar 2011, S.Hannon - bug fix for ifov
+% Update: 09 Dec 2011, S.Hannon - add QAbits iudefs and robsqual; set
+%    prof fields to appropriate RTP types
+% Update: 15 Jan 2012, L. Strow - switched to readsdr_rawpd_all.m; used Geo 
+%    file name from pd_file_a.N_GEO_Ref instead of string searching.  This
+%    update on /asl/prod includes Scott's 09 Dec updates as well
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-addpath /asl/matlab/cris/readers
+%addpath /asl/matlab/cris/readers
+%addpath /asl/matlab/cris/utils
 
 % Number of seconds between 0z 1 Jan 1958 and 0z 1 Jan 2000 (excluding
 % leap seconds).
@@ -38,27 +44,36 @@ if (nargin ~= 1)
    error('unexpected number of input arguments')
 end
 
-% Determine geofile from pdfile
-junk = dirname(pdfile);
-junk2 = basename(pdfile);
-junk3 = strrep(junk2,'SCRIS_','GCRSO_');
-geofile = [junk '/' junk3(1:37) '*.h5'];
-d = dir(geofile);
-if (length(d) == 1)
-   geofile = [junk '/' d.name];
-else
-   pdfile;
-   geofile;
-   error('Unable to find matching geofile for pdfile')
-end
-clear junk junk2 junk3
-
-
 % Read the Product_Data file
-[pd] = readsdr_rawpd(pdfile);
+[pd pd_file_a pd_aggr_a pd_sdr_a pd_gran0_a] = readsdr_rawpd_all(pdfile);
+
+% Determine geofile from pdfile
+[sdrdir,~,~] = fileparts(pdfile);
+%if isfield(pd_file_a,'N_GEO_Ref')
+%  geofile = fullfile(sdrdir,pd_file_a.N_GEO_Ref)
+%else
+  f = dir(regexprep(pdfile,{'SCRIS' '_c[0-9]+'},{'GCRSO' '*'}));
+  geofile = fullfile(sdrdir,f.name);
+%end
+
+if exist(geofile) ~= 2
+   f
+   geofile
+   error('Geo file does not exist')
+end
+
+% Create a structure of quality flag info
+[qa] = cris_sdr_QAFlags(pd);
+% Convert QA data to QAbits for each band and overall qual flag
+[QAbitsLW,QAbitsMW,QAbitsSW,qual] = QA_to_bits(qa);
+clear qa
 
 % Read the Geolocation file
 [geo] = readsdr_rawgeo(geofile);
+
+%[geo2, agatt, attr4] = read_GCRSO(geofile)
+
+%keyboard
 
 % We have no means to check the match of pd and geo files but we
 % can at least can check they have the same number of observations
@@ -70,7 +85,7 @@ if (isfield(geo,'Latitude'))
    junk = geo.Latitude;
    s = size(junk);
    nobs = round(prod(s)); % exact integer
-   prof.rlat = reshape(junk,1,nobs);
+   prof.rlat = single( reshape(junk,1,nobs) );
 else
    geo
    error('Missing required field Latitude')
@@ -78,15 +93,14 @@ end
 %
 if (isfield(geo,'Longitude'))
    junk = geo.Longitude;
-   prof.rlon = reshape(junk,1,nobs);
+   prof.rlon = single( reshape(junk,1,nobs) );
 else
    error('Missing required field Longitude')
 end
 %
 if (isfield(geo,'FORTime'))
    % Convert IET1958 microseconds to TAI2000
-%  junk = double(geo.FORTime)*1E-6 - seconds1958to2000; % [30 x 4*n]
-   junk = double(geo.FORTime);
+   junk = double(geo.FORTime)*1E-6 - seconds1958to2000; % [30 x 4*n]
    s = size(junk);
    nx = round(prod(s)); % exact integer
    junk2 = reshape(junk,1,nx);
@@ -97,28 +111,28 @@ end
 %
 if (isfield(geo,'SatelliteZenithAngle'))
    junk = geo.SatelliteZenithAngle;
-   prof.satzen = reshape(junk,1,nobs);
+   prof.satzen = single( reshape(junk,1,nobs) );
 else
    error('Missing required field SatelliteZenithAngle')
 end
 %
 if (isfield(geo,'SatelliteAzimuthAngle'))
    junk = geo.SatelliteAzimuthAngle;
-   prof.satazi = reshape(junk,1,nobs);
+   prof.satazi = single( reshape(junk,1,nobs) );
 else
    error('Missing required field SatelliteAzimuthAngle')
 end
 %
 if (isfield(geo,'SolarZenithAngle'))
    junk = geo.SolarZenithAngle;
-   prof.solzen = reshape(junk,1,nobs);
+   prof.solzen = single( reshape(junk,1,nobs) );
 else
    error('Missing required field SolarZenithAngle')
 end
 %
 if (isfield(geo,'SolarAzimuthAngle'))
    junk = geo.SolarAzimuthAngle;
-   prof.solazi = reshape(junk,1,nobs);
+   prof.solazi = single( reshape(junk,1,nobs) );
 else
    error('Missing required field SolarAzimuthAngle')
 end
@@ -127,19 +141,18 @@ end
 % Unsure about "Height" (is it supposed to be zobs or salti?)
 if (isfield(geo,'Height'))
    junk = geo.Height;
-   prof.zobs = reshape(junk,1,nobs);
+   prof.zobs = single( reshape(junk,1,nobs) );
 else
    error('Missing required field Height')
 end
 %%%
-prof.pobs = zeros(1,nobs);
-prof.upwell = ones(1,nobs);
+prof.pobs = zeros(1,nobs,'single');
+prof.upwell = ones(1,nobs,'int32');
 iobs = 1:nobs;
-prof.atrack = 1 + floor((iobs-1)/270);
-prof.xtrack = 1 + mod(floor((iobs-1)/9),30);
+prof.atrack = int32( 1 + floor((iobs-1)/270) );
+prof.xtrack = int32( 1 + mod(floor((iobs-1)/9),30) );
 %wrong prof.ifov = 1 + mod(iobs,9);
-prof.ifov = 1 + mod(iobs-1,9);
-
+prof.ifov = int32( 1 + mod(iobs-1,9) );
 %
 if (isfield(pd,'ES_RealLW'))
    junk = pd.ES_RealLW;
@@ -151,7 +164,7 @@ if (isfield(pd,'ES_RealLW'))
    if (nobs_pd ~= nobs)
       error('Product_Data and Geolocation data have different nobs')
    end
-   prof.robs1 = zeros(nchan,nobs);
+   prof.robs1 = zeros(nchan,nobs,'single');
    ic = 1:nchanLW;
    prof.robs1(ic,:) = reshape(junk,nchanLW,nobs);
 else
@@ -181,22 +194,48 @@ if (isfield(pd,'ES_RealSW'))
 else
    error('Missing required field ES_RealSW')
 end
+%
+% Overall quality flag
+prof.robsqual = qual;
 
 
 % Assign non-standard fields
-prof.udef=zeros(20,nobs);
+prof.udef = zeros(20,nobs,'single');
+prof.iudef = zeros(10,nobs,'int32');
+
+prof.iudef(3,:) = ones(size(prof.rtime)) * str2num(pd_gran0_a.N_Granule_ID{1}(4:end));
+prof.iudef(4,:) = ones(size(prof.rtime)) * double(pd_gran0_a.Descending_Indicator);
+prof.iudef(5,:) = ones(size(prof.rtime)) * double(pd_gran0_a.N_Beginning_Orbit_Number);
+
 %
 % Interpolate X,Y,Z at MidTime to rtime
 if (isfield(geo,'SCPosition') & isfield(geo,'MidTime'))
+  try
    xyz = geo.SCPosition; % [3 x 4*n]
    mtime = double(geo.MidTime)*1E-6 - seconds1958to2000; % [1 x 4*n]
-   prof.udef(10,:) = interp1(mtime,xyz(1,:),prof.rtime,'linear','extrap');
-   prof.udef(11,:) = interp1(mtime,xyz(2,:),prof.rtime,'linear','extrap');
-   prof.udef(12,:) = interp1(mtime,xyz(3,:),prof.rtime,'linear','extrap');
+   isub = prof.rtime > 0;
+   msel = [logical(1); diff(mtime) > 0];
+   prof.udef(10,isub) = interp1(mtime(msel),xyz(1,msel),prof.rtime(isub),'linear','extrap');
+   prof.udef(11,isub) = interp1(mtime(msel),xyz(2,msel),prof.rtime(isub),'linear','extrap');
+   prof.udef(12,isub) = interp1(mtime(msel),xyz(3,msel),prof.rtime(isub),'linear','extrap');
+  catch e;
+   e
+   keyboard
+  end
 end
-%%%
+%
+prof.iudef( 8,:) = QAbitsLW;
+prof.iudef( 9,:) = QAbitsMW;
+prof.iudef(10,:) = QAbitsSW;
+
 
 pattr = {{'profiles' 'rtime' 'seconds since 0z 1 Jan 2000'}, ...
+         {'profiles' 'iudef(3,:)' 'Granule ID {granid}'}, ...
+         {'profiles' 'iudef(4,:)' 'Descending Indicator {descending_ind}'}, ...
+         {'profiles' 'iudef(5,:)' 'Beginning Orbit Number {orbit_num}'}, ...
+         {'profiles' 'iudef(8,:)' 'longwave QA bits {QAbitsLW}'}, ...
+         {'profiles' 'iudef(9,:)' 'mediumwave QA bits {QAbitsMW}'}, ...
+         {'profiles' 'iudef(10,:)' 'shortwave QA bits {QAbitsSW}'}, ...
          {'profiles' 'udef(10,:)' 'spacecraft X coordinate {X}'}, ...
          {'profiles' 'udef(11,:)' 'spacecraft Y coordinate {Y}'}, ...
          {'profiles' 'udef(12,:)' 'spacecraft Z coordinate {Z}'}, ...

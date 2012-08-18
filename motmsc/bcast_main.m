@@ -32,11 +32,11 @@
 %   files from source, and finally files from davet
 %
 
-% function bcast_main(doy)
+function bcast_main(doy)
 
 % select day-of-the-year
 % doy = '054';  % high-res 2nd day
-doy = '136';
+% doy = '136';  % may 15 focus day
 
 % set bcast paths
 addpath ../davet
