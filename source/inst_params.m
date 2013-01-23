@@ -107,6 +107,7 @@ freq = dv * (c1ind:c1ind+npts-1)' + awidth * vbase;
 
 % return selected parameters 
 inst.wlaser = wlaser;
+inst.df     = df;
 inst.npts   = npts;
 inst.vlaser = vlaser;
 inst.dx     = dx;

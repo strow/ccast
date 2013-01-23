@@ -43,8 +43,8 @@ unix(['mkdir -p ', sdir]);
 
 % get matlab RDR file list
 flist = dir(fullfile(rdir, 'RDR*.mat'));
-% flist = flist(61:64);
-flist = flist(21:end);
+% flist = flist(end-26:end);  % for 22 feb high res
+flist = flist(1:240);  % 23 feb high res, 16 may mat files
 
 % initialize opts
 opts = struct;

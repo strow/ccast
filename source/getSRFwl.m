@@ -39,11 +39,10 @@ end
 
 % find position of wlaser in the table
 wj = max(find(wtab <= wlaser));
-if wj == ntab
-  wj = wj - 1;
-end
 if isempty(wj)
-  error('wlaser outside tabulated interval')
+  wj = 1;
+elseif wj == ntab
+  wj = wj - 1;
 end
 
 % get the interpolation weights

@@ -1,10 +1,9 @@
 
-% compare bcast and IDPS spectra.  
+% compare readsdr_rtp with prototype readbc_rtp (under development)
 %
 % specify a bcast SDR file and scan index, find the corresponding
-% IDPS file and scan, and compare selected spectra.  This is simple
-% because the bcast SDR files include the gid string from the GCRSO
-% file, which is also an identifier for the IDPS SDR files.
+% IDPS file and scan, and compare data returned by the readers
+%
 
 addpath /home/motteler/cris/bcast/motmsc/asl
 
@@ -16,8 +15,7 @@ wn_sw = linspace(2155-2.50*2,2550+2.50*2,163)';
 % select day-of-the-year
 % doy = '054';  % high-res 2nd day
 % doy = '136';  % may 15 focus day
-% doy = '228';      % includes new geo
-doy = '159';      % includes new geo
+doy = '228';      % includes new geo
 
 % get a list of files for this day
 byear = '/home/motteler/cris/data/2012';  
@@ -25,7 +23,7 @@ bdir  = fullfile(byear, doy);
 blist = dir(fullfile(bdir, 'SDR*.mat'));
 
 % choose and load particular file
-fi = 40;
+fi = 61;
 bfile = fullfile(bdir, blist(fi).name);
 load(bfile)
 
@@ -44,6 +42,10 @@ sfile = fullfile(sdir, slist(end).name);
 
 % read the IDPS SDR file
 pd = readsdr_rawpd(sfile);
+
+% read both as RTP prof structs
+[prof1, pattr1] = readbc_rtp(bfile);
+[prof2, pattr2] = readsdr_rtp(sfile);
 
 % ------------------------
 % LW single FOV comparison
@@ -65,7 +67,25 @@ ix = interp1(x1, 1:length(x1), x2, 'nearest');
 x1 = x1(ix);
 y1 = y1(ix);
 
+% get bcast SDR from RTP
+kb = j + 9*(k-1) + 270*(bi-1);
+ib = 1:length(wn_lw);
+yb = real(rad2bt(x2, prof1.robs1(ib, kb)));
+
+% get IDPS SDR from RTP
+ks = j + 9*(k-1) + 270*(si-1);
+ys = real(rad2bt(x2, prof2.robs1(ib, ks)));
+
+% compare bcast RTP vs SDR
+max(abs(y1 - yb)) / rms(y1)
+
+% compare IDPS RTP vs SDR
+max(abs(y2 - ys)) / rms(y2)
+
+return
+
 rms(y2 - y1)
+rms(ys - yb)
 
 % comparison plot
 figure (1)
