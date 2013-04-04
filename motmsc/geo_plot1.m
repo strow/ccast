@@ -1,7 +1,7 @@
 
 % get an allgeo file
-% load ../data/2012/daily/allgeo20120519.mat
-load ../data/2012/daily/allgeo20120515.mat
+% load ../../data/2012/daily/allgeo20120519.mat
+load ../../data/2013/daily/allgeo20130312.mat
 
 % microseconds/hour, conversion factor for plots
 us_hr = 1e6 * 60 * 60;

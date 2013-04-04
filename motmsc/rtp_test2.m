@@ -5,7 +5,7 @@
 % IDPS file and scan, and compare data returned by the readers
 %
 
-addpath /home/motteler/cris/bcast/motmsc/asl
+addpath ./asl
 
 % IDPS SDR channel frequencies
 wn_lw = linspace(650-0.625*2,1095+0.625*2,717)';
@@ -15,15 +15,17 @@ wn_sw = linspace(2155-2.50*2,2550+2.50*2,163)';
 % select day-of-the-year
 % doy = '054';  % high-res 2nd day
 % doy = '136';  % may 15 focus day
-doy = '228';      % includes new geo
+% doy = '228';  % includes new geo
+doy = '129';
 
 % get a list of files for this day
 byear = '/home/motteler/cris/data/2012';  
 bdir  = fullfile(byear, doy);
 blist = dir(fullfile(bdir, 'SDR*.mat'));
 
-% choose and load particular file
-fi = 61;
+% choose and load a particular file
+% fi = 61;
+fi = 120;
 bfile = fullfile(bdir, blist(fi).name);
 load(bfile)
 
@@ -82,7 +84,7 @@ max(abs(y1 - yb)) / rms(y1)
 % compare IDPS RTP vs SDR
 max(abs(y2 - ys)) / rms(y2)
 
-return
+% return
 
 rms(y2 - y1)
 rms(ys - yb)

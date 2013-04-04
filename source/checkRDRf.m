@@ -149,7 +149,7 @@ for i = 1 : 9
   tmp1FOR(i, ix) = d1.FOR.LWES(i, 1:n);
   tmp1SDR(i, ix) = d1.sweep_dir.LWES(i, 1:n);
   igmLW(:, i, ix) =  d1.idata.LWES(:, i, 1:n) + ...
-          sqrt(-1) * d1.qdata.LWES(:, i, 1:n);
+                1i * d1.qdata.LWES(:, i, 1:n);
 
   n = ztail(d1.packet.LWIT.time(:, i));
   t1 = d1.packet.LWIT.time(1:n, i) * mwt;
@@ -157,7 +157,7 @@ for i = 1 : 9
   tmp1FOR(i, ix) = d1.FOR.LWIT(i, 1:n);
   tmp1SDR(i, ix) = d1.sweep_dir.LWIT(i, 1:n);
   igmLW(:, i, ix) =  d1.idata.LWIT(:, i, 1:n) + ...
-          sqrt(-1) * d1.qdata.LWIT(:, i, 1:n);
+                1i * d1.qdata.LWIT(:, i, 1:n);
 
   n = ztail(d1.packet.LWSP.time(:, i));
   t1 = d1.packet.LWSP.time(1:n, i) * mwt;
@@ -165,7 +165,7 @@ for i = 1 : 9
   tmp1FOR(i, ix) = d1.FOR.LWSP(i, 1:n);
   tmp1SDR(i, ix) = d1.sweep_dir.LWSP(i, 1:n);
   igmLW(:, i, ix) =  d1.idata.LWSP(:, i, 1:n) + ...
-          sqrt(-1) * d1.qdata.LWSP(:, i, 1:n);
+                1i * d1.qdata.LWSP(:, i, 1:n);
 
   % --------------------------------
   % merge band 2 ES, IT, and SP data
@@ -176,7 +176,7 @@ for i = 1 : 9
   tmp2FOR(i, ix) = d1.FOR.MWES(i, 1:n);
   tmp2SDR(i, ix) = d1.sweep_dir.MWES(i, 1:n);
   igmMW(:, i, ix) =  d1.idata.MWES(:, i, 1:n) + ...
-          sqrt(-1) * d1.qdata.MWES(:, i, 1:n);
+                1i * d1.qdata.MWES(:, i, 1:n);
 
   n = ztail(d1.packet.MWIT.time(:, i));
   t1 = d1.packet.MWIT.time(1:n, i) * mwt;
@@ -184,7 +184,7 @@ for i = 1 : 9
   tmp2FOR(i, ix) = d1.FOR.MWIT(i, 1:n);
   tmp2SDR(i, ix) = d1.sweep_dir.MWIT(i, 1:n);
   igmMW(:, i, ix) =  d1.idata.MWIT(:, i, 1:n) + ...
-          sqrt(-1) * d1.qdata.MWIT(:, i, 1:n);
+                1i * d1.qdata.MWIT(:, i, 1:n);
 
   n = ztail(d1.packet.MWSP.time(:, i));
   t1 = d1.packet.MWSP.time(1:n, i) * mwt;
@@ -192,7 +192,7 @@ for i = 1 : 9
   tmp2FOR(i, ix) = d1.FOR.MWSP(i, 1:n);
   tmp2SDR(i, ix) = d1.sweep_dir.MWSP(i, 1:n);
   igmMW(:, i, ix) =  d1.idata.MWSP(:, i, 1:n) + ...
-          sqrt(-1) * d1.qdata.MWSP(:, i, 1:n);
+                1i * d1.qdata.MWSP(:, i, 1:n);
 
   % --------------------------------
   % merge band 3 ES, IT, and SP data
@@ -203,7 +203,7 @@ for i = 1 : 9
   tmp3FOR(i, ix) = d1.FOR.SWES(i, 1:n);
   tmp3SDR(i, ix) = d1.sweep_dir.SWES(i, 1:n);
   igmSW(:, i, ix) =  d1.idata.SWES(:, i, 1:n) + ...
-          sqrt(-1) * d1.qdata.SWES(:, i, 1:n);
+                1i * d1.qdata.SWES(:, i, 1:n);
 
   n = ztail(d1.packet.SWIT.time(:, i));
   t1 = d1.packet.SWIT.time(1:n, i) * mwt;
@@ -211,7 +211,7 @@ for i = 1 : 9
   tmp3FOR(i, ix) = d1.FOR.SWIT(i, 1:n);
   tmp3SDR(i, ix) = d1.sweep_dir.SWIT(i, 1:n);
   igmSW(:, i, ix) =  d1.idata.SWIT(:, i, 1:n) + ...
-          sqrt(-1) * d1.qdata.SWIT(:, i, 1:n);
+                1i * d1.qdata.SWIT(:, i, 1:n);
 
   n = ztail(d1.packet.SWSP.time(:, i));
   t1 = d1.packet.SWSP.time(1:n, i) * mwt;
@@ -219,7 +219,7 @@ for i = 1 : 9
   tmp3FOR(i, ix) = d1.FOR.SWSP(i, 1:n);
   tmp3SDR(i, ix) = d1.sweep_dir.SWSP(i, 1:n);
   igmSW(:, i, ix) =  d1.idata.SWSP(:, i, 1:n) + ...
-          sqrt(-1) * d1.qdata.SWSP(:, i, 1:n);
+                1i * d1.qdata.SWSP(:, i, 1:n);
 
 end % loop on FOVs
 

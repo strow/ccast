@@ -46,14 +46,17 @@ switch band
     user.v1 = 650;
     user.v2 = 1095;
     user.opd = 0.8;
+    user.vr = 20;
   case 'MW'  
     user.v1 = 1210;
     user.v2 = 1750;
     user.opd = 0.8;
+    user.vr = 20;
   case 'SW'  
     user.v1 = 2155;
     user.v2 = 2550;
     user.opd = 0.8;
+    user.vr = 22;
 end
 
 user.dv = 1 / (2*user.opd);
