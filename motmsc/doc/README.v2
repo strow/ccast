@@ -1,0 +1,94 @@
+
+Some of the main procedures 
+-----------------------------
+
+rdr2mat     - process RDR h5 files to mat files
+
+rdr2sdr     - process RDR mat files to SDR mat files
+scipack     - process sci and eng packets
+checkRDRf   - validate the RDR data
+scanorder   - group data into scans
+calmain2    - main calibration procedure, Dave T. version
+calmain3    - main calibration procedure, new hi res branch
+calmain4    - main calibration procedure, general purpose 
+
+igm2spec    - take interferograms to uncalibrated spectra
+inst_params - set selected instrument parameters
+movavg_pre  - preprocess moving averages
+movavg_app  - calculate or load moving averages
+
+oaffov2     - spectral space SRF, Scott & Dave
+mkSRFwl     - build SRF matrix tables for interpolation
+getSRFwl    - wlaser SRF matrix interpolation
+finterp     - fourier interpolation for FTIR data
+bandpass    - spectral domain bandpass filter
+
+sdr2rtp     - process SDR mat files to RTP files
+
+davet/ - Dave's procedures, mostly from dcast, added after they are
+         checked out as being compatible with the bcast code
+
+davet2/ - Earlier versions of Dave's code, before the 20 Dec fork.
+
+
+To Do List
+-----------
+
+1 May 2012
+
+
+30 Apr 2012
+
++ uh oh, calmain4 gives major cal errors after ES nlc sweep parity
+  fix and mods to loop on sweep dire sweep dir.  calmain4.bak was OK
+
+- how to manage calibration and other major branches?
+    - code subtrees, select with addpath
+    - opts flags and case statements
+    - git branches
+
+  none of these is ideal.  git makes working with both branches at
+  the same time a hassle, opts flags and case statements are clunky,
+  and subtrees with addpath require some care with paths
+
+- bring the rest of Dave's code back as a calibration branch
+
+- SDR mat file format?  probably can just fill out as needed
+
+- test the hi-res code with Dave's ICT model without NLC--the NLC
+  won't work but we can still try the ICT model
+
+- "opts" is becoming mostly filenames and a few run parameters, 
+
+- consider adding msc.err as a placeholder for returning errors in
+  major procedures like calmain and rdr2sdr.  Possibly also add an
+  opts.verbose flag, if used with restraint.
+
+- do_allgeo needs to be a function
+
+25 Apr 2012
+
+- bring Dave's "science core" from dcast into the current calmain2.
+  this is a 3-way merge of calmain3 initial parts, the old current
+  calmain2 here, and calmain2 from dcast.
+
+- current calmain2 -- prototype for dcast version; this has the
+  sweep direction fix and my initial setup for calls to ICTradModel,
+  nlc, and nlc params load w/ sweep direction fix
+
+- current calmain3 -- history is calmain1 -> calmainX -> calmain3;
+  has my spectral cal but needs needs emiss and nonlinearity code
+
+- test out the file-spanning moving averages with the new code.  
+  I haven't looked at this for a while
+
+- integrate the geo struct from do_allgeo.m.  probably want to call
+  this from the wrapper.  Can't simply pass in a list of rid string
+  since this uses the IDPS SDR naming scheme.  Could simply process
+  a day at a time.
+
+- add Dave's non-linearity correction and ICT radiance modeling to
+  the calmain3 branch
+
+- add some documentation
+

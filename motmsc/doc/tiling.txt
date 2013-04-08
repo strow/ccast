@@ -1,0 +1,60 @@
+
+          CrIS data organization and image tiling
+
+
+CrIS data from routines like read_GCRSO and from the RDR cleanup
+procedures checkRDRf and scanorder are in column and time order.
+For example radiance data is nchan x 9 x 30 x nscan (that is, nchan
+x nFOV x nFOR x nscan) and geo data such as lat and lon is 9 x 30 x
+nscan.
+
+This note compares this standard column-order representation with a
+column-order tiling for images and geo applications.  In each of the
+following figures the individual digits are FOV numbers.
+
+
+(1) 9 x 30 x N column order data.  This is how geo data is organized
+in memory, and returned by procedures like read_GCRSO.
+
+   1 1 ... 1   1 1 ... 1  ...  1 1 ... 1
+   2 2 ... 2   2 2 ... 2  ...  2 2 ... 2
+   : :  :  :   : :  :  :       : :  :  :
+   9 9 ... 9   9 9 ... 9  ...  9 9 ... 9
+   ---------   ---------       ---------
+    scan 1      scan 2          scan N
+
+
+(2) 3 x 90 x N column order data.  This is just a reshape of (1)
+
+   1 4 7  1 4 7 ... 1 4 7  ...  1 4 7  1 4 7 ... 1 4 7  
+   2 5 8  2 5 8 ... 2 5 8  ...  2 5 8  2 5 8 ... 2 5 8  
+   3 6 9  3 6 9 ... 3 6 9  ...  3 6 9  3 6 9 ... 3 6 9   
+   ----------------------       ----------------------
+           scan 1                       scan N
+
+
+(3) 90 x 3*N column order data, the desired tiling for images
+
+   1 4 7  1 4 7 ... 1 4 7
+   2 5 8  2 5 8 ... 2 5 8  scan 1
+   3 6 9  3 6 9 ... 3 6 9
+
+   1 4 7  1 4 7 ... 1 4 7
+   2 5 8  2 5 8 ... 2 5 8  scan 2
+   3 6 9  3 6 9 ... 3 6 9
+
+     :      :         :
+
+   1 4 7  1 4 7 ... 1 4 7
+   2 5 8  2 5 8 ... 2 5 8  scan N
+   3 6 9  3 6 9 ... 3 6 9
+
+
+Here columns are cross-track and rows are along-track observations.
+This is the transpose of a typical image representation, but keeps
+the data in column order.  The data here is no longer stricly in
+time order as the individual 3 x 3 FOR submatrices are simultaneous.
+
+Note that for a single scan (2) and (3) are the same, but for the
+general case of (3) we need to re-tile the array from (1).
+

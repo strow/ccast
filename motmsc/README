@@ -1,94 +1,102 @@
 
-Some of the main procedures 
------------------------------
+drivers and plots
+------------------
+bcast_hires  - call rdr2sdr on regular or high-res data
+bcast_main   - wrapper to process matlab RDR to SDR data
+do_rdr2mat   - multi-day driver script for rdr2mat
+sci_daily    - save sci and eng data from RDR mat files
+plot_allsci  - sample plots of sci and eng data
 
-rdr2mat     - process RDR h5 files to mat files
+mkSRFwl      -  build SRF matrix tables for interpolation
+mkSRFwl_run  - demo wrapper for the above
 
-rdr2sdr     - process RDR mat files to SDR mat files
-scipack     - process sci and eng packets
-checkRDRf   - validate the RDR data
-scanorder   - group data into scans
-calmain2    - main calibration procedure, Dave T. version
-calmain3    - main calibration procedure, new hi res branch
-calmain4    - main calibration procedure, general purpose 
+cmp_fovs     - find a FOR with similar FOVs and compare them
+sdr_match    - compare bcast and IDPS spectra 
 
-igm2spec    - take interferograms to uncalibrated spectra
-inst_params - set selected instrument parameters
-movavg_pre  - preprocess moving averages
-movavg_app  - calculate or load moving averages
+bcast_dump   - call rdr2dmp to dump regular RDR data
+hires_dump   - call rdr2dmp to dump high-res RDR data 
 
-oaffov2     - spectral space SRF, Scott & Dave
-mkSRFwl     - build SRF matrix tables for interpolation
-getSRFwl    - wlaser SRF matrix interpolation
-finterp     - fourier interpolation for FTIR data
-bandpass    - spectral domain bandpass filter
+hires_resid  - check high res SA residuals
+lowres_plot3 - compare SRFs for FOVs 1, 2, and 5 at mid-band
+hires_plot3  - compare SRFs for FOVs 1, 2, and 5 at mid-band
+hires_plot   - quick look at hires (or any) SDR data
 
-sdr2rtp     - process SDR mat files to RTP files
+plotSDR1     - compare bcast and ccast spectra
+plotSDR2     - quick look at SDR data
 
-davet/ - Dave's procedures, mostly from dcast, added after they are
-         checked out as being compatible with the bcast code
+geo_test
+---------
+geo_plot1    - demo plot of allgeo data
+geo_run1     - geo_daily-only wrapper
+geo_test     - simple geo tests and benchmarks
+map_demo1    - plot xtrack by atrack for a selected channel
+map_demo2    - map demo from a list of matlab SDR files
 
-davet2/ - Earlier versions of Dave's code, before the 20 Dec fork.
+msc_test
+---------
+bpass_demo    - show bandpass full filter wings
+checkRDR      - validate MIT RDR data
+conv_demo1    - demo of kcarta to CrIS convolution with finterp
+cos_demo      - generic cosine transform demo
+rdr_times     - compare RDR internal, filename, and attribute time
+rtp_test2     - compare readsdr_rtp with prototype readbc_rtp
+sdr_day_check - quick look a day's worth of SDR data
+test_mean     - test of recursive mean
+test_std      - test of recursive std
 
+bcast_rdr4  - call rdr2sdr4 on regular or high-res data
+rdr2mat4    - process 4-scan RDR h5 files to mat files
+rdr2sdr4    - rdr2sdr to check for out-of-order 4-scan data
 
-To Do List
------------
+movavg
+-------
+atest        - moving average w/ NaN tests
+movavg_aux   - get moving average from a 3-file window
+movavg_pre   - preprocess moving averages
 
-1 May 2012
+igm_test
+---------
+igm_mean     - find mean of a day of interferogram data
+igm_std      - find std of a day of interferogram data
+igm_plots    - plot mean and std of interferogram data
+igm_scan1    - find max and min IGM values from bcast dump files
+phase_look   - print summary phase stats from bcast dump files
+phase_diffs  - plot even minus odd phase diffs
+mask_test1   - plot IGM obs along with high res bit-trim mask
 
+utils
+------
+bt2rad       - translate brightness temperature to radiance
+rad2bt       - translate radiance to brightness temperature
+finterp      - interferometric fourier interpolation
+finterp2     - fourier interpolation, wrapper for interpft
+hires_bmask  - high res bit trim mask with max and min bounds
+isclose      - test for rms relative difference less than eps
+ntail        - find the non-NaN end a vector or array
+oaffov2      - compute the off axis SRF
+readbc_rtp   - translate bcast SDR data to RTP profiles
+rdr2dmp      - save selected internal values from rdr2sdr
+rec_std      - recursive standard deviation
+rec_mean     - recursive (mean
+rms          - returns RMS average of vector or matrix
+rmscol       - return rms value for each column
+header.m     - man-page style function boilerplate 
 
-30 Apr 2012
+zold1
+------
+h5test1      - split up a fat h5 granule
+ngas_batch3  - process data with the NGAS reader
+ngas_flags   - NGAS scan status flags
+readspec6    - get spectra from a CrIS RDR interferogram
+scancat      - concatenat scan blocks from RDRs
+scancat3     - concatenate 3 x 3 scan blocks from RDRs
+sftab1       - tabulate non-zero scan flags
+testBitTrim  - scan RDR records for bit trim mask changes
+testload     - load selected MIT and NGAS records
+testspecs    - compare readspec, inst_params, and spectral_params
+tileplot1    - simple tiling plot
 
-+ uh oh, calmain4 gives major cal errors after ES nlc sweep parity
-  fix and mods to loop on sweep dire sweep dir.  calmain4.bak was OK
-
-- how to manage calibration and other major branches?
-    - code subtrees, select with addpath
-    - opts flags and case statements
-    - git branches
-
-  none of these is ideal.  git makes working with both branches at
-  the same time a hassle, opts flags and case statements are clunky,
-  and subtrees with addpath require some care with paths
-
-- bring the rest of Dave's code back as a calibration branch
-
-- SDR mat file format?  probably can just fill out as needed
-
-- test the hi-res code with Dave's ICT model without NLC--the NLC
-  won't work but we can still try the ICT model
-
-- "opts" is becoming mostly filenames and a few run parameters, 
-
-- consider adding msc.err as a placeholder for returning errors in
-  major procedures like calmain and rdr2sdr.  Possibly also add an
-  opts.verbose flag, if used with restraint.
-
-- do_allgeo needs to be a function
-
-25 Apr 2012
-
-- bring Dave's "science core" from dcast into the current calmain2.
-  this is a 3-way merge of calmain3 initial parts, the old current
-  calmain2 here, and calmain2 from dcast.
-
-- current calmain2 -- prototype for dcast version; this has the
-  sweep direction fix and my initial setup for calls to ICTradModel,
-  nlc, and nlc params load w/ sweep direction fix
-
-- current calmain3 -- history is calmain1 -> calmainX -> calmain3;
-  has my spectral cal but needs needs emiss and nonlinearity code
-
-- test out the file-spanning moving averages with the new code.  
-  I haven't looked at this for a while
-
-- integrate the geo struct from do_allgeo.m.  probably want to call
-  this from the wrapper.  Can't simply pass in a list of rid string
-  since this uses the IDPS SDR naming scheme.  Could simply process
-  a day at a time.
-
-- add Dave's non-linearity correction and ICT radiance modeling to
-  the calmain3 branch
-
-- add some documentation
+zold2
+------
+msc old stuff
 

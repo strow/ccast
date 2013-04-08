@@ -1,0 +1,55 @@
+
+       Group '/All_Data/CrIS-SDR-GEO_All' 
+            Dataset 'FORTime' 
+            Dataset 'Height' 
+            Dataset 'Latitude' 
+		...
+            Dataset 'StartTime' 
+
+       Group '/Data_Products/CrIS-SDR-GEO' 
+            Dataset 'CrIS-SDR-GEO_Aggr' 
+                Attributes:
+                    'AggregateBeginningDate':  '20120427'
+                    'AggregateBeginningGranuleID':  'NPP000161707718'
+                    'AggregateBeginningOrbitNumber':  2579 
+                    'AggregateBeginningTime':  '035258.984108Z'
+                    'AggregateEndingDate':  '20120427'
+                    'AggregateEndingGranuleID':  'NPP000161712198'
+                    'AggregateEndingOrbitNumber':  2579 
+                    'AggregateEndingTime':  '040056.784177Z'
+                    'AggregateNumberGranules':  15 
+
+            Dataset 'CrIS-SDR-GEO_Gran_0' 
+                Attributes:
+                    'Ascending/Descending_Indicator':  1 
+                    'Beginning_Date':  '20120427'
+                    'East_Bounding_Coordinate':  -3.098190 
+                    'Beginning_Time':  '035258.984108Z'
+                    'Ending_Date':  '20120427'
+                    'Ending_Time':  '035328.784176Z'
+			...
+                    'N_Beginning_Orbit_Number':  2579 
+                    'N_Beginning_Time_IET':  1.714190e+15 
+                    'N_Creation_Date':  '20120427'
+                    'N_Creation_Time':  '052956.061428Z'
+                    'N_Ending_Time_IET':  1.714190e+15 
+                    'N_Granule_ID':  'NPP000161707718'
+                    'N_Granule_Status':  'N/A'
+                    'N_Granule_Version':  'A1'
+			...
+                    'N_LEOA_Flag':  'On'
+                    'N_Nadir_Latitude_Max':  61.427101 
+                    'N_Nadir_Latitude_Min':  60.168900 
+                    'N_Nadir_Longitude_Max':  -20.697300 
+                    'N_Nadir_Longitude_Min':  -22.257401 
+                    'N_NPOESS_Document_Ref':  '474-00001-03_JPSS-CDFCB-X-Vol-III
+			...
+                    'N_Number_Of_Scans':  4 
+                    'N_Quality_Summary_Names':  'N/A'
+                    'N_Quality_Summary_Values':  -993 
+                    'N_Reference_ID':  '4f9a2ed4-0efb3-0a180213-59b2bc5a'
+                    'N_Software_Version':  'I1.5.05.03'
+                    'N_Spacecraft_Maneuver':  'Normal Operations'
+                    'North_Bounding_Coordinate':  63.255100 
+                    'South_Bounding_Coordinate':  56.572800 
+                    'West_Bounding_Coordinate':  -42.241600 

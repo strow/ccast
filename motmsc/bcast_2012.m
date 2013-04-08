@@ -41,22 +41,21 @@ function bcast_main(doy)
 % set bcast paths
 addpath ../davet
 addpath ../source
-addpath ./utils
 
 % for high-res ONLY
 % addpath ../hires
 
 % path to matlab RDR input by day-of-year
-RDR_mat = '/asl/data/cris/rdr60/mat/2013/';
+RDR_mat = '/asl/data/cris/rdr60/mat/2012/';
 
 % path to matlab SDR output by day-of-year
-SDR_mat = '/home/motteler/cris/data/2013/';  
+SDR_mat = '/home/motteler/cris/data/2012/';  
 
 % path to allgeo (and allsci) data
-dailydir = '/home/motteler/cris/data/2013/daily';  
+dailydir = '/home/motteler/cris/data/2012/daily';  
 
 % get geo filename allgeo<yyyymmdd>.mat from day-of-year
-tmp = datestr(datenum(2013,1,1) + str2num(doy) - 1, 30);
+tmp = datestr(datenum(2012,1,1) + str2num(doy) - 1, 30);
 geofile = fullfile(dailydir, ['allgeo', tmp(1:8), '.mat']);
 
 % full path to matlab RDR input files

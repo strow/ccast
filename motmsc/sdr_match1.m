@@ -6,7 +6,8 @@
 % because the bcast SDR files include the gid string from the GCRSO
 % file, which is also an identifier for the IDPS SDR files.
 
-addpath /home/motteler/cris/bcast/motmsc/asl
+addpath ./asl
+addpath ../source
 
 % IDPS SDR channel frequencies
 wn_lw = linspace(650-0.625*2,1095+0.625*2,717)';
@@ -16,16 +17,15 @@ wn_sw = linspace(2155-2.50*2,2550+2.50*2,163)';
 % select day-of-the-year
 % doy = '054';  % high-res 2nd day
 % doy = '136';  % may 15 focus day
-% doy = '228';      % includes new geo
-doy = '159';      % includes new geo
+doy = '060';
 
 % get a list of files for this day
-byear = '/home/motteler/cris/data/2012';  
+byear = '/home/motteler/cris/data/2013';  
 bdir  = fullfile(byear, doy);
 blist = dir(fullfile(bdir, 'SDR*.mat'));
 
 % choose and load particular file
-fi = 40;
+fi = 5;
 bfile = fullfile(bdir, blist(fi).name);
 load(bfile)
 
@@ -37,7 +37,7 @@ gid = geo.sdr_gid(bi, :);
 si = geo.sdr_ind(bi, :);  
 
 % get the IDPS SDR path and filename
-syear = '/asl/data/cris/sdr60/hdf/2012';
+syear = '/asl/data/cris/sdr60/hdf/2013';
 sdir  = fullfile(syear, doy);
 slist = dir(fullfile(sdir, ['SCRIS_npp_', gid, '*.h5']));
 sfile = fullfile(sdir, slist(end).name);

@@ -38,6 +38,9 @@ function [nlcorr_cxs,extra] = nlc(band,iFov,v,scene_cxs,space_cxs,PGA_Gain,contr
 %   Revision: 24 Nov 2008   JKT, UW-SSEC
 %   11 Nov 2011, DCT, renamed nlc.m and mods to work with the MIT LL format input and other mods
 %   regarding form of input variables and passing of variables to DC level function.
+%   09 Feb 2012, DCT, fixed bug in extracting PGA gain values from 4-min-eng packet (!!!)
+%   28 Feb 2012, DCT, preliminary a2 scale factors based on DM and Fov-2-Fov analysis
+%   19 Nov 2012, DCT, a2 scale factors based on Fov-2-Fov analysis of IDPS/ADL processing
 %
 
 % Construct control structure if not input.  This includes numerical filter data, instrument background 
@@ -55,6 +58,8 @@ NF = control.NF;
 %
 % These are a2 values derived from minimizing ECT view residuals from TVAC3 MN1 and 
 % are the values contained in a2_coeffs.optJAN2009 in a2_UW_refined_27Jan2009.mat.
+%
+% Although in different units, these correspond to the version 32 Engineering Packet values used in IDPS/ADL processing.
 %
 %              FOV =     1         2         3         4         5         6          7        8         9
 a2_tvac3_mn1_ect.lw = [6.6814    6.3409    5.9984    9.5624    7.7635    7.6739     5.916    5.8978    7.9171  ]'/1e7;
@@ -74,9 +79,9 @@ pgaGain_tvac3_mn1.sw = tmp([6 4 6 4 3 5 5 5 8]+1)';
 %
 % Scale the above a2 values for use with the current data based on the current PGA Gain values.  Pull out PGA gains:
 %
-pgaGain_now.lw = PGA_Gain.Band(1).map(PGA_Gain.Band(1).Setting);
-pgaGain_now.mw = PGA_Gain.Band(2).map(PGA_Gain.Band(2).Setting);
-pgaGain_now.sw = PGA_Gain.Band(3).map(PGA_Gain.Band(3).Setting);
+pgaGain_now.lw = PGA_Gain.Band(1).map(PGA_Gain.Band(1).Setting+1);
+pgaGain_now.mw = PGA_Gain.Band(2).map(PGA_Gain.Band(2).Setting+1);
+pgaGain_now.sw = PGA_Gain.Band(3).map(PGA_Gain.Band(3).Setting+1);
 %
 % And do the scaling
 %
@@ -84,6 +89,30 @@ a2_now.lw = a2_tvac3_mn1_ect.lw .* pgaGain_tvac3_mn1.lw ./ pgaGain_now.lw;
 a2_now.mw = a2_tvac3_mn1_ect.mw .* pgaGain_tvac3_mn1.mw ./ pgaGain_now.mw;
 a2_now.sw = a2_tvac3_mn1_ect.sw .* pgaGain_tvac3_mn1.sw ./ pgaGain_now.sw;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%% Preliminary scale factors, 28-Feb, DCT, based on DM and Fov-2-Fov analysis
+%sf = [1.3000 1.2300 0.9500 1.2100 1      0.7800 1.0900 2.5000 1.7000];
+%a2_now.lw = a2_now.lw .* sf';
+%sf = [0      1.4300 1.3100 0.5000 0.8300 0      2.1500 1.6800 0];
+%a2_now.mw = a2_now.mw .* sf';
+
+
+% DCT 19-Nov-2012
+% a2 scale factors derived from analysis of FOV-2-FOV differences.  These scale factors are ratios of 
+% a2 values derived from analysis of IDPS/CSPP data, and are applied here to the CCAST values.
+sf = [1.166 1.0346 0.94156 1.2843 1.0697 0.95456 1.3812 1.6973 1.3745];
+a2_now.lw = a2_now.lw .* sf';
+sf = [1.0081 1.4049 1.1205 1.1543 1.1414 1.4764 2.1252 1.7396 1.0003];
+a2_now.mw = a2_now.mw .* sf';
+
+
+% Apply additional overall (FOV independent) emperical scale factors
+% global A2_SCALE_FACTOR
+A2_SCALE_FACTOR = 1;
+a2_now.lw = a2_now.lw * A2_SCALE_FACTOR;
+a2_now.mw = a2_now.mw * A2_SCALE_FACTOR;
+a2_now.sw = a2_now.sw * A2_SCALE_FACTOR;
 
 %
 % Define limits for spectral integrals, reduction factors, and # normal mode spectral points.  

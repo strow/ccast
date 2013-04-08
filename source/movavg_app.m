@@ -3,7 +3,7 @@
 %   movavg_app - take moving average of SP and IT data
 %
 % SYNOPSIS
-%   function [avgSP, avgIT] = movavg_main(scal, mspan)
+%   function [avgSP, avgIT] = movavg_app(scal, mspan)
 %
 % INPUTS
 %   scal  - nchan x 9 x 4 x nscan, ICT and SP scans
