@@ -7,11 +7,13 @@
 %   - plot metrology laser wavelength vs time (hours)
 % 
 
+addpath ../davet
+
 % factor to convert MIT to IET time
 mwt = 8.64e7;
 
 % path to allsci data
-daily_mat = '/home/motteler/cris/data/2012/daily';  
+daily_mat = '/home/motteler/cris/data/2013/daily';  
 
 % get matlab date number
 dnum = datenum(input('date > ', 's'));
@@ -43,7 +45,7 @@ end
 ms_hr = 1000 * 60 * 60;
 
 % plot met laser vs eng packet time
-figure(1)
+figure(1); clf
 plot((ptime-ptime(1))/ms_hr, mlaser, 'o')
 title(sprintf('met laser vs eng packet time, %s', dstr))
 xlabel('hour')
@@ -52,7 +54,7 @@ grid
 saveas(gcf, ['met_', fstr], 'fig')
 
 % plot ICT temps vs eng packet time
-figure(2)
+figure(2); clf
 xx1 = [allsci(:).time];
 xx1 = (xx1 - xx1(1)) / ms_hr;
 yy1 = [allsci(:).T_PRT1];

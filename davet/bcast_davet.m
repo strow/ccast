@@ -32,34 +32,31 @@
 %   files from source, and finally files from davet
 %
 
-% function bcast_main(doy)
+function bcast_main(doy)
 
 % select day-of-the-year
-% doy = '054';  % high-res 2nd day
-doy = '136';
+% doy = '136';
 
 % set bcast paths
-addpath ../motmsc
 addpath ../source
-addpath ../davet
 
 % for high-res ONLY
 % addpath ../hires
 
 % path to matlab RDR input by day-of-year
-RDR_mat = '/asl/data/cris/rdr60/mat/2012/';
+RDR_mat = '/asl/data/cris/rdr60/mat/2013/';
 
 % path to matlab SDR output by day-of-year
 % dt11 is resample_mode = 1, calmode = 1
 % dt12 is resample_mode = 1, calmode = 2
 % dt22 is resample_mode = 2, calmode = 2
-SDR_mat = '/home/motteler/cris/data/2012dt12/';  
+SDR_mat = '/home/motteler/cris/data/2013dt/';  
 
 % path to allgeo (and allsci) data
-dailydir = '/home/motteler/cris/data/2012/daily';  
+dailydir = '/home/motteler/cris/data/2013/daily';  
 
 % get geo filename allgeo<yyyymmdd>.mat from day-of-year
-tmp = datestr(datenum(2012,1,1) + str2num(doy) - 1, 30);
+tmp = datestr(datenum(2013,1,1) + str2num(doy) - 1, 30);
 geofile = fullfile(dailydir, ['allgeo', tmp(1:8), '.mat']);
 
 % full path to matlab RDR input files

@@ -7,22 +7,22 @@ do_rdr2mat   - multi-day driver script for rdr2mat
 sci_daily    - save sci and eng data from RDR mat files
 plot_allsci  - sample plots of sci and eng data
 
-mkSRFwl      -  build SRF matrix tables for interpolation
+mkSRFwl      - build SRF matrix tables for interpolation
 mkSRFwl_run  - demo wrapper for the above
 
+cmp_sdr      - compare two b/ccast SDR files
+cmp_idps     - compare b/ccast and IPDS spectra
 cmp_fovs     - find a FOR with similar FOVs and compare them
-sdr_match    - compare bcast and IDPS spectra 
 
 bcast_dump   - call rdr2dmp to dump regular RDR data
 hires_dump   - call rdr2dmp to dump high-res RDR data 
 
-hires_resid  - check high res SA residuals
-lowres_plot3 - compare SRFs for FOVs 1, 2, and 5 at mid-band
-hires_plot3  - compare SRFs for FOVs 1, 2, and 5 at mid-band
-hires_plot   - quick look at hires (or any) SDR data
+srf_lowres   - compare low res SRFs by FOV at mid-band
+srf_hires1   - compare high res SRFs by FOV at mid-band
+srf_hires2   - compare high res SRFs by FOV at low end of band
+srf_hires3   - check high res SA residuals
 
-plotSDR1     - compare bcast and ccast spectra
-plotSDR2     - quick look at SDR data
+plot_sdr1    - quick look at SDR data
 
 geo_test
 ---------

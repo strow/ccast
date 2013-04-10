@@ -4,47 +4,50 @@ bcast v 0.8, beta release
 
 H. Motteler, 6 April 2013
 
- 
-
-
 Overview
 ---------
 
-This is an "alpha" release.  The key procedures rdr2mat, geo_daily,
+This is a "beta" release.  The key procedures rdr2mat, geo_daily,
 and rdr2sdr, which together take HDF RDR to Matlab SDR data, have
 been tested extensively, but the wrappers and user environment are
 still evolving.  
 
-Major steps remaining include: integrate the old file-spanning
-moving average code, integrate Dave's radiometric calibration code
-from the old ccast, and write routines to translate the Matlab SDR
-data to more useful formats.
+The to-do list includes documentation for the matfile SDR fields,
+a high res version of the NLC correction, file-spanning moving
+averages, and updating names from bcast to ccast.  There needs to
+be better over-all documentation.  There is this README and often
+detailed comments in individual procedures, but not much else.
 
+There are some high-level design issues that could be addressed,
+like what RDR reader to use, low-level data flow, output formats,
+and so on, but these are probably not urgent.  The current output
+is SDR mat files, which we translate to RTP or work with directly.
+I'd originally intended this purely as an intermediate format but
+they are compact and convenient for many applications.
 
 Top level directories
 ----------------------
 
-  docs    - documentation
-  source  - main source directory
-  motmsc  - my dev, utils, and junk
-  hires   - high res code and params
-  davet   - Dave's code
-  strow   - Larrabee's code
-  readers - MIT readers with local mods
-  inst_data - instrument data: ILS, nonlinearity, emissivity, etc.
-  demo    - end-to-end demo with a small dataset
-
+  docs      - documentation
+  source    - main source directory
+  motmsc    - my development and utils
+  hires     - high res code and params
+  davet     - Dave's code
+  strow     - Larrabee's code
+  readers   - MIT readers with local mods
+  inst_data - instrument data:  nonlinearity, emissivity, etc.
+  demo      - end-to-end demo with a small dataset
 
 Matlab and data paths 
 ----------------------
 
 I'd like to allow for a limited set of different versions of some
-procedures by careful management of matlab path.  This lets us have
-things like a highres/inst_params.m and a source/inst_params.m, or 
-a source/calmain.m and a davet/calmain.m.  Mostly this just means if
-you're working in your own directory you can, as an option, run your
-own version of some of the code.  But you have to be careful with
-this.
+procedures by careful management of the matlab path.  This lets us
+have things like a highres/inst_params.m and a source/inst_params.m,
+or a source/calmain.m and a davet/calmain.m.  Mostly this just means
+if you're working in your own directory you can, as an option, run
+your own version of some of the code.  But you have to be careful
+with this.
 
 The search order for matlab procedures is the current directory and
 then the reverse order they are set with addpath.  So for example if
@@ -62,7 +65,6 @@ as ../yyyy/doy/ but that's just a convention, doy can be any subset
 of the day's data.  The only restriction is that the current setup
 uses doy to match the geo daily summary, so doy can't be a subset
 that spans days.
-
 
 Main processing steps
 ----------------------
@@ -85,10 +87,4 @@ summary file for a day's worth of data.
 The moving average preprocessing (to allow moving averages to span
 the 60-scan RDR files) has been tested with earlier versions of the
 code but is not yet integrated with the current release.
-
-The following are mostly vaporware
-
-  sdr2rtp    - save SDRs as RTP files
-  sdr2netcdf - save SDRs as netcdf files
-  sdr2map    - tile SDRs for fancy maps, data QC, etc.
 
