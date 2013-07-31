@@ -2,7 +2,7 @@
 bcast v 0.8, beta release  
 --------------------------
 
-H. Motteler, 6 April 2013
+H. Motteler, 30 July 2013
 
 Overview
 ---------
@@ -12,11 +12,14 @@ and rdr2sdr, which together take HDF RDR to Matlab SDR data, have
 been tested extensively, but the wrappers and user environment are
 still evolving.  
 
-The to-do list includes documentation for the matfile SDR fields,
-a high res version of the NLC correction, file-spanning moving
-averages, and updating names from bcast to ccast.  There needs to
-be better over-all documentation.  There is this README and often
-detailed comments in individual procedures, but not much else.
+The to-do list includes documentation for the mat file SDR fields,
+a high res version of the LW NLC correction, file-spanning moving
+averages, and regularization of the output format.  A lot of this
+could be fixed with an RDR reader that is better integrated with the
+validation code in checkRDRf.  There could be better documentation.
+There is this README and detailed comments in many of the individual
+procedures but not much else.  Some notes on getting started would
+be helpful.
 
 There are some high-level design issues that could be addressed,
 like what RDR reader to use, low-level data flow, output formats,
@@ -46,8 +49,7 @@ procedures by careful management of the matlab path.  This lets us
 have things like a highres/inst_params.m and a source/inst_params.m,
 or a source/calmain.m and a davet/calmain.m.  Mostly this just means
 if you're working in your own directory you can, as an option, run
-your own version of some of the code.  But you have to be careful
-with this.
+your own version of some of the code.
 
 The search order for matlab procedures is the current directory and
 then the reverse order they are set with addpath.  So for example if
@@ -71,20 +73,23 @@ Main processing steps
 
   rdr2mat    - wrapper and some QC for the MIT reader
   geo_daily  - save a day of GCRSO data in a mat file
+  sci_daily  - science and engineering packet summary
   avg_daily  - optional moving average preprocessing
   rdr2sdr    - main function for RDR to SDR processing
 
-currently rdr2mat and geo_daily are called once a day after the
-RDR HDF data has been downloaded, as a separate processing step.
-bcast_main is a wrapper for rdr2sd4 that sets paths, files, and
-options.
+rdr2mat, sci_daily, and geo_daily are called by a wrapper script
+motmsc/do_rdr2mat.m, that loops over days.  sci_daily is not needed
+for bcast processing but is useful for monitoring various instrument
+parameters, see motmsc/plot_allsci.m for some examples.  bcast_main
+is a wrapper for rdr2sd4 that sets paths, files, and options.
 
-The use of the geo summary file is probably temporary, the
-geo_match procedure could be modified to read the GCRSO files
-directly.  But it only takes a couple of minutes to build the
-summary file for a day's worth of data.
+The use of the geo summary file may be temporary, the geo_match
+procedure could be modified to read the GCRSO files directly.  But
+it only takes a couple of minutes to build the summary file for a
+day's worth of data.
 
-The moving average preprocessing (to allow moving averages to span
-the 60-scan RDR files) has been tested with earlier versions of the
-code but is not yet integrated with the current release.
+The moving average preprocessing, to allow moving averages to span
+the 60-scan RDR files, has been tested with earlier versions of the
+code but is not yet integrated with the current release.  This may
+wait on a more general rewrite of the lower layers of the code.
 

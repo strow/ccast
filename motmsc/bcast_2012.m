@@ -9,8 +9,8 @@
 % DISCUSSION
 %   this is a wrapper script to set paths, files, and options to
 %   process matlab RDR to matlab SDR files.  it can be modified to
-%   work as a function with parameter doy (day of year as a 3-char
-%   string).  the actual processing is done by rdr2sdr.
+%   work as a function with parameter doy, day of year as a 3-char
+%   string.  the actual processing is done by rdr2sdr.
 %
 %   bcast_main is just one step in a chain of processing, it assumes
 %   we have matlab RDR files and geo daily summary data available
@@ -34,11 +34,11 @@
 
 function bcast_main(doy)
 
-% select day-of-the-year
+% set doy here to run as a script
 % doy = '054';  % high-res 2nd day
-% doy = '136';  % may 15 focus day
+% doy = '142';
 
-% set bcast paths
+% search source, then davet
 addpath ../davet
 addpath ../source
 
@@ -46,13 +46,13 @@ addpath ../source
 % addpath ../hires
 
 % path to matlab RDR input by day-of-year
-RDR_mat = '/asl/data/cris/ccast/rdr60/2012/';
+RDR_mat = '/asl/data/cris/rdr60/mat/2012/';
 
 % path to matlab SDR output by day-of-year
-SDR_mat = '/asl/data/cris/ccast/sdr60_imx/2012/';
+SDR_mat = '/home/motteler/cris/data/2012/';  
 
 % path to allgeo (and allsci) data
-dailydir = '/asl/data/cris/ccast/daily/2012/';  
+dailydir = '/home/motteler/cris/data/2012/daily';  
 
 % get geo filename allgeo<yyyymmdd>.mat from day-of-year
 tmp = datestr(datenum(2012,1,1) + str2num(doy) - 1, 30);
