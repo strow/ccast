@@ -10,7 +10,7 @@ addpath ./asl
 addpath ../source
 
 % select day-of-the-year
-doy = '060';
+doy = '091';
 
 % get a list of files for this day
 byear = '/home/motteler/cris/data/2013';  
@@ -18,7 +18,7 @@ bdir  = fullfile(byear, doy);
 blist = dir(fullfile(bdir, 'SDR*.mat'));
 
 % choose and load particular file
-fi = 14;
+fi = 15;
 bfile = fullfile(bdir, blist(fi).name);
 load(bfile)
 
@@ -50,7 +50,7 @@ wlaser = 773.1301;
 %---------------------------------------
 % compare a selected FOV, FOR, and scan
 %---------------------------------------
-j = 8;   % select a FOV
+j = 2;   % select a FOV
 k = 15;  % select a FOR
 
 % bcast spectra

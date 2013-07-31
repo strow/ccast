@@ -2,11 +2,11 @@
 # bcast git ignore file
 
 # data & misc
-*.h5                # no h5 files
-*.mat               # no mat files
-*.fig               # no fig files
-*.log               # no log files
-*.core              # no coredumps
+*.h5
+*.mat
+*.fig
+*.log
+*.core
 
 # archives and packages
 *.gz

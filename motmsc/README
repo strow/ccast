@@ -6,13 +6,18 @@ bcast_main   - wrapper to process matlab RDR to SDR data
 do_rdr2mat   - multi-day driver script for rdr2mat
 sci_daily    - save sci and eng data from RDR mat files
 plot_allsci  - sample plots of sci and eng data
+plot_sdr1    - quick look at SDR data
 
 mkSRFwl      - build SRF matrix tables for interpolation
 mkSRFwl_run  - demo wrapper for the above
 
-cmp_sdr      - compare two b/ccast SDR files
-cmp_idps     - compare b/ccast and IPDS spectra
+cmp_sdr      - compare spectra from two b/ccast SDR files
+cmp_idps     - compare spectra from b/ccast and IPDS files
 cmp_fovs     - find a FOR with similar FOVs and compare them
+cmp_loop1    - loop on bcast SDR files, compare with IDPS 
+cmp_dtbc     - stats and plots with data from cmp_loop1
+cmp_ecmwf1   - loop on ECMWF rtp, match with IDPS, compare
+cmp_ecmwf2   - compare ecmwf, idps, and ccast radiances
 
 bcast_dump   - call rdr2dmp to dump regular RDR data
 hires_dump   - call rdr2dmp to dump high-res RDR data 
@@ -21,8 +26,6 @@ srf_lowres   - compare low res SRFs by FOV at mid-band
 srf_hires1   - compare high res SRFs by FOV at mid-band
 srf_hires2   - compare high res SRFs by FOV at low end of band
 srf_hires3   - check high res SA residuals
-
-plot_sdr1    - quick look at SDR data
 
 geo_test
 ---------
@@ -34,6 +37,7 @@ map_demo2    - map demo from a list of matlab SDR files
 
 msc_test
 ---------
+dw2dv_test    - compare wlaser and frequency residuals
 bpass_demo    - show bandpass full filter wings
 checkRDR      - validate MIT RDR data
 conv_demo1    - demo of kcarta to CrIS convolution with finterp
@@ -66,6 +70,7 @@ mask_test1   - plot IGM obs along with high res bit-trim mask
 
 utils
 ------
+header       - man-page style function boilerplate 
 bt2rad       - translate brightness temperature to radiance
 rad2bt       - translate radiance to brightness temperature
 finterp      - interferometric fourier interpolation
@@ -80,7 +85,12 @@ rec_std      - recursive standard deviation
 rec_mean     - recursive (mean
 rms          - returns RMS average of vector or matrix
 rmscol       - return rms value for each column
-header.m     - man-page style function boilerplate 
+iet2mat      - take IET time to matlab serial date number
+tai2mat      - take AIRS TAI to matlab serial date number
+iet2tai      - take IET to AIRS TAI
+tai2iet      - take AIRS TAI to IET
+seq_match    - return closest matching pairs from two sequences
+mkhamm       - build a sparse matrix for fast hamming convolutions
 
 zold1
 ------
