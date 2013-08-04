@@ -9,27 +9,24 @@
 % function bcast_main(doy)
 
 % select day-of-the-year
-% doy = '054';  % high-res 2nd day
-doy = '054';
+doy = '071';
 
-% set bcast paths
-addpath /home/motteler/cris/bcast
-addpath /home/motteler/cris/bcast/davet
+% search source, then davet
+addpath ../davet
+addpath ../source
 
 % for high-res ONLY
-addpath /home/motteler/cris/bcast/hires
+addpath ../hires
 
 % set RDR and SDR base paths
-RDR_mat = '/asl/data/cris/rdr60/mat/2012/';
-SDR_mat = '/home/motteler/cris/data/2012/';
-RDR_HDF = '/asl/data/cris/rdr60/hdf/2012/';
-SDR_HDF = '/asl/data/cris/sdr60/hdf/2012/';
+RDR_mat = '/asl/data/cris/ccast/rdr60/2013/';
+SDR_mat = '/asl/data/cris/ccast/sdr60/2013/'
 
 % set path for allgeo
-dailydir = '/home/motteler/cris/data/2012/daily';  
+dailydir = '/asl/data/cris/ccast/daily/2013/';
 
 % get geo filename allgeo<yyyymmdd>.mat from day-of-year
-tmp = datestr(datenum(2012,1,1) + str2num(doy) - 1, 30);
+tmp = datestr(datenum(2013,1,1) + str2num(doy) - 1, 30);
 geofile = fullfile(dailydir, ['allgeo', tmp(1:8), '.mat']);
 
 % full path to matlab RDR files
@@ -43,8 +40,8 @@ unix(['mkdir -p ', sdir]);
 
 % get matlab RDR file list
 flist = dir(fullfile(rdir, 'RDR*.mat'));
-% flist = flist(61:64);
-flist = flist(21:end);
+% flist = flist(1:240);  % 23 feb high res, 16 may mat files
+flist = flist(end-60:end);
 
 % initialize opts
 opts = struct;
@@ -83,10 +80,10 @@ opts.SW.eICT = dd.e3hi;  % SW hi res emissivity
 
 % process matlab RDR to SDR data 
 
-profile clear
-profile on
+% profile clear
+% profile on
 
 [slist, msc] = rdr2sdr(flist, rdir, sdir, opts);
 
-profile viewer
+% profile viewer
 

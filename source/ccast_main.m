@@ -46,13 +46,13 @@ addpath ../source
 % addpath ../hires
 
 % path to matlab RDR input by day-of-year
-RDR_mat = '/asl/data/cris/rdr60/mat/2013/';
+RDR_mat = '/asl/data/cris/ccast/rdr60/2013/';
 
 % path to matlab SDR output by day-of-year
-SDR_mat = '/home/motteler/cris/data/2013/';  
+SDR_mat = '/asl/data/cris/ccast/sdr60/2013/';  
 
 % path to allgeo (and allsci) data
-dailydir = '/home/motteler/cris/data/2013/daily';  
+dailydir = '/asl/data/cris/ccast/daily/2013/';
 
 % get geo filename allgeo<yyyymmdd>.mat from day-of-year
 tmp = datestr(datenum(2013,1,1) + str2num(doy) - 1, 30);

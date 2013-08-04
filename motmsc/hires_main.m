@@ -11,7 +11,7 @@
 % select day-of-the-year
 doy = '071';
 
-% set bcast paths
+% search source, then davet
 addpath ../davet
 addpath ../source
 
@@ -19,11 +19,11 @@ addpath ../source
 addpath ../hires
 
 % set RDR and SDR base paths
-RDR_mat = '/asl/data/cris/rdr60/mat/2013/';
-SDR_mat = '/home/motteler/cris/data/2013/';
+RDR_mat = '/asl/data/cris/ccast/rdr60/2013/';
+SDR_mat = '/asl/data/cris/ccast/sdr60/2013/'
 
 % set path for allgeo
-dailydir = '/home/motteler/cris/data/2013/daily';  
+dailydir = '/asl/data/cris/ccast/daily/2013/';
 
 % get geo filename allgeo<yyyymmdd>.mat from day-of-year
 tmp = datestr(datenum(2013,1,1) + str2num(doy) - 1, 30);
