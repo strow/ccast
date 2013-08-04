@@ -2,7 +2,7 @@
 bcast v 0.8, beta release  
 --------------------------
 
-H. Motteler, 30 July 2013
+H. Motteler, 1 Aug 2013
 
 Overview
 ---------
@@ -12,21 +12,35 @@ and rdr2sdr, which together take HDF RDR to Matlab SDR data, have
 been tested extensively, but the wrappers and user environment are
 still evolving.  
 
-The to-do list includes documentation for the mat file SDR fields,
-a high res version of the LW NLC correction, file-spanning moving
-averages, and regularization of the output format.  A lot of this
-could be fixed with an RDR reader that is better integrated with the
-validation code in checkRDRf.  There could be better documentation.
-There is this README and detailed comments in many of the individual
-procedures but not much else.  Some notes on getting started would
-be helpful.
+The to-do list includes better documentation, regularized output,
+probably new output formats, a more closely integrated RDR reader,
+file-spanning moving averages, a high resolution version of the LW
+non-linearity correction, retaining the complex component for the
+matlab SDR output, possibly changing SDR variable names to match
+the IDPS and ADL conventions, and an option for locally calculated
+geolocation.
 
-There are some high-level design issues that could be addressed,
-like what RDR reader to use, low-level data flow, output formats,
-and so on, but these are probably not urgent.  The current output
-is SDR mat files, which we translate to RTP or work with directly.
-I'd originally intended this purely as an intermediate format but
-they are compact and convenient for many applications.
+Documentation is sparse.  There are some READMEs and detailed
+comments in many of the individual procedures, but not much else.
+We need an ATBD or at least an overview, and maybe some notes on
+getting started.  As an interim measure short descriptions of the
+current mat file SDR variables would be helpful.  I'd originally 
+intended this purely as an intermediate format but it is compact
+and convenient for some applications.
+
+Design choices for output format and features such as file-spanning
+moving averages depend on the RDR reader and its integration with the
+validation code in checkRDRf.  It was convenient for development but
+we should probably move away from a one-to-one correspondence between
+RDR and SDR files, and present the SDR data in a more regularized way.
+The current geo preprocessing step is needed mainly because the GCRSO
+geo and RDR files don't match up.
+
+Despite these problems the calibration code--both the UMBC and davet
+branches--works well and for the most part is in close agreement with
+the IDPS and ADL codes.  Differences that remain are more likely due
+to different physical assumptions and modeling than any problems that
+are purely with the code.
 
 Top level directories
 ----------------------
