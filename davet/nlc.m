@@ -42,82 +42,48 @@ function [nlcorr_cxs,extra] = nlc(band,iFov,v,scene_cxs,space_cxs,PGA_Gain,contr
 %   28 Feb 2012, DCT, preliminary a2 scale factors based on DM and Fov-2-Fov analysis
 %   19 Nov 2012, DCT, a2 scale factors based on Fov-2-Fov analysis of IDPS/ADL processing
 %
+%   18 Aug 2013, DCT, re-written to:
+%      a) use a2 values in units of inverse volts, 
+%      b) a2, mod-eff, and Vinst values are 07 Aug 2013 UW values.
+%      c) work with new DC level model function which uses Vinst as background contribution and V in units of volts.
+%
 
-% Construct control structure if not input.  This includes numerical filter data, instrument background 
-% fraction parameter, and ifr modulation efficiency.
-if nargin <= 6
-  control = load('DClevel_parameters_22July2008.mat'); 
-  control.NF = load('NF_dct_20080617modified.mat');
-  control.NF = control.NF.NF;
-end
+% Extract numerical filter info/data
 NF = control.NF;
 
+% Insert hard-coded Vinst values into control structure.  These are v34 EP values.
+control.DClevel_parameters.Vinst.lw = [1.36500   1.42370   1.42830   1.41930   1.32880   1.46600   1.47150   1.40460   1.37920];
+control.DClevel_parameters.Vinst.mw = [0.63620   0.60160   0.63600   0.61420   0.56100   0.65130   0.58310   0.61160   0.67520];
+control.DClevel_parameters.Vinst.sw = [0.00000   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000];
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% Define/compute a2 values
+% Define a2 values
 %
-% These are a2 values derived from minimizing ECT view residuals from TVAC3 MN1 and 
-% are the values contained in a2_coeffs.optJAN2009 in a2_UW_refined_27Jan2009.mat.
-%
-% Although in different units, these correspond to the version 32 Engineering Packet values used in IDPS/ADL processing.
-%
-%              FOV =     1         2         3         4         5         6          7        8         9
-a2_tvac3_mn1_ect.lw = [6.6814    6.3409    5.9984    9.5624    7.7635    7.6739     5.916    5.8978    7.9171  ]'/1e7;
-a2_tvac3_mn1_ect.mw = [2.7352    6.6925   11.567     5.6065    6.9917    1.6121    17.954   12.393     0.99827 ]'/1e7;
-a2_tvac3_mn1_ect.sw = [  0         0         0         0         0         0          0        0         0     ]'/1e7;
-%
-% Also define PGA gain values corresponding to TVAC3 MN1.  These values where hard-coded in 
-% NLAPP.m ($Id: ccast_NLAPP.m,v 1.16 2009/03/03 16:07:59 joet Exp $) as variables MN1lw_gainsTV3, 
-% MN1mw_gainsTV3, and MN1sw_gainsTV3;
-%
-tmp = [3.3200 3.6500 4.0200 4.4200 4.8800 5.3600 5.9000 6.4900 7.1400 7.8600 8.6400 9.5100 10.4900 11.5400 12.6900 13.9600];
-pgaGain_tvac3_mn1.lw = tmp([9 7 9 7 4 7 8 7 10]+1)';
-tmp = [3.0100 3.3100 3.6400 4.0100 4.4200 4.8600 5.3500 5.8600 6.4800 7.1300 7.8400 8.6200 9.5100 10.4600 11.5100 12.6600];
-pgaGain_tvac3_mn1.mw = tmp([8 8 9 7 6 7 10 8 10]+1)';
-tmp = [3.0100 3.3100 3.6400 4.0100 4.4200 4.8600 5.3500 5.8600 6.4800 7.1300 7.8400 8.6200 9.5100 10.4600 11.5100 12.6600];
-pgaGain_tvac3_mn1.sw = tmp([6 4 6 4 3 5 5 5 8]+1)';
-%
-% Scale the above a2 values for use with the current data based on the current PGA Gain values.  Pull out PGA gains:
-%
-pgaGain_now.lw = PGA_Gain.Band(1).map(PGA_Gain.Band(1).Setting+1);
-pgaGain_now.mw = PGA_Gain.Band(2).map(PGA_Gain.Band(2).Setting+1);
-pgaGain_now.sw = PGA_Gain.Band(3).map(PGA_Gain.Band(3).Setting+1);
-%
-% And do the scaling
-%
-a2_now.lw = a2_tvac3_mn1_ect.lw .* pgaGain_tvac3_mn1.lw ./ pgaGain_now.lw;
-a2_now.mw = a2_tvac3_mn1_ect.mw .* pgaGain_tvac3_mn1.mw ./ pgaGain_now.mw;
-a2_now.sw = a2_tvac3_mn1_ect.sw .* pgaGain_tvac3_mn1.sw ./ pgaGain_now.sw;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% These are 07-Aug-2013 UW a2 values in units of inverse volts.  Ref: uw_recommended_nlc_coefficients_07Aug2013.ppt
 
-
-%%% Preliminary scale factors, 28-Feb, DCT, based on DM and Fov-2-Fov analysis
-%sf = [1.3000 1.2300 0.9500 1.2100 1      0.7800 1.0900 2.5000 1.7000];
-%a2_now.lw = a2_now.lw .* sf';
-%sf = [0      1.4300 1.3100 0.5000 0.8300 0      2.1500 1.6800 0];
-%a2_now.mw = a2_now.mw .* sf';
-
-
-% DCT 19-Nov-2012
-% a2 scale factors derived from analysis of FOV-2-FOV differences.  These scale factors are ratios of 
-% a2 values derived from analysis of IDPS/CSPP data, and are applied here to the CCAST values.
-sf = [1.166 1.0346 0.94156 1.2843 1.0697 0.95456 1.3812 1.6973 1.3745];
-a2_now.lw = a2_now.lw .* sf';
-sf = [1.0081 1.4049 1.1205 1.1543 1.1414 1.4764 2.1252 1.7396 1.0003];
-a2_now.mw = a2_now.mw .* sf';
-
+a2_now.lw = [0.01936   0.01433   0.01609   0.02192   0.01341   0.01637   0.01464   0.01732   0.03045];
+a2_now.mw = [0.00529   0.02156   0.02924   0.01215   0.01435   0.00372   0.10702   0.04564   0.00256];
+a2_now.sw = [0.00000   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000];
 
 % Apply additional overall (FOV independent) emperical scale factors
-% global A2_SCALE_FACTOR
-A2_SCALE_FACTOR = 1;
+global A2_SCALE_FACTOR
 a2_now.lw = a2_now.lw * A2_SCALE_FACTOR;
 a2_now.mw = a2_now.mw * A2_SCALE_FACTOR;
 a2_now.sw = a2_now.sw * A2_SCALE_FACTOR;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Define PGA gains
+pgaGain_now.lw = PGA_Gain.Band(1).map(PGA_Gain.Band(1).Setting+1);
+pgaGain_now.mw = PGA_Gain.Band(2).map(PGA_Gain.Band(2).Setting+1);
+pgaGain_now.sw = PGA_Gain.Band(3).map(PGA_Gain.Band(3).Setting+1);
+
+
 %
 % Define limits for spectral integrals, reduction factors, and # normal mode spectral points.  
-% Divide the complex spectra by the numerical filter.  Also pull out values of a2, kfac, and 
-% modulation efficiency for this FOV, this band.
+% Divide the complex spectra by the numerical filter.  Also pull out values of a2, Vinst, modulation 
+  % efficiency, and PGA-gain for this FOV, this band.
 %
 switch upper(band)
 
@@ -129,7 +95,8 @@ switch upper(band)
     space_cxs = space_cxs./NF.lw;
     a2 = a2_now.lw(iFov);
     modEff = control.DClevel_parameters.ModEff.lw(iFov);
-    kfac = control.DClevel_parameters.kfac.lw(iFov);
+    vinst = control.DClevel_parameters.Vinst.lw(iFov);
+    PGAgain = pgaGain_now.lw(iFov);
 
   case 'MW'
     reduction_factor = 20;
@@ -139,7 +106,8 @@ switch upper(band)
     space_cxs = space_cxs./NF.mw;
     a2 = a2_now.mw(iFov);
     modEff = control.DClevel_parameters.ModEff.mw(iFov);
-    kfac = control.DClevel_parameters.kfac.mw(iFov);
+    vinst = control.DClevel_parameters.Vinst.mw(iFov);
+    PGAgain = pgaGain_now.mw(iFov);
 
   case 'SW'
     reduction_factor = 26;
@@ -149,7 +117,8 @@ switch upper(band)
     space_cxs = space_cxs./NF.sw;
     a2 = a2_now.sw(iFov);
     modEff = control.DClevel_parameters.ModEff.sw(iFov);
-    kfac = control.DClevel_parameters.kfac.sw(iFov);
+    vinst = control.DClevel_parameters.Vinst.sw(iFov);
+    PGAgain = pgaGain_now.sw(iFov);
 
 end
 
@@ -159,10 +128,10 @@ end
 %
 norm_factor = 1/(reduction_factor*npoints_nm);
 
-%
+
 % Compute the DC level
 %
-Vdc  = DClevel_model(v,v_lo,v_hi,scene_cxs,space_cxs,norm_factor,modEff,kfac);
+[Vdc,F_target_minus_space] = DClevel_model(v,v_lo,v_hi,scene_cxs,space_cxs,norm_factor,modEff,vinst,PGAgain);
 
 %
 % Compute 2*a2*Vdc*CXS as the "linear" cross-term of the quadratic nonlinearity correction
@@ -179,18 +148,24 @@ sqcorr_cxs = 0;
 %
 nlcorr_cxs = scene_cxs + lincorr_cxs + sqcorr_cxs;
 
+%% ITT equation
+%nlcorr_cxs = scene_cxs ./ (1 - 2.*a2.*Vdc);
+
 
 if nargout == 2
   extra.band = band;
   extra.iFov = iFov;
   extra.a2 = a2;
   extra.norm_factor = norm_factor;
-  extra.kfac = kfac;
+%  extra.kfac = kfac;
   extra.modEff = modEff;
-  extra.control = control;
-  extra.a2_now = a2_now;
-  extra.pgaGain_now = pgaGain_now;
-  extra.a2_tvac3_mn1_ext = a2_tvac3_mn1_ect;
-  extra.pgaGain_tvac3_mn1 = pgaGain_tvac3_mn1;
+  extra.vinst = vinst;
+%  extra.control = control;
+%  extra.a2_now = a2_now;
+%  extra.pgaGain_now = pgaGain_now;
+%  extra.a2_tvac3_mn1_ext = a2_tvac3_mn1_ect;
+%  extra.pgaGain_tvac3_mn1 = pgaGain_tvac3_mn1;
   extra.Vdc = Vdc;
+  extra.F_target_minus_space = F_target_minus_space;
+%  extra.F_space = F_space;
 end

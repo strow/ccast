@@ -1,14 +1,14 @@
 
-function [Vdc]  = DClevel_model(v,vlo,vhi,scene_cxs,space_cxs,norm_factor,modeff,kfac);
+function [Vdc,F_target_minus_space]  = DClevel_model(v,vlo,vhi,scene_cxs,space_cxs,norm_factor,modeff,Vinst,PGAgain);
 
 %
-% function [Vdc]  = DClevel_model(v,vlo,vhi,scene_cxs,space_cxs,norm_factor,modeff,kfac);
+% function [Vdc,F_target_minus_space]  = DClevel_model(v,vlo,vhi,scene_cxs,space_cxs,norm_factor,modeff,Vinst,PGAgain);
 %
 % University of Wisconsin DC Level Model for CrIS FM1
 %
 % This version implements the integral of the magnitude spectrum between band limits
 % using the following formula:
-%   Vdc = F(target - space)/modeff + kfac*F(space)/modeff
+%   Vdc = F(target - space)/modeff + Vinst
 %   where
 %   F(x) = twice the integral between [v1,v2] of magnitude of complex spectrum x 
 %          (factor of 2 accounts for integration over plus and minus frequencies)
@@ -26,8 +26,9 @@ function [Vdc]  = DClevel_model(v,vlo,vhi,scene_cxs,space_cxs,norm_factor,modeff
 %   scene_cxs       = current scene complex spectrum
 %   space_cxs       = space view complex spectrum
 %   norm_factor     = scalar value used for normalization (tbd)
-%   kfac            = background factor
 %   modeff          = modulation efficiency
+%   Vinst           = instrument contribution to DC level
+%   PGAgain         = current PGA gain value
 %
 % Output:
 %   Vdc             = Estimated DC level
@@ -43,6 +44,7 @@ function [Vdc]  = DClevel_model(v,vlo,vhi,scene_cxs,space_cxs,norm_factor,modeff
 %   Revision: 08 July 2008  JKT, UW-SSEC, converted to work within quickCAL framework
 %   11 Nov 2011   DCT, renamed DClevel_model.m, format of inputs modified and call to 
 %           integration function removed; done inline here
+%   18 Aug 2013, DCT, edited to a) produce DC levels in units of volts, and b) instrument contribution is Vinst versus kfac*F_space/modeff
 %
 
 % Difference between scene and space views
@@ -53,11 +55,11 @@ scene_minus_space_cxs = scene_cxs - space_cxs;
 %   (1) Factor of 2 accounts for integration over plus and minus frequencies.
 %   (2) Normalized to match the unfiltered ZPD value used to define a2.
 
+% Analog to Digital gain
+gain_AD = 8192/2.5;
+
 v_indices = find(v >= vlo & v <= vhi);
 
 F_target_minus_space = norm_factor*(2*sum(abs(scene_minus_space_cxs(v_indices))));
 
-F_space = norm_factor*(2*sum(abs(space_cxs(v_indices))));
-
-Vdc = F_target_minus_space./modeff + kfac.*F_space./modeff;
-
+Vdc = (F_target_minus_space./modeff) ./ (gain_AD .* PGAgain) + Vinst;
