@@ -3,84 +3,78 @@
 %   bcast_main -- wrapper to process matlab RDR to SDR data
 %
 % SYNOPSIS
-%   bcast_main
 %   bcast_main(doy)
 %
+% INPUTS
+%   day   - integer day of year
+%   year  - integer year, default is 2013
+%
 % DISCUSSION
-%   this is a wrapper script to set paths, files, and options to
-%   process matlab RDR to matlab SDR files.  it can be modified to
-%   work as a function with parameter doy, day of year as a 3-char
-%   string.  the actual processing is done by rdr2sdr.
+%   This is a wrapper script to set paths, files, and options to
+%   process matlab RDR to SDR files.  It can be edited as needed     
+%   to change options and paths.  The actual processing is done by
+%   rdr2sdr.m
 %
-%   bcast_main is just one step in a chain of processing, it assumes
-%   we have matlab RDR files and geo daily summary data available
+%   bcast_main is the last of several processing steps, and needs
+%   matlab RDR files and geo daily summary data.
 %
-%   the paths to data are set up as ../yyyy/doy/ but that's just a
+%   The paths to data are set up as ../yyyy/doy/ but that's just a
 %   convention, doy can be any subset of the day's data.  The only
 %   restriction is that the current setup uses doy to match the geo
 %   daily summary, so doy can't be subset that spans days.
 %
-%   matlab paths here are relative, they assume you are running one
-%   level below the bcast installation home.  the search priority is
-%   the current directory and then the reverse order the're set with
-%   addpath.  So for example if you do
-%
-%     addpath ../davet
-%     addpath ../source
-% 
-%   and then run in motmsc, files there will take precence, then
-%   files from source, and finally files from davet
+%   To switch to one of the high res mode, addpath ../motmsc/hires,
+%   set opt.resmode to 'hires1' or 'hires2', and set opts.XW.sfile 
+%   to a high res SRF tabulation.
 %
 
-function bcast_main(doy)
+function bcast_main(doy, year)
 
-% set doy here to run as a script
-% doy = '054';  % high-res 2nd day
-% doy = '142';
+% set default year
+if nargin == 1
+  year = 2013;
+end
+
+% year and day-of-year as strings
+ystr = sprintf('%d', year);
+dstr = sprintf('%0.3d', doy);
+
+%-------------------------
+% set paths and get files 
+%-------------------------
 
 % search source, then davet
 addpath ../davet
 addpath ../source
 
 % for high-res ONLY
-% addpath ../hires
+% addpath ../motmsc/hires
 
-% path to matlab RDR input by day-of-year
-RDR_mat = '/asl/data/cris/ccast/rdr60/2013/';
+% path to matlab RDR input files
+rhome = '/asl/data/cris/ccast/rdr60/';
+rdir = fullfile(rhome, ystr, dstr);
+flist = dir(fullfile(rdir, 'RDR*.mat'));
+% flist = flist(61:64);
 
-% path to matlab SDR output by day-of-year
-SDR_mat = '/asl/data/cris/ccast/sdr60/2013/';  
-
-% path to allgeo (and allsci) data
-dailydir = '/asl/data/cris/ccast/daily/2013/';
-
-% get geo filename allgeo<yyyymmdd>.mat from day-of-year
-tmp = datestr(datenum(2013,1,1) + str2num(doy) - 1, 30);
-geofile = fullfile(dailydir, ['allgeo', tmp(1:8), '.mat']);
-
-% full path to matlab RDR input files
-rdir = fullfile(RDR_mat, doy);
-
-% full path to matlab SDR output files
-sdir = fullfile(SDR_mat, doy);
-
-% create the matlab SDR directory, if necessary
+% path to matlab SDR output files
+shome = '/asl/data/cris/ccast/sdr60/';  
+sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
-% get matlab RDR file list
-flist = dir(fullfile(rdir, 'RDR*.mat'));
+% path to geo data, allgeo<yyyymmdd>.mat
+ghome = '/asl/data/cris/ccast/daily/';
+tmp = datestr(datenum(year,1,1) + doy - 1, 30);
+geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 
-% option to choose an RDR subset by index
-% flist = flist(61:64);
-% flist = flist((end-10):end);
+%----------------------------
+% set opts struct parameters
+%----------------------------
 
-% initialize opts
-opts = struct;
-opts.geofile = geofile;  % geo filename for this doy
-
-% misc params
-opts.avgdir = '.';   % moving avg working directory
-opts.mvspan = 4;     % moving avg span is 2*mvspan + 1
+opts = struct;            % initialize opts
+opts.resmode = 'lowres';  % mode for inst_params
+opts.geofile = geofile;   % geo filename for this doy
+opts.avgdir = '.';        % moving avg working directory
+opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 
 % instrument SRF files
 opts.LW.sfile = '../inst_data/SRF_v33a_LW.mat';  % LW SRF table
@@ -88,9 +82,9 @@ opts.MW.sfile = '../inst_data/SRF_v33a_MW.mat';  % MW SRF table
 opts.SW.sfile = '../inst_data/SRF_v33a_SW.mat';  % SW SRF table
 
 % high-res SRF files
-% opts.LW.sfile = '../inst_data/SRF_v33aHR_LW.mat';  % LW SRF table
-% opts.MW.sfile = '../inst_data/SRF_v33aHR_MW.mat';  % MW SRF table
-% opts.SW.sfile = '../inst_data/SRF_v33aHR_SW.mat';  % SW SRF table
+% opts.LW.sfile = '../inst_data/SRF_vxHR_LW.mat';  % LW SRF table
+% opts.MW.sfile = '../inst_data/SRF_vxHR_MW.mat';  % MW SRF table
+% opts.SW.sfile = '../inst_data/SRF_vxHR_SW.mat';  % SW SRF table
 
 % nonlinearity correction
 opts.DClevel_file = '../inst_data/DClevel_parameters_22July2008.mat';
@@ -102,14 +96,9 @@ opts.LW.eICT = NaN;  % no LW eICT value read when eFlag is 1
 opts.MW.eICT = NaN;  % no MW eICT value read when eFlag is 1
 opts.SW.eICT = NaN;  % no SW eICT value read when eFlag is 1
 
-% high res ICT modeling
-% dd = load('inst_data/emissHR.mat');
-% opts.eFlag = 0;   % set to 0 to pass emissivity as a parameter
-% opts.LW.eICT = dd.e1hi;  % LW hi res emissivity
-% opts.MW.eICT = dd.e2hi;  % MW hi res emissivity
-% opts.SW.eICT = dd.e3hi;  % SW hi res emissivity
-
+%--------------------------------
 % process matlab RDR to SDR data 
+%--------------------------------
 
 % profile clear
 % profile on

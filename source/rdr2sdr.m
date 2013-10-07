@@ -139,9 +139,9 @@ for fi = 1 : nfile
   wlaser = metlaser(eng.NeonCal);
 
   % get instrument and user grid parameters
-  [instLW, userLW] = inst_params('LW', wlaser);
-  [instMW, userMW] = inst_params('MW', wlaser);
-  [instSW, userSW] = inst_params('SW', wlaser);
+  [instLW, userLW] = inst_params('LW', wlaser, opts);
+  [instMW, userMW] = inst_params('MW', wlaser, opts);
+  [instSW, userSW] = inst_params('SW', wlaser, opts);
 
   % -----------------
   % get count spectra

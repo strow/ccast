@@ -45,7 +45,7 @@
 %   of ICT predicted radiance evaluated at the on-axis sensor grid.
 %
 % AUTHOR
-%   H. Motteler, 18 June 2012
+%   H. Motteler, D. Tobin, 18 June 2012
 %
 
 function [rcal, vcal, msc] = ...
