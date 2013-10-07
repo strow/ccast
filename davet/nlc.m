@@ -68,6 +68,7 @@ a2_now.sw = [0.00000   0.00000   0.00000   0.00000   0.00000   0.00000   0.00000
 
 % Apply additional overall (FOV independent) emperical scale factors
 global A2_SCALE_FACTOR
+A2_SCALE_FACTOR = 1;
 a2_now.lw = a2_now.lw * A2_SCALE_FACTOR;
 a2_now.mw = a2_now.mw * A2_SCALE_FACTOR;
 a2_now.sw = a2_now.sw * A2_SCALE_FACTOR;

@@ -1,15 +1,17 @@
 %
-% cmp_fovs - find a FOR with similar FOVs and compare them
+% cmp_fovs1 - find a FOR with similar FOVs and compare them
 %
-% this should work for both regular and high res data but so far
-% has only been tested with high res.  The call to inst_params is
-% only to get the user grid endpoints, and so doesn't really need
-% to be the high res version.
+% this version is for a single SDR file
+%
+% works for both regular and high res data.  The call to inst_params
+% is only to get the user grid endpoints, and doesn't need to be the
+% high res version to do high res.
+%
+% change all the uppercase names, e.g. SW to MW, to change bands
+%
 
-% specify SDR mat file
-  sfile = '../../data/2012/054/SDR_d20120223_t1505265.mat';
-% sfile = '../../data/2013/071/SDR_d20130312_t1709422.mat';
-% sfile = '../../data/2013/071/SDR_d20130312_t1741420.mat';
+% specify an SDR mat file
+sfile = '/asl/data/cris/ccast/sdr60/2013/240/SDR_d20130828_t0742563.mat'
 
 % get the data
 load(sfile)

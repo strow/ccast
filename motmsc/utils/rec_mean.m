@@ -7,7 +7,7 @@
 %
 % INPUTS
 %   m1   - the mean of x(1), x(2), ..., x(n1)
-%   n1   - number of values in m1
+%   n1   - number of averaged values in m1
 %   x    - next value for the mean
 %   
 % OUTPUTS

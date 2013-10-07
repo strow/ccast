@@ -1,7 +1,6 @@
 
 drivers and plots
 ------------------
-bcast_hires  - call rdr2sdr on regular or high-res data
 bcast_main   - wrapper to process matlab RDR to SDR data
 do_rdr2mat   - multi-day driver script for rdr2mat
 sci_daily    - save sci and eng data from RDR mat files
@@ -11,7 +10,8 @@ plot_sdr1    - quick look at SDR data
 mkSRFwl      - build SRF matrix tables for interpolation
 mkSRFwl_run  - demo wrapper for the above
 
-cmp_sdr      - compare spectra from two b/ccast SDR files
+cmp_sdr      - compare spectra from two ccast SDR files
+cmp_mean     - compare mean vs fov 5 over a set of files
 cmp_idps     - compare spectra from b/ccast and IPDS files
 cmp_fovs     - find a FOR with similar FOVs and compare them
 cmp_loop1    - loop on bcast SDR files, compare with IDPS 
@@ -22,35 +22,41 @@ cmp_ecmwf2   - compare ecmwf, idps, and ccast radiances
 bcast_dump   - call rdr2dmp to dump regular RDR data
 hires_dump   - call rdr2dmp to dump high-res RDR data 
 
-srf_lowres   - compare low res SRFs by FOV at mid-band
-srf_hires1   - compare high res SRFs by FOV at mid-band
-srf_hires2   - compare high res SRFs by FOV at low end of band
-srf_hires3   - check high res SA residuals
+msc_test
+---------
+joepcut      - compare Joe P spreadsheet vs inst_params
+echeck1      - compare eng packet vs older saved emissivity 
+echeck2      - quick look at changes in eng packet emissivity
+dw2dv_test   - compare wlaser and frequency residuals
+rtp_test2    - compare readsdr_rtp with prototype readbc_rtp
+conv_demo1   - demo of kcarta to CrIS convolution with finterp
+test_std     - test of recursive std
+test_mean    - test of recursive mean
+cos_demo     - generic cosine transform demo
+rdr_times    - compare RDR internal, filename, and attribute time
+matbench     - simple matlab vectorization benchmarks
+bcast_rdr4   - call rdr2sdr4 on regular or high-res data
+rdr2mat4     - process 4-scan RDR h5 files to mat files
+rdr2sdr4     - rdr2sdr to check for out-of-order 4-scan data
+idps_check   - quick look a day's worth of SDR data
+checkRDR     - validate MIT RDR data
+
+hires
+------
+nlc         - dummy nlc skips non-linearity correction
+srf_lowres  - compare low res SRFs by FOV at mid-band
+srf_hires1  - compare high res SRFs by FOV at mid-band
+srf_hires2  - compare high res SRFs by FOV at low end of band
+srf_hires3  - check high res SA residuals
+mkemissHR   - tabulated emissivity for highres ICT model
 
 geo_test
 ---------
-geo_plot1    - demo plot of allgeo data
-geo_run1     - geo_daily-only wrapper
-geo_test     - simple geo tests and benchmarks
-map_demo1    - plot xtrack by atrack for a selected channel
-map_demo2    - map demo from a list of matlab SDR files
-
-msc_test
----------
-dw2dv_test    - compare wlaser and frequency residuals
-bpass_demo    - show bandpass full filter wings
-checkRDR      - validate MIT RDR data
-conv_demo1    - demo of kcarta to CrIS convolution with finterp
-cos_demo      - generic cosine transform demo
-rdr_times     - compare RDR internal, filename, and attribute time
-rtp_test2     - compare readsdr_rtp with prototype readbc_rtp
-sdr_day_check - quick look a day's worth of SDR data
-test_mean     - test of recursive mean
-test_std      - test of recursive std
-
-bcast_rdr4  - call rdr2sdr4 on regular or high-res data
-rdr2mat4    - process 4-scan RDR h5 files to mat files
-rdr2sdr4    - rdr2sdr to check for out-of-order 4-scan data
+geo_plot1   - demo plot of allgeo data
+geo_run1    - geo_daily-only wrapper
+geo_test    - simple geo tests and benchmarks
+map_demo1   - plot xtrack by atrack for a selected channel
+map_demo2   - map demo from a list of matlab SDR files
 
 movavg
 -------

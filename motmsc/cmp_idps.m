@@ -10,19 +10,19 @@ addpath ./asl
 addpath ../source
 
 % select day-of-the-year
-doy = '091';
+doy = '264';
 
 % get a list of files for this day
-byear = '/home/motteler/cris/data/2013';  
+byear = '/asl/data/cris/ccast/sdr60/2012/';  
 bdir  = fullfile(byear, doy);
 blist = dir(fullfile(bdir, 'SDR*.mat'));
 
 % choose and load particular file
-fi = 15;
+fi = 14;
 bfile = fullfile(bdir, blist(fi).name);
 load(bfile)
 
-% select a bcast scan index
+% select a ccast scan index
 bi = 31;
 
 % find the corresponding IDPS SDR file time and scan index
@@ -30,7 +30,7 @@ gid = geo.sdr_gid(bi, :);
 si = geo.sdr_ind(bi, :);  
 
 % get the IDPS SDR path and filename
-syear = '/asl/data/cris/sdr60/hdf/2013';
+syear = '/asl/data/cris/sdr60/hdf/2012';
 sdir  = fullfile(syear, doy);
 slist = dir(fullfile(sdir, ['SCRIS_npp_', gid, '*.h5']));
 sfile = fullfile(sdir, slist(end).name);
@@ -45,21 +45,21 @@ pd = readsdr_rawpd(sfile);
 
 % get user grid
 wlaser = 773.1301;
-[inst, user] = inst_params('SW', wlaser);
+[inst, user] = inst_params('LW', wlaser);
 
 %---------------------------------------
 % compare a selected FOV, FOR, and scan
 %---------------------------------------
-j = 2;   % select a FOV
-k = 15;  % select a FOR
+iFOV = 5;   % select a FOV
+iFOR = 15;  % select a FOR
 
 % bcast spectra
-x1 = vSW';
-y1 = real(rad2bt(x1, rSW(:, j, k, bi)));
+x1 = vLW';
+y1 = real(rad2bt(x1, rLW(:, iFOV, iFOR, bi)));
 
 % IDPS spectra
-x2 = wn_sw;
-y2 = real(rad2bt(x2, pd.ES_RealSW(:, j, k, si)));
+x2 = wn_lw;
+y2 = real(rad2bt(x2, pd.ES_RealLW(:, iFOV, iFOR, si)));
 
 % match frequency grids (IDPS is a subset of bcast)
 ix = interp1(x1, 1:length(x1), x2, 'nearest');
@@ -74,7 +74,7 @@ subplot(2,1,1)
 plot(x1, y1, x2, y2)
 ax = axis; ax(1) = user.v1; ax(2) = user.v2; axis(ax);
 rtmp = gid; rtmp(10) = ' ';
-title(sprintf('%s FOV %d FOR %d Scan %d', rtmp, j, k, bi))
+title(sprintf('%s FOV %d FOR %d Scan %d', rtmp, iFOV, iFOR, bi))
 legend('ccast', 'IDPS', 'location', 'best')
 ylabel('BT, K')
 grid on; zoom on
@@ -92,10 +92,10 @@ grid on; zoom on
 %----------------------------------------------
 
 % bcast spectra
-y1 = real(rad2bt(x1, rSW(ix, :, k, bi)));
+y1 = real(rad2bt(x1, rLW(ix, :, iFOR, bi)));
 
 % IDPS spectra
-y2 = real(rad2bt(x2, pd.ES_RealSW(:, :, k, si)));
+y2 = real(rad2bt(x2, pd.ES_RealLW(:, :, iFOR, si)));
 
 fovnames = {'FOV 1','FOV 2','FOV 3',...
             'FOV 4','FOV 5','FOV 6',...
@@ -104,7 +104,7 @@ fovnames = {'FOV 1','FOV 2','FOV 3',...
 figure(2); clf
 plot(x1, y1 - y2)
 ax(1) = user.v1; ax(2) = user.v2; ax(3) = -0.5; ax(4) = 0.5; axis(ax);
-title(sprintf('ccast - IDPS, %s FOR %d Scan %d', rtmp, k, bi))
+title(sprintf('ccast - IDPS, %s FOR %d Scan %d', rtmp, iFOR, bi))
 legend(fovnames, 'location', 'best')
 xlabel('wavenumber')
 ylabel('dBT, K')

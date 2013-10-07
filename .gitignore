@@ -1,13 +1,22 @@
 #
-# bcast git ignore file
+# ccast git ignore file
+#
 
 # data & misc
 *.h5
 *.mat
 *.fig
-*.png
 *.log
 *.core
+
+# tex & xfig
+*.aux
+*.toc
+*.snm
+*.nav
+*.out
+*.pdf
+*.png
 
 # archives and packages
 *.gz
@@ -23,18 +32,4 @@
 # backup files
 *.bak
 *~
-
-# mat files to keep
-!inst_data/DClevel_parameters_22July2008.mat
-!inst_data/cris_NF_dct_20080617modified.mat
-!inst_data/emissHR.mat
-
-# fig files to keep
-!doc/*.fig
-!doc/*/*.fig
-!doc/*/*/*.fig
-
-# motmsc ignore
-motmsc/asl/
-motmsc/zold2/
 

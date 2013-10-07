@@ -2,16 +2,16 @@
 % cmp_sdr - compare two b/ccast SDR files
 %
 
-sfile = 'SDR_d20130301_t0111167.mat';
-sfile = 'SDR_d20130301_t0407157.mat';
-sdir1 =   '../../data/2013/060/';
-sdir2 = '../../data/2013dt/060/';
+sfile = 'SDR_d20120920_t0117090.mat';
+sdir1 = '/asl/data/cris/ccast/sdr60_dtf/2012/264';
+% sdir2 = '/asl/data/cris/ccast/sdr60_dt2/2012/264';
+sdir2 = '/asl/data/cris/ccast/sdr60/2012/264';
 sname1 = 'bcast';
 sname2 = 'ccast';
 band = 'LW';
 
-sfile1 = [sdir1, sfile];
-sfile2 = [sdir2, sfile];
+sfile1 = fullfile(sdir1, sfile);
+sfile2 = fullfile(sdir2, sfile);
 d1 = load(sfile1);
 d2 = load(sfile2);
 
@@ -40,7 +40,7 @@ i2 = interp1(v2, 1:n2, vg, 'nearest');
 %---------------------------------------
 ifov = 1;
 ifor = 15;
-iscan = 41;
+iscan = 21;
 
 x1 = real(rad2bt(vg, r1(i1, ifov, ifor, iscan)));
 x2 = real(rad2bt(vg, r2(i2, ifov, ifor, iscan)));
