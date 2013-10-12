@@ -36,7 +36,7 @@ function B = ICTradModel(band,wn,T_ICT,T_CRIS,ICT_Param,eFlag,eICT,ssmFlag,ssmOf
 %    ssmOffset:  Scalar temperature offset (K) to SSM Baffle temperature.  Only used if ssmFlag=0.
 %                (In TVAC was -0.5K for PQL, -1.5K for MN, -2.1K for PQH, and -3.2K for special 
 %                PQH ICT emis test)
-
+%
 % Outputs:
 %
 %    B:        Structure of predicted ICT radiance variables:
@@ -111,8 +111,24 @@ end
 % ICT emissivity
 if eFlag == 1        % Pull from 4-min-eng packet;
   e_ICT = ICT_Param.Band(iband).ICT.EffEmissivity.Pts;
-  % Note that if using the sensor wavenumber grid that these emissivity curves should be 
-  % shifted to sensor grid (not implemented)
+
+  % check if eng packet emiss and input frequency grid match
+  if length(e_ICT) ~= length(wn)
+
+    % if not, try the low res instrument grid 
+    wtmp = 773.1301;  % use a nominal value, for now
+    opt1.resmode = 'lowres';
+    [inst1, user1] = inst_params(band, wtmp, opt1);
+
+    % see if low res grid will match eng packet emiss
+    if length(e_ICT) ~= length(inst1.freq)
+      error('no frequency grid for eng packet emissivity')
+    end
+
+    % interpolate e_ICT to the input frequency grid
+    % linear interp is best for steps in MW and SW emiss data
+    e_ICT = interp1(inst1.freq, e_ICT, wn, 'linear', 'extrap');
+  end
 
 elseif eFlag == 0;   % user input
   e_ICT = eICT;
