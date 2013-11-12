@@ -23,7 +23,7 @@ bfile = fullfile(bdir, blist(fi).name);
 load(bfile)
 
 % select a ccast scan index
-bi = 31;
+bi = 32;
 
 % find the corresponding IDPS SDR file time and scan index
 gid = geo.sdr_gid(bi, :);

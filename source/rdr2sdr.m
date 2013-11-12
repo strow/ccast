@@ -116,7 +116,7 @@ for fi = 1 : nfile
 
   % RDR validation.  checkRDR returns data as nchan x 9 x nobs
   % arrays, ordered by time
-  [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDRf(d1, rid);
+  [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR(d1, rid);
 
   if isempty(igmTime)
     fprintf(1, 'rdr2sdr: no valid data, skipping file %s\n', rid)

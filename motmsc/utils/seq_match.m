@@ -1,6 +1,6 @@
 %
 % NAME
-%  seq_match - return closest matching pairs from two sequences 
+%  seq_match -- find the matching subsequence of two sequences
 %
 % SYNOPSIS
 %  function [i, j] = seq_match(a, b, d) 
@@ -13,28 +13,16 @@
 %   i, j  - indices of matches in a and b
 %
 % DISCUSSION
-%   Given sorted lists a and b, we match a(i) with b(j) iff a(i) is
-%   the closest element in a to b(j) and b(j) is the closest element
-%   in b to a(i).  If d is specified, then elements are matched only
-%   if the distance is less than or equal to d.
+%   For sorted sequences A and B, seq_match returns a list of 
+%   all pairs u, v such that v is the closest element in B to u,
+%   and u is the closest element in A to v.  This something like
+%   intersection for matches that are close but not identical.
 %
-% EXAMPLES
-%   [i, j] = seq_match([2, 3, 4], [3.9, 4, 4.1]);
-%   i == 3, j == 2
-% 
-%   [i, j] = seq_match([2, 3, 4], [3.2, 3.9, 4, 4.1]);
-%   i == [2, 3], j == [1, 3]
-%
-%   a = [3.0 4.0 4.7 5.1 5.2 6.2 7.0 8.0 8.1 8.9];
-%   b = [1.0 2.0 3.1 3.9 5.0 6.0 6.1 6.9];
-%   [i, j] = seq_match(a, b);
-%   a(i) ==  [3.0  4.0  5.1  6.2  7.0]
-%   b(j) ==  [3.1  3.9  5.0  6.1  6.9]
-%
-%   Disjoint sequences such as 
-%     a = [1 2 3] 
-%     b = [4 5 6] 
-%   will match max(a) with the min(b), if this is not more than d.
+%   More specifically, if [i, j] = seq_match(a, b), then a(i) is
+%   the list of matches in a, and b(j) the list of matches in b.
+%   The index lists i and j have the same length.  If d is given,
+%   only matches where the distance between pairs is less than or
+%   equal to d are kept.
 %
 % AUTHOR
 %  H. Motteler, 2 June 2013
@@ -42,22 +30,62 @@
 
 function [i, j] = seq_match(a, b, d)
 
-% indices in a of values closest to elements of b
-ia = interp1(a, 1:length(a), b, 'nearest', 'extrap');
+% move input to column vectors
+a = a(:);  b = b(:);
 
-% indices in b of values closest to elements of a
-ib = interp1(b, 1:length(b), a, 'nearest', 'extrap');
+% check that input is sorted
+if ~issorted(a) || ~issorted(b)
+  error('input must be in sorted order')
+end
 
-% drop duplicates
+% check for min sequence length
+if length(a) < 2 || length(b) < 2
+  error('sequences must have length at least 2')
+end
+
+% for each element of b, get index in a of the closest element of a
+ia = interp1(a, (1:length(a))', b, 'nearest', 'extrap');
+
+% for each element of a, get index in b of the closest element of b
+ib = interp1(b, (1:length(b))', a, 'nearest', 'extrap');
+
+% set up loops
 i = unique(ia(ib));
 j = unique(ib(ia));
-% [a(i); b(j)]
+ix = []; jx = [];
+ic = 0; jc = 0;
+
+% nearest-neighbor loop from a
+while ~isequal(i, ix)
+  ix = i;
+  i = unique(ia(ib(i)));
+  ic = ic + 1;
+end
+
+% nearest-neighbor loop from b
+while ~isequal(j, jx)
+  jx = j;
+  j = unique(ib(ia(j)));
+  jc = jc + 1;
+end
+
+% if ic > 3 || jc > 3
+%   fprintf(1, 'a len %d, b len %d, ic %d, jc %d, match len %d\n', ...
+%               length(a), length(b), ic, jc, length(i))
+% end
+
+% check the match
+jx = ib(i); 
+ix = ia(j);
+if ~isequal(jx, j) || ~isequal(ix, i)
+  fprintf(1, 'seq_match ERROR: mismatch after convergence\n')
+  keyboard
+end
 
 % drop matches greater than d
 if nargin == 3
   iok = find(abs(a(i) - b(j)) <= d);
   i = i(iok);
   j = j(iok);
-% [a(i); b(j)]
 end
 

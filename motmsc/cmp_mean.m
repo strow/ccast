@@ -11,17 +11,20 @@
 % change all the uppercase names, e.g. SW to MW, to change bands
 % 
 
+addpath utils
+
 % path to SDR mat files
-% sdir = '/asl/data/cris/ccast/sdr60/2012/264/';
-% sdir = '/asl/data/cris/ccast/sdr60/2013/240/';
-sdir = '/asl/s1/motteler/cris/tmp';  % both hi res days
+sdir = '/asl/data/cris/ccast/sdr60/2012/264/';
 flist = dir(fullfile(sdir, 'SDR*.mat'));
 
 % initialize output struct
 mlist = struct([]);
 
-% choose an FOR
-iFOR = 25;
+% choose an FOR range
+% iFOR = 11:20;
+iFOR = 15;
+nFOR = length(iFOR);
+adflag = 1;
 
 % loop on SDR files
 for fi = 1 : length(flist);
@@ -37,21 +40,24 @@ for fi = 1 : length(flist);
 
   % save results at the user grid
   if fi == 1
-    [inst, user] = inst_params('MW', 773.13);
+    [inst, user] = inst_params('LW', 773.13);
     vband = [user.v1, user.v2];
-    iband = interp1(vMW, 1:length(vMW), vband, 'nearest');
+    iband = interp1(vLW, 1:length(vLW), vband, 'nearest');
     ix =  iband(1) : iband(2);
-    vgrid = vMW(ix);
+    vgrid = vLW(ix);
     nchan = length(vgrid);
     bavg = zeros(nchan * 9, 1);
     navg = 0;
   end
 
-  btmp = real(rad2bt(vgrid, rMW(ix, :, iFOR, :)));
-  btmp = reshape(btmp, nchan * 9, nscan);
+  btmp = real(rad2bt(vgrid, rLW(ix, :, iFOR, :)));
+  btmp = reshape(btmp, nchan * 9, nscan * nFOR);
 
-  % loop on scans
+  % loop on good scans
   for j = 1 : nscan
+    if geo.Asc_Desc_Flag(j) ~= adflag
+      continue
+    end
     if isempty(find(isnan(btmp(:, j))))
       [bavg, navg] = rec_mean(bavg, navg, btmp(:, j));
     end
@@ -63,6 +69,18 @@ fprintf(1, '\n')
 bavg = reshape(bavg, nchan, 9);
 
 % plot results
+if nFOR == 1
+ sFOR = sprintf('%d', iFOR);
+else
+ sFOR = sprintf('%d-%d', iFOR(1), iFOR(end));
+end
+
+if adflag == 1
+  adstr = 'asc';
+else
+  adstr = 'des';
+end
+
 figure(1); clf
 fovnames = {'FOV 1','FOV 2','FOV 3',...
             'FOV 4','FOV 5','FOV 6',...
@@ -71,7 +89,7 @@ fovnames = {'FOV 1','FOV 2','FOV 3',...
 subplot(2,1,1)
 plot(vgrid, bavg);
 legend(fovnames, 'location', 'southeast')
-title(sprintf('MW mean, all FOVs, FOR %d', iFOR))
+title(sprintf('LW mean, all FOVs, FOR %s, %s', sFOR, adstr))
 xlabel('wavenumber')
 ylabel('BT, K')
 grid on; zoom on
@@ -84,13 +102,13 @@ xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 
-% saveas(gcf, sprintf('cmp_mean_MW_avg_%d', iFOR), 'fig')
+saveas(gcf, sprintf('cmp_mean_LW_avg_FOR_%s_%s', sFOR, adstr), 'fig')
 
 figure(2); clf
 subplot(2,1,1)
 plot(vgrid, bavg(:,[1,3,7,9]) - bavg(:,5)*ones(1,4));
 legend('FOV 1', 'FOV 3', 'FOV 7', 'FOV 9', 'location', 'northeast')
-title('corner FOVs  minus FOV 5')
+title(sprintf('corner FOVs  minus FOV 5, FOR %s, %s', sFOR, adstr))
 xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
@@ -103,5 +121,5 @@ xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 
-% saveas(gcf, sprintf('cmp_mean_MW_dif_%d', iFOR), 'fig')
+saveas(gcf, sprintf('cmp_mean_LW_dif_FOR_%s_%s', sFOR, adstr), 'fig')
 

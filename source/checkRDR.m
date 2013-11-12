@@ -1,60 +1,57 @@
 %
 % NAME
-%   checkRDRf.m - validate RDR data from the MIT reader
+%   checkRDR.m -- check and order RDR data from the MIT reader
 %
 % SYNOPSIS
-%   [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDRf(d1, rid);
+%   [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR(d1, rid);
 %
 % INPUTS
-%   d1  - output structure from MIT reader
-%   rid - RDR file time and date substring (for error messages)
+%   d1   - data output struct from the MIT reader
+%   rid  - RDR time and date substring, for messages
 %
 % OUTPUTS
-%   igmLW   - nchan x 9 x nobs, LW pseudo-interferograms
-%   igmMW   - nchan x 9 x nobs, MW pseudo-interferograms
-%   igmSW   - nchan x 9 x nobs, SW pseudo-interferograms
-%   igmTime - nobs x 1, IGM times, millseconds since 1 Jan 1958
+%   igmLW   - nchan x 9 x nobs, LW interferograms
+%   igmMW   - nchan x 9 x nobs, MW interferograms
+%   igmSW   - nchan x 9 x nobs, SW interferograms
+%   igmTime - nobs x 1, IGM times, ms since 1 Jan 1958
 %   igmFOR  - nobs x 1, IGM FOR values, 0-31
-%   igmSDR  - nobs x 1, IGM sweep direction
+%   igmSDR  - nobs x 1, IGM sweep direction, 0-1
 %
 % DISCUSSION
+%   checkRDR puts the interferogram data in time order.  obs times are
+%   sorted, merged, and duplicates are dropped, and some sanity checks
+%   are done on the resulting timeline.  Steps in this timeline become
+%   the nobs index, with obs times in igmTime.  Interferograms are moved
+%   to an nchan x 9 x nobs grid and any gaps are filled with NaNs.
 %
-% The output data (in column order) is ordered by time.  
+%   If the time intervals spanned by obs from successive RDR files do
+%   not overlap, the output from successive calls to checkRDR can be
+%   concatenated along the nobs dimension.
 %
-% This version of checkRDR is a function that returns the merge of
-% the ES, IT, and SP interferograms, with FOR flags, sorted by time.
-% It is derived from the script checkRDR4 and is a total rewrite of
-% checkRDR3.  The key difference is that checkRDR3 drops obs indices
-% when all time fields were not identical while checkRDR4 merges all
-% 81 timelines (9 fovs x 3 bands x 3 obs types) to a single sorted
-% list of unique times, does some QC on this list, fits all obs to
-% the merged timeline, and fills any gaps with NaNs.
+%   igmFOR distinguishes the ES, SP, and IT looks.  ES are 1-30, SP 31,
+%   and IT 0.  igmSDR gives the sweep direction, 0 or 1.  Sanity checks
+%   for igmFOR and igmSDR verify that they agree for simultaneous obs.
 %
-% NOTES
-% 
-% NGAS and geo time appears to be milliseconds since 1 Jan 1958,
-% roughly 52.7 * 365.25 * 24 * 60 * 60 * 1000
-% 
-% t_mit * 8.64e7 = t_ngas.  There are 8.64e7 ms in a day, so the 
-% MIT time is days since 1 Jan 1958
+%   checkRDR should work for any file read_cris_hdf5_rdr can read.
+%   A minor mod to the MIT v380 reader returns the interal variable
+%   sweep_direction as DATA.sweep_dir.
 %
-% The time in the test data is about 200 ms between the ES FORs and
-% about 2 sec and between ES scans, in agreement with the ATBD spec
+%   The MIT reader returns days since 1 Jan 1958.  This is converted
+%   to milliseconds since 1 Jan 1958 for internal processing and for
+%   the values returned in igmTime.
 %
-% The NGAS and MIT FOR numbering has IT=0 and SP=31.  According to
-% the Bomem ATBD SP=0 and IT=31, but maybe that's out of date.
-%
-% Many of the MIT arrays, including time, igm data, FOR flags, and
-% ICT parameters, are padded with zeros past the actual end point.
+% COPYRIGHT
+%   Copyright 2011-2013, Atmospheric Spectroscopy Laboratory.  
+%   This code is distributed under the terms of the GNU GPL v3.
 %
 % AUTHOR
 %   H. Motteler, 26 Nov 2011
 %
 
-function [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDRf(d1, rid);
+function [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR(d1, rid);
 
-% factor to convert MIT time to IET, t_mit * mwt = t_ngas
-mwt = 8.64e7;
+% milliseconds per day
+msd = 8.64e7;
 
 % initialize returned values
 igmLW   = [];  igmMW   = [];  igmSW  = [];
@@ -65,15 +62,15 @@ igmTime = [];  igmFOR  = [];  igmSDR = [];
 % ---------------------
 
 % sort and merge all 81 timelines (9 fovs x 3 bands x 3 obs types)
-t1 = unique(mwt * d1.packet.LWES.time(:));
-t2 = unique(mwt * d1.packet.LWIT.time(:));
-t3 = unique(mwt * d1.packet.LWSP.time(:));
-t4 = unique(mwt * d1.packet.MWES.time(:));
-t5 = unique(mwt * d1.packet.MWIT.time(:));
-t6 = unique(mwt * d1.packet.MWSP.time(:));
-t7 = unique(mwt * d1.packet.SWES.time(:));
-t8 = unique(mwt * d1.packet.SWIT.time(:));
-t9 = unique(mwt * d1.packet.SWSP.time(:));
+t1 = unique(msd * d1.packet.LWES.time(:));
+t2 = unique(msd * d1.packet.LWIT.time(:));
+t3 = unique(msd * d1.packet.LWSP.time(:));
+t4 = unique(msd * d1.packet.MWES.time(:));
+t5 = unique(msd * d1.packet.MWIT.time(:));
+t6 = unique(msd * d1.packet.MWSP.time(:));
+t7 = unique(msd * d1.packet.SWES.time(:));
+t8 = unique(msd * d1.packet.SWIT.time(:));
+t9 = unique(msd * d1.packet.SWSP.time(:));
 t0 = unique([t1;t2;t3;t4;t5;t6;t7;t8;t9]);
 
 % check for valid timeline
@@ -89,7 +86,7 @@ end
 
 % check that the min and max time steps are sensible.  10 ms is 5
 % pct of a 200 ms ES FOR step.  A time step of less than 190 ms is
-% probably an error.  If it'is less than 10 ms, the two steps are
+% probably an error.  If it is less than 10 ms, the two steps are
 % probably equal so drop the first.
 
 dt0 = diff(t0);
@@ -144,7 +141,7 @@ for i = 1 : 9
   % merge band 1 ES, IT, and SP data
   % --------------------------------
   n = ztail(d1.packet.LWES.time(:, i));
-  t1 = d1.packet.LWES.time(1:n, i) * mwt;
+  t1 = d1.packet.LWES.time(1:n, i) * msd;
   ix = interp1(igmTime, 1:nobs, t1, 'nearest');
   tmp1FOR(i, ix) = d1.FOR.LWES(i, 1:n);
   tmp1SDR(i, ix) = d1.sweep_dir.LWES(i, 1:n);
@@ -152,7 +149,7 @@ for i = 1 : 9
                 1i * d1.qdata.LWES(:, i, 1:n);
 
   n = ztail(d1.packet.LWIT.time(:, i));
-  t1 = d1.packet.LWIT.time(1:n, i) * mwt;
+  t1 = d1.packet.LWIT.time(1:n, i) * msd;
   ix = interp1(igmTime, 1:nobs, t1, 'nearest');
   tmp1FOR(i, ix) = d1.FOR.LWIT(i, 1:n);
   tmp1SDR(i, ix) = d1.sweep_dir.LWIT(i, 1:n);
@@ -160,7 +157,7 @@ for i = 1 : 9
                 1i * d1.qdata.LWIT(:, i, 1:n);
 
   n = ztail(d1.packet.LWSP.time(:, i));
-  t1 = d1.packet.LWSP.time(1:n, i) * mwt;
+  t1 = d1.packet.LWSP.time(1:n, i) * msd;
   ix = interp1(igmTime, 1:nobs, t1, 'nearest');
   tmp1FOR(i, ix) = d1.FOR.LWSP(i, 1:n);
   tmp1SDR(i, ix) = d1.sweep_dir.LWSP(i, 1:n);
@@ -171,7 +168,7 @@ for i = 1 : 9
   % merge band 2 ES, IT, and SP data
   % --------------------------------
   n = ztail(d1.packet.MWES.time(:, i));
-  t1 = d1.packet.MWES.time(1:n, i) * mwt;
+  t1 = d1.packet.MWES.time(1:n, i) * msd;
   ix = interp1(igmTime, 1:nobs, t1, 'nearest');
   tmp2FOR(i, ix) = d1.FOR.MWES(i, 1:n);
   tmp2SDR(i, ix) = d1.sweep_dir.MWES(i, 1:n);
@@ -179,7 +176,7 @@ for i = 1 : 9
                 1i * d1.qdata.MWES(:, i, 1:n);
 
   n = ztail(d1.packet.MWIT.time(:, i));
-  t1 = d1.packet.MWIT.time(1:n, i) * mwt;
+  t1 = d1.packet.MWIT.time(1:n, i) * msd;
   ix = interp1(igmTime, 1:nobs, t1, 'nearest');
   tmp2FOR(i, ix) = d1.FOR.MWIT(i, 1:n);
   tmp2SDR(i, ix) = d1.sweep_dir.MWIT(i, 1:n);
@@ -187,7 +184,7 @@ for i = 1 : 9
                 1i * d1.qdata.MWIT(:, i, 1:n);
 
   n = ztail(d1.packet.MWSP.time(:, i));
-  t1 = d1.packet.MWSP.time(1:n, i) * mwt;
+  t1 = d1.packet.MWSP.time(1:n, i) * msd;
   ix = interp1(igmTime, 1:nobs, t1, 'nearest');
   tmp2FOR(i, ix) = d1.FOR.MWSP(i, 1:n);
   tmp2SDR(i, ix) = d1.sweep_dir.MWSP(i, 1:n);
@@ -198,7 +195,7 @@ for i = 1 : 9
   % merge band 3 ES, IT, and SP data
   % --------------------------------
   n = ztail(d1.packet.SWES.time(:, i));
-  t1 = d1.packet.SWES.time(1:n, i) * mwt;
+  t1 = d1.packet.SWES.time(1:n, i) * msd;
   ix = interp1(igmTime, 1:nobs, t1, 'nearest');
   tmp3FOR(i, ix) = d1.FOR.SWES(i, 1:n);
   tmp3SDR(i, ix) = d1.sweep_dir.SWES(i, 1:n);
@@ -206,7 +203,7 @@ for i = 1 : 9
                 1i * d1.qdata.SWES(:, i, 1:n);
 
   n = ztail(d1.packet.SWIT.time(:, i));
-  t1 = d1.packet.SWIT.time(1:n, i) * mwt;
+  t1 = d1.packet.SWIT.time(1:n, i) * msd;
   ix = interp1(igmTime, 1:nobs, t1, 'nearest');
   tmp3FOR(i, ix) = d1.FOR.SWIT(i, 1:n);
   tmp3SDR(i, ix) = d1.sweep_dir.SWIT(i, 1:n);
@@ -214,7 +211,7 @@ for i = 1 : 9
                 1i * d1.qdata.SWIT(:, i, 1:n);
 
   n = ztail(d1.packet.SWSP.time(:, i));
-  t1 = d1.packet.SWSP.time(1:n, i) * mwt;
+  t1 = d1.packet.SWSP.time(1:n, i) * msd;
   ix = interp1(igmTime, 1:nobs, t1, 'nearest');
   tmp3FOR(i, ix) = d1.FOR.SWSP(i, 1:n);
   tmp3SDR(i, ix) = d1.sweep_dir.SWSP(i, 1:n);

@@ -5,19 +5,19 @@
 %  tabulate radiances for a selected FOR and channel subset
 %
 
-addpath ./asl
+addpath asl
 addpath ../source
 
 % select day-of-the-year
-doy = '091';
+doy = '264';
 
 % parameters to save
 ifor = 15;
-sv1 = 665;
+sv1 = 655;
 sv2 = 675;
 
 % get a list of bcast files for the day
-byear = '/home/motteler/cris/data/2013';  
+byear = '/asl/data/cris/ccast/sdr60/2012';
 bdir  = fullfile(byear, doy);
 blist = dir(fullfile(bdir, 'SDR*.mat'));
 
@@ -26,7 +26,7 @@ wlaser = 773.1301;
 [inst, user] = inst_params('LW', wlaser);
 
 % get the path to the IDPS SDR data
-syear = '/asl/data/cris/sdr60/hdf/2013';
+syear = '/asl/data/cris/sdr60/hdf/2012';
 sdir  = fullfile(syear, doy);
 sfile_old = '';
 
@@ -66,6 +66,7 @@ for fi = 1 : 38
 
     % get the IDPS SDR filename
     slist = dir(fullfile(sdir, ['SCRIS_npp_', gid, '*.h5']));
+    if isempty(slist), continue, end
     sfile = fullfile(sdir, slist(end).name);
 
     % read the IDPS SDR file, if needed
@@ -82,7 +83,7 @@ for fi = 1 : 38
     rtime = [rtime, geo.FORTime(ifor, bi)];
     rlat = [rlat, geo.Latitude(:, ifor, bi)];
     rlon = [rlon, geo.Longitude(:, ifor, bi)];
-   
+
   end
   fprintf(1, '.')
 end
@@ -110,7 +111,7 @@ xlabel('hours')
 ylabel('latitude')
 grid on; zoom on
 
-saveas(gcf, sprintf('FOV_%d_residuals', ifov), 'fig')
+% saveas(gcf, sprintf('FOV_%d_residuals', ifov), 'fig')
 
-save cmp_loop1 rad1 rad2 bt1 bt2 rtime rlat rlon vrad
+% save cmp_loop1 rad1 rad2 bt1 bt2 rtime rlat rlon vrad
 
