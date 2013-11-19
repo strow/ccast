@@ -121,7 +121,13 @@ for gi = 1 : length(glist);
 
   % read the next geo file
   gfile = fullfile(gsrc, glist(gi).name); 
-  [geo, agatt, attr4] = read_GCRSO(gfile);
+  try 
+    [geo, agatt, attr4] = read_GCRSO(gfile);
+  catch
+    fprintf(1, 'geo_daily: error reading %s\n', gfile)
+    fprintf(1, 'continuing with the next file...\n')
+    continue
+  end
 
   % get scans in this file
   [m, nscan] = size(geo.FORTime);

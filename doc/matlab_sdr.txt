@@ -1,0 +1,167 @@
+
+ccast matlab SDR format
+------------------------
+
+H. Motteler, 16 Nov 2013
+
+
+The ccast Matlab SDR files are mainly just a dump of working
+variables, intended as an intermediate step to something more
+user-friendly such as netCDF or RTP files.  But since they can
+also be used as is, here is a summary of the format.
+
+
+Matlab list of variables
+-------------------------
+
+  eng          1x1                 129936  struct
+  geo          1x1                1085036  struct
+  instLW       1x1                  16876  struct
+  instMW       1x1                  11500  struct
+  instSW       1x1                   6252  struct
+  rLW          4-D              113445360  double
+  rMW          4-D               67988160  double
+  rSW          4-D               26088480  double
+  rid          1x18                    36  char
+  scTime      34x61                 16592  double
+  sci          1x60                 72640  struct
+  userLW       1x1                   1100  struct
+  userMW       1x1                   1100  struct
+  userSW       1x1                   1100  struct
+  vLW          861x1                 6888  double
+  vMW          516x1                 4128  double
+  vSW          198x1                 1584  double
+
+
+Field definitions
+------------------
+
+userLW, userMW, userSW - the user grid parameters, for each band.  
+The instrument grid is translated to these specs.  The fields are
+
+    v1   - band start
+    v2   - band end
+    dv   - user dv
+    opd  - user opd, 1/(2*dv)
+
+instLW, instMW, instSW - instrument grid parameters.  This is what
+the instrument is really using.  The following three values, along
+with user.v1 and user.v2, determine the remaining parameters
+
+    wlaser  - metrology laser half-wavelength
+    npts    - number of decimated points
+    df      - decimation factor
+
+The derived parameters include
+  
+    dv      - true instrument dv
+    opd     - true optical path difference
+    freq    - instrument frequency grid
+
+rLW, rMW, rSW - nchan x 9 x 30 x nscan arrays of calibrated radiance
+data.  The second dimension is FOV index, and the third FOR index.
+
+vLW, vMW, vSW - nchan x 1 vector of radiance frequencies. 
+
+scTime - 34 x nscan array of instrument internal time, currently
+around 35 seconds behind real time.  This is IET time, but returned
+here as milliseconds since 1958.
+
+sci - an array of structs with selected values from the "science" 
+aka 8 second packets.  Mainly used for ICT modeling.
+
+eng - the most recent "engineering" aka 4-minute packet.  This
+includes instrument parameters, measurements, and status--more than
+3000 values.  The only officialy specs available for this and other
+CrIS RDR data structures are as ITAR-restricted xml data.
+
+rid - a date and time string of the form dYYYYMMDD_tHHMMSSS taken
+from the RDR filename and used in the SDR filename.
+
+
+Notes on radiance data
+-----------------------
+
+Radiance data is at the user grid dv, but vLW, vMW and vSW are
+supersets of the user grid band span, and that superset can change
+based on ccast options.  So to use this data you need to match
+frequencies.  For example
+
+  ugrid = userLW.v1 : userLW.dv : userLW.v2;
+  ix = interp1(vLW, 1:length(vLW), ugrid, 'nearest');
+  rLW = rLW(ix, :, :, :);
+
+The RDR files that ccast reads can start and stop at any FOR index,
+and this is reflected in the output data.  Probably the best way to
+deal with this is to use scTime as a valid data indicator.  scTime 
+is a 34 x nscan array, with indices 1-30 the earth scene positions.
+When this is NaN there is no data for that FOR.  Typically if file 
+n ends at FOR k then file n + 1 will begin at FOR k + 1 but this is
+not guaranteed, for example if there are gaps in the data.
+
+
+Geo fields
+-----------
+
+Here is a matlab field dump of a typical geo struct.  The first 
+group of fields are the same as the IDPS GCRSO geo data.  FORTime 
+is IET time, microseconds since 1958.
+
+                  FORTime: [30x61 double]
+                   Height: [9x30x61 double]
+                 Latitude: [9x30x61 double]
+                Longitude: [9x30x61 double]
+                  MidTime: [61x1 double]
+                 PadByte1: [61x1 double]
+           QF1_CRISSDRGEO: [61x1 double]
+               SCAttitude: [3x61 double]
+               SCPosition: [3x61 double]
+               SCVelocity: [3x61 double]
+    SatelliteAzimuthAngle: [9x30x61 double]
+           SatelliteRange: [9x30x61 double]
+     SatelliteZenithAngle: [9x30x61 double]
+        SolarAzimuthAngle: [9x30x61 double]
+         SolarZenithAngle: [9x30x61 double]
+                StartTime: [61x1 double]
+
+The following are selected GCRSO attribute or attribute-derived
+fields
+
+            Asc_Desc_Flag: [61x1 double]
+             Orbit_Number: [61x1 double]
+               Granule_ID: [61x16 char]
+         Orbit_Start_Time: [61x1 double]
+
+The following are locally defined
+
+                  sdr_gid: [61x18 char]
+                  sdr_ind: [61x1 double]
+
+sdr_gid is a date and time string from the GCRSO file from which we
+found this scan, and sdr_ind is the scan index for that file.  These
+are mainly intended to make matchups with IDPS data easy.
+
+
+Note on time fields
+--------------------
+
+geo.FORTime is corrected obs times.  But scTime is better as a valid
+data indicator, it is authoritative for that because it is the sort
+and merge of all individual obs times that are actually found in the
+RDR file, while geo.FORTime is taken from the GCRSO files.  
+
+Currently the RDR to SDR time offset is
+
+  dtRDR = 2817 + 4 * 8000;
+
+that is, four scans plus an arbitrary shift of less than a scan.  
+To verify this I first look at the phase of the obs scan times.  
+The scans make a distinct pattern--30 obs, slew, space look, slew,
+ICT look, slew.  I use this to match times modulo the scan number.
+Matching GCRSO/SDR scans with RDR scans is then relatively easy.
+
+On 1 july 2012 the delay increased by 1 second and seems to have 
+been stable since then.  The procedure geo_match prints a warning 
+if the GCRSO and corrected RDR times differ by more than 1 ms, and 
+so did detect the 1 sec shift.
+
