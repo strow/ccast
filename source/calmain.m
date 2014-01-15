@@ -41,10 +41,8 @@
 function [rcal, vcal, msc] = ...
      calmain(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts)
 
-% load parameters for nlc()
-control = load(opts.DClevel_file);
-control.NF = load(opts.cris_NF_file);
-control.NF = control.NF.NF;
+% get the spectral space numeric filter
+inst.sNF = specNF(inst, opts.specNF_file);
 
 % get key dimensions
 [nchan, n, k, nscan] = size(rcnt);
@@ -68,26 +66,15 @@ uv2 = user.v2;   % final passband upper bound
 udv = user.dv;   % user-grid dv (for interpolation)
 uvr = user.vr;   % user-grid rolloff
 
-% set the pre-transform passband.  This is applied to the 
-% ratio (ES-SP)/(ICT-SP) before applying the SA-1 matrix.
-% iv1 = vinst(1); iv2 = vinst(end);
-% pv1 = max(iv1, iv1 + (uv1 - iv1) / 2);
-% pv2 = min(iv2, iv2 - (iv2 - uv2) / 2);
-pv1 = uv1;
-pv2 = uv2;
-
 % select band-specific options
 switch band
-  case 'LW'
-    bopt = opts.LW;
-  case 'MW'
-    bopt = opts.MW;
-  case 'SW'
-    bopt = opts.SW;
+  case 'LW', sfile = opts.LW_sfile;
+  case 'MW', sfile = opts.MW_sfile;
+  case 'SW', sfile = opts.SW_sfile;
 end
 
 % get SRF matrix for the current wlaser
-Smat = getSRFwl(wlaser, bopt.sfile);
+Smat = getSRFwl(wlaser, sfile);
 
 % take the inverse after interpolation
 Sinv = zeros(nchan, nchan, 9);
@@ -111,7 +98,7 @@ for si = 1 : nscan   % loop on scans
 
   % Compute predicted radiance from ICT
   B = ICTradModel(band, vinst, T_ICT, sci(ix), eng.ICT_Param, ...
-                  opts.eFlag, bopt.eICT, 1, NaN);
+                  1, NaN, 1, NaN);
 
   % copy rIT across 30 columns
   rIT = B.total(:) * ones(1, 30);
@@ -120,15 +107,15 @@ for si = 1 : nscan   % loop on scans
     for k = 1 : 2   % loop on sweep directions
  
       % do the ICT and space look nonlinearity corrections
-      [sp_nlc(:, k), extra] = nlc(band, iFov, vinst, ...
-                                  avgSP(:, iFov, k, si), ...
-                                  avgSP(:, iFov, k, si), ...
-                                  eng.PGA_Gain, control);   
+      sp_nlc(:, k) = nlc(band, iFov, vinst, ...
+                         avgSP(:, iFov, k, si), ...
+                         avgSP(:, iFov, k, si), ...
+                         eng.PGA_Gain, inst);   
 
-      [it_nlc(:, k), extra] = nlc(band, iFov, vinst, ...
-                                  avgIT(:, iFov, k, si), ...
-                                  avgSP(:, iFov, k, si), ...
-                                  eng.PGA_Gain, control);   
+      it_nlc(:, k) = nlc(band, iFov, vinst, ...
+                         avgIT(:, iFov, k, si), ...
+                         avgSP(:, iFov, k, si), ...
+                         eng.PGA_Gain, inst);   
     end    
 
     for iES = 1 : 30  % loop on ES
@@ -139,10 +126,10 @@ for si = 1 : nscan   % loop on scans
       k = mod(iES, 2) + 1;  % opposite parity for all real data
 
       % do the ES nonlinearity correction
-      [es_nlc, extra] = nlc(band, iFov, vinst, ...
-                            rcnt(:, iFov, iES, si), ...
-                            avgSP(:, iFov, k, si), ...
-                            eng.PGA_Gain, control);   
+      es_nlc = nlc(band, iFov, vinst, ...
+                   rcnt(:, iFov, iES, si), ...
+                   avgSP(:, iFov, k, si), ...
+                   eng.PGA_Gain, inst);   
 
       % calculate (ES-SP)/(ICT-SP), accounting for sweep direction
       rcal(:, iFov, iES, si) = ...
@@ -157,11 +144,11 @@ for si = 1 : nscan   % loop on scans
 
     rtmp = squeeze(real(rcal(:,fi,:,si)));  
 
-    rtmp = bandpass(vinst, rtmp, pv1, pv2, uvr);
+    rtmp = bandpass(vinst, rtmp, uv1, uv2, uvr);
 
     rtmp = rIT .* (Sinv(:,:,fi) * rtmp);
 
-    rtmp = bandpass(vinst, rtmp, pv1, pv2, uvr);
+    rtmp = bandpass(vinst, rtmp, uv1, uv2, uvr);
 
     [rtmp, vcal] = finterp(rtmp, vinst, udv);
 

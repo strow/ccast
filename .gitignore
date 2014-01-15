@@ -28,6 +28,7 @@
 *.a
 *.o
 *.so
+*.mexa64
 
 # backup files
 *.bak

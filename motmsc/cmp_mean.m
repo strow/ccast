@@ -14,7 +14,11 @@
 addpath utils
 
 % path to SDR mat files
-sdir = '/asl/data/cris/ccast/sdr60/2012/264/';
+% sdir = '/asl/data/cris/ccast/sdr60/2012/264/';
+% sdir = '/asl/data/cris/ccast/sdr60_hr_x2/2013/240/';
+% sdir = '/asl/data/cris/ccast/sdr60_hr/2013/240/';
+% sdir = '/asl/data/cris/ccast/sdr60_hr/2013/071/';
+sdir = '/asl/data/cris/ccast/sdr60/2013/238/';
 flist = dir(fullfile(sdir, 'SDR*.mat'));
 
 % initialize output struct
@@ -40,17 +44,17 @@ for fi = 1 : length(flist);
 
   % save results at the user grid
   if fi == 1
-    [inst, user] = inst_params('LW', 773.13);
+    [inst, user] = inst_params('MW', 773.13);
     vband = [user.v1, user.v2];
-    iband = interp1(vLW, 1:length(vLW), vband, 'nearest');
+    iband = interp1(vMW, 1:length(vMW), vband, 'nearest');
     ix =  iband(1) : iband(2);
-    vgrid = vLW(ix);
+    vgrid = vMW(ix);
     nchan = length(vgrid);
     bavg = zeros(nchan * 9, 1);
     navg = 0;
   end
 
-  btmp = real(rad2bt(vgrid, rLW(ix, :, iFOR, :)));
+  btmp = real(rad2bt(vgrid, rMW(ix, :, iFOR, :)));
   btmp = reshape(btmp, nchan * 9, nscan * nFOR);
 
   % loop on good scans
@@ -89,7 +93,7 @@ fovnames = {'FOV 1','FOV 2','FOV 3',...
 subplot(2,1,1)
 plot(vgrid, bavg);
 legend(fovnames, 'location', 'southeast')
-title(sprintf('LW mean, all FOVs, FOR %s, %s', sFOR, adstr))
+title(sprintf('MW mean, all FOVs, FOR %s, %s', sFOR, adstr))
 xlabel('wavenumber')
 ylabel('BT, K')
 grid on; zoom on
@@ -102,7 +106,7 @@ xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 
-saveas(gcf, sprintf('cmp_mean_LW_avg_FOR_%s_%s', sFOR, adstr), 'fig')
+saveas(gcf, sprintf('cmp_mean_MW_avg_FOR_%s_%s', sFOR, adstr), 'fig')
 
 figure(2); clf
 subplot(2,1,1)
@@ -121,5 +125,5 @@ xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 
-saveas(gcf, sprintf('cmp_mean_LW_dif_FOR_%s_%s', sFOR, adstr), 'fig')
+saveas(gcf, sprintf('cmp_mean_MW_dif_FOR_%s_%s', sFOR, adstr), 'fig')
 

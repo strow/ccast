@@ -68,12 +68,12 @@ around 35 seconds behind real time.  This is IET time, but returned
 here as milliseconds since 1958.
 
 sci - an array of structs with selected values from the "science" 
-aka 8 second packets.  Mainly used for ICT modeling.
+aka 8-second packets.  Mainly used for ICT modeling.
 
 eng - the most recent "engineering" aka 4-minute packet.  This
 includes instrument parameters, measurements, and status--more than
-3000 values.  The only officialy specs available for this and other
-CrIS RDR data structures are as ITAR-restricted xml data.
+3000 values.  The only official specs available for this and other
+CrIS RDR data structures are as ITAR-restricted xml documents.
 
 rid - a date and time string of the form dYYYYMMDD_tHHMMSSS taken
 from the RDR filename and used in the SDR filename.
@@ -139,7 +139,7 @@ The following are locally defined
 
 sdr_gid is a date and time string from the GCRSO file from which we
 found this scan, and sdr_ind is the scan index for that file.  These
-are mainly intended to make matchups with IDPS data easy.
+are mainly intended to make matchups with IDPS SDR data easy.
 
 
 Note on time fields
@@ -148,14 +148,14 @@ Note on time fields
 geo.FORTime is corrected obs times.  But scTime is better as a valid
 data indicator, it is authoritative for that because it is the sort
 and merge of all individual obs times that are actually found in the
-RDR file, while geo.FORTime is taken from the GCRSO files.  
+RDR file while geo.FORTime is taken from the GCRSO files.
 
 Currently the RDR to SDR time offset is
 
   dtRDR = 2817 + 4 * 8000;
 
 that is, four scans plus an arbitrary shift of less than a scan.  
-To verify this I first look at the phase of the obs scan times.  
+To verify this I first look at the phase of the RDR scan times.  
 The scans make a distinct pattern--30 obs, slew, space look, slew,
 ICT look, slew.  I use this to match times modulo the scan number.
 Matching GCRSO/SDR scans with RDR scans is then relatively easy.

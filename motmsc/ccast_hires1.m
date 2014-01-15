@@ -49,13 +49,13 @@ addpath ../davet
 addpath ../source
 
 % path to matlab RDR input files
-rhome = '/asl/data/cris/ccast/rdr60/';
+rhome = '/asl/data/cris/ccast/rdr60_hr/';
 rdir = fullfile(rhome, ystr, dstr);
 flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(61:64);
 
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/sdr60/';  
+shome = '/asl/data/cris/ccast/sdr60_hr/';  
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
@@ -69,19 +69,14 @@ geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 %----------------------------
 
 opts = struct;            % initialize opts
-opts.resmode = 'lowres';  % mode for inst_params
+opts.resmode = 'hires1';  % mode for inst_params
 opts.geofile = geofile;   % geo filename for this doy
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 
-% instrument SRF files
-opts.LW_sfile = '../inst_data/SRF_v33a_LW.mat';  % LW SRF table
-opts.MW_sfile = '../inst_data/SRF_v33a_MW.mat';  % MW SRF table
-opts.SW_sfile = '../inst_data/SRF_v33a_SW.mat';  % SW SRF table
-
 % high-res SRF files
-% opts.LW_sfile = '../inst_data/SRF_vxHR_LW.mat';  % LW SRF table
-% opts.MW_sfile = '../inst_data/SRF_vxHR_MW.mat';  % MW SRF table
-% opts.SW_sfile = '../inst_data/SRF_vxHR_SW.mat';  % SW SRF table
+opts.LW_sfile = '../inst_data/SRF_v33aHR_LW.mat';  % LW SRF table
+opts.MW_sfile = '../inst_data/SRF_v33aHR_MW.mat';  % MW SRF table
+opts.SW_sfile = '../inst_data/SRF_v33aHR_SW.mat';  % SW SRF table
 
 % time-domain FIR filter 
 opts.specNF_file = '../inst_data/FIR_19_Mar_2012.txt';

@@ -99,8 +99,8 @@ for fi = 1 : nfile
   sfile = fullfile(sdir, stmp);
 
   % moving average filenames
-  atmp = ['AVG_', rid, '.mat'];
-  afile = fullfile(opts.avgdir, atmp);
+  % atmp = ['AVG_', rid, '.mat'];
+  % afile = fullfile(opts.avgdir, atmp);
 
   % print a short status message
   if exist(rfile, 'file')
@@ -181,13 +181,13 @@ for fi = 1 : nfile
   % get moving averages of SP and IT count spectra
   % ----------------------------------------------
 
-  if exist(afile) == 2
-    load(afile)
-  else
+% if exist(afile) == 2
+%   load(afile)
+% else
     [avgLWSP, avgLWIT] = movavg_app(scLW(:, :, 31:34, :), mvspan);
     [avgMWSP, avgMWIT] = movavg_app(scMW(:, :, 31:34, :), mvspan);
     [avgSWSP, avgSWIT] = movavg_app(scSW(:, :, 31:34, :), mvspan);
-  end
+% end
 
   % -----------------------
   % radiometric calibration

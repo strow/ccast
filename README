@@ -1,5 +1,5 @@
 
-bcast v 0.8, beta release  
+ccast v 0.9, beta release  
 --------------------------
 
 H. Motteler, 1 Aug 2013
@@ -20,13 +20,11 @@ matlab SDR output, possibly changing SDR variable names to match
 the IDPS and ADL conventions, and an option for locally calculated
 geolocation.
 
-Documentation is sparse.  There are some READMEs and detailed
-comments in many of the individual procedures, but not much else.
-We need an ATBD or at least an overview, and maybe some notes on
-getting started.  As an interim measure short descriptions of the
-current mat file SDR variables would be helpful.  I'd originally 
-intended this purely as an intermediate format but it is compact
-and convenient for some applications.
+Documentation is sparse.  There are detailed comments at the start
+of most major procedures, doc/matlab_sdr.txt gives the ccast matlab
+SDR format, and motmsc/README a summary of the test and development
+scripts there.  We need an ATBD, at least an overview, and a user's
+guide.
 
 Design choices for output format and features such as file-spanning
 moving averages depend on the RDR reader and its integration with the

@@ -95,7 +95,7 @@ gsrc = fullfile(gdir, doy);
 glist = dir(fullfile(gsrc, 'GCRSO_npp*.h5'));
 
 % drop anything too small to be a 60-scan file
-ix = find([glist.bytes] > 700000);
+ix = find([glist.bytes] > 500000);
 glist = glist(ix);
 
 if isempty(glist)

@@ -1,0 +1,83 @@
+
+ccast status report
+--------------------
+
+H. Motteler, 12 Dec 2013
+
+
+Capabilities
+
+ccast produces high quality L1b radiances from RDR data, for both
+regular and high resolution modes.  Features include interpolation
+of the ILS matrix, allowing for close tracking of the metrology
+laser, and the implementation of several forms of the calibration
+equation with flexibility to try others.  This reflects the goal 
+of being a testbed.
+
+Runtime performance is reasonable, currently it takes about two
+minutes to process an 8-minute 60-scan granule on a single core.
+Reliability is good, we regularly process data when the IDPS fails.
+If desired ccast could be used to produce L1a data--this is done
+internally but the data is not normally saved.
+
+
+Limitations
+
+The SDR output is HDF 5 "mat" files with geo from the GCRSO data.
+We either use this data as is, or translate it to RTP format files
+as needed.  The mat files could be translated to other formats, so
+this is not so much a limitation as a "to do" item.
+
+The RDR files can start at any FOR, and this is reflected in the
+SDR output.  Typically if file n ends at FOR k then file n + 1 will
+begin at FOR k + 1, so the output columns can be concatenated, but
+this is not guaranteed if there are gaps in the data.  This is easy
+to deal with in translation to other formats or by redesign of the
+L1a processing, as discussed below.
+
+Reflecting the testbed intent, the code is currently in a state of
+flux.  We are looking at the non-linearity correction with different
+numeric filters.  There are separate UMBC and UW code branches and
+some recent updates, such as recalculating cut point as a function
+of the metrology laser wavelength, are not yet in the UW code.
+
+There is currently no explicit QC code or status flags.  ccast 
+does return the eng (4-minute) and selected values from the sci
+(8-second) packets.  There is a powerful implicit QC in that all
+values that are expected to be updated are initialized with NaNs
+rather than zero or an explicit bad value, so NaN in the output
+always means bad data.
+
+
+L0 to L1a processing
+
+Although it has been reliable, the current ccast L0 to L1a
+processing is clunky.  We use version 380 of Dan Mooney's RDR
+reader, with his newer general-purpose interferogram unpacker
+back-ported (by me) to work with the older code.
+
+The data from the reader needs to be put into strict time order.
+In checkRDR I sort and merge obs times, drop duplicates, and do 
+some sanity checks on the resulting timeline.  The reordering and
+validation is very fast but the reader is very slow, mainly due 
+to using dynamic array extension to buffer data as it is read.
+
+Because the reader is slow we process the data in two passes.  
+Pass 1 runs Dan's reader on the RDR data, saves the output as mat
+files and produces geo, "science" and "engineering" packet data
+summaries.  Pass 2 does the reordering as above and the 1a to 1b
+processing.  This two-pass approach is useful for tests, since we
+will often run pass 2 with different configurations.  But with a
+faster reader it would not be necessary.
+
+I have looked into that.  I found I could take the CrIS CCSDS XML
+specs and translated them directly to C structs with bit-fields, 
+for a (potential) big simplification of the reader code.  The main
+problem is that the C bit-fields are compiler-specific and I only
+tried this with gcc.  Graeme did something similar translating XML
+specs to matlab code, and that's also interesting.  Either of these
+approaches, coupled with Dan's new interferogram unpacker and my
+ordering and validation code, could be the basis of a fast L0 to 
+L1a translation.
+
+

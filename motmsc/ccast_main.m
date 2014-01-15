@@ -1,9 +1,9 @@
 %
 % NAME
-%   bcast_main -- wrapper to process matlab RDR to SDR data
+%   ccast_main -- wrapper to process matlab RDR to SDR data
 %
 % SYNOPSIS
-%   bcast_main(doy)
+%   ccast_main(doy)
 %
 % INPUTS
 %   day   - integer day of year
@@ -15,20 +15,21 @@
 %   to change options and paths.  The actual processing is done by
 %   rdr2sdr.m
 %
-%   bcast_main is the last of several processing steps, and needs
-%   matlab RDR files and geo daily summary data.
+%   ccast_main is the last of several processing steps, and uses
+%   matlab RDR files and geo daily summary data from scripts such 
+%   as rdr2mat.m and geo_daily.m
 %
 %   The paths to data are set up as ../yyyy/doy/ but that's just a
 %   convention, doy can be any subset of the day's data.  The only
 %   restriction is that the current setup uses doy to match the geo
 %   daily summary, so doy can't be subset that spans days.
 %
-%   To switch to one of the high res mode, addpath ../motmsc/hires,
-%   set opt.resmode to 'hires1' or 'hires2', and set opts.XW.sfile 
-%   to a high res SRF tabulation.
+%   To switch to one of the high res modes, set opt.resmode to
+%   'hires1' or 'hires2' and opts.LW_sfile, MW_sfile, and SW_sfile
+%   to the high res SRF files.
 %
 
-function bcast_main(doy, year)
+function ccast_main(doy, year)
 
 % set default year
 if nargin == 1
@@ -46,9 +47,6 @@ dstr = sprintf('%0.3d', doy);
 % search source, then davet
 addpath ../davet
 addpath ../source
-
-% for high-res ONLY
-% addpath ../motmsc/hires
 
 % path to matlab RDR input files
 rhome = '/asl/data/cris/ccast/rdr60/';
@@ -73,28 +71,20 @@ geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 opts = struct;            % initialize opts
 opts.resmode = 'lowres';  % mode for inst_params
 opts.geofile = geofile;   % geo filename for this doy
-opts.avgdir = '.';        % moving avg working directory
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 
 % instrument SRF files
-opts.LW.sfile = '../inst_data/SRF_v33a_LW.mat';  % LW SRF table
-opts.MW.sfile = '../inst_data/SRF_v33a_MW.mat';  % MW SRF table
-opts.SW.sfile = '../inst_data/SRF_v33a_SW.mat';  % SW SRF table
+opts.LW_sfile = '../inst_data/SRF_v33a_LW.mat';  % LW SRF table
+opts.MW_sfile = '../inst_data/SRF_v33a_MW.mat';  % MW SRF table
+opts.SW_sfile = '../inst_data/SRF_v33a_SW.mat';  % SW SRF table
 
 % high-res SRF files
-% opts.LW.sfile = '../inst_data/SRF_vxHR_LW.mat';  % LW SRF table
-% opts.MW.sfile = '../inst_data/SRF_vxHR_MW.mat';  % MW SRF table
-% opts.SW.sfile = '../inst_data/SRF_vxHR_SW.mat';  % SW SRF table
+% opts.LW_sfile = '../inst_data/SRF_vxHR_LW.mat';  % LW SRF table
+% opts.MW_sfile = '../inst_data/SRF_vxHR_MW.mat';  % MW SRF table
+% opts.SW_sfile = '../inst_data/SRF_vxHR_SW.mat';  % SW SRF table
 
-% nonlinearity correction
-opts.DClevel_file = '../inst_data/DClevel_parameters_22July2008.mat';
-opts.cris_NF_file = '../inst_data/cris_NF_dct_20080617modified.mat';
-
-% ICT modeling
-opts.eFlag = 1;      % set to 1 to read emissivity from eng packet
-opts.LW.eICT = NaN;  % no LW eICT value read when eFlag is 1
-opts.MW.eICT = NaN;  % no MW eICT value read when eFlag is 1
-opts.SW.eICT = NaN;  % no SW eICT value read when eFlag is 1
+% time-domain FIR filter 
+opts.specNF_file = '../inst_data/FIR_19_Mar_2012.txt';
 
 %--------------------------------
 % process matlab RDR to SDR data 

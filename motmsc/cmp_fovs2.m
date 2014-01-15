@@ -12,10 +12,11 @@
 % change all the uppercase names, e.g. SW to MW, to change bands
 % 
 
+addpath utils
+
 % path to SDR mat files
-sdir = '/asl/s1/motteler/cris/tmp';  % both new hires days
-% sdir = '/asl/data/cris/ccast/sdr60/2013/240/';  % hires day 2
 % sdir = '/asl/data/cris/ccast/sdr60/2012/264/';  % 20 Sep 2012
+sdir = '/asl/data/cris/ccast/sdr60_hr/2013/239';  % hires day 2
 
 % get a list of files
 flist = dir(fullfile(sdir, 'SDR*.mat'));
