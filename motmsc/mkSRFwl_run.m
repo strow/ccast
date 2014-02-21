@@ -1,13 +1,21 @@
+%
+% wrapper for mkSRFwl, set parameters as needed
+%
 
-% build SRF matrices
+more off
+addpath ../source
+addpath ../motmsc/utils
 
+opts = struct;
+opts.resmode = 'hires2';
 wlist = [773.1300, 773.1305]
-sfile = 'data/SRF_v33a_LW.mat';
-mkSRFwl('LW', wlist, sfile)
 
-sfile = 'data/SRF_v33a_MW.mat';
-mkSRFwl('MW', wlist, sfile)
+sfile = 'SRF_v33aHR_LW_p.mat';
+mkSRFwl('LW', wlist, sfile, opts)
 
-sfile = 'data/SRF_v33a_SW.mat';
-mkSRFwl('SW', wlist, sfile)
+sfile = 'SRF_v33aHR_MW_p.mat';
+mkSRFwl('MW', wlist, sfile, opts)
+
+sfile = 'SRF_v33aHR_SW_p.mat';
+mkSRFwl('SW', wlist, sfile, opts)
 

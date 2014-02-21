@@ -3,12 +3,13 @@
 %   mkSRFwl -  build SRF matrix tables for interpolation
 %
 % SYNOPSIS
-%   function mkSRFwl(band, wlist, sfile)
+%   function mkSRFwl(band, wlist, sfile, opts)
 %
 % INPUTS
 %   band   - band string, 'LW', 'MW', or 'SW'
 %   wlist  - list of wlaser tabulation points
 %   sfile  - output file for SRF matrix tables 
+%   opts   - options for inst_params
 %
 % OUTPUT
 %   mat file containing a structure array "s" with fields
@@ -26,7 +27,7 @@
 %   works with either oaffov2 or computeIls
 %
 
-function mkSRFwl(band, wlist, sfile)
+function mkSRFwl(band, wlist, sfile, opts)
 
 band = upper(band);
 wlist = sort(wlist(:));
@@ -44,6 +45,11 @@ nslice = 2001;
 % initialize output struct
 s = struct([]);
 
+% pass opts to inst_params
+if nargin < 4
+  opts = struct;
+end
+
 % ----------------------
 % loop on wlaser values
 % ----------------------
@@ -51,7 +57,7 @@ s = struct([]);
 for wi = 1 : length(wlist)
 
   % calculate interferometric parameters
-  inst = inst_params(band, wlist(wi));
+  inst = inst_params(band, wlist(wi), opts);
   dv   = inst.dv;
   npts = inst.npts;
   opd  = inst.opd;
@@ -96,7 +102,8 @@ for wi = 1 : length(wlist)
       hfov = frad(j);
 
       % call oaffov2
-      [oafreq, oasrf] = oaffov2(v1, fchan, opd, thetac, hfov, nslice);
+      [oafreq, oasrf] = oaffov_p(v1, fchan, opd, thetac, hfov, nslice, npts);
+      % [oafreq, oasrf] = oaffov2(v1, fchan, opd, thetac, hfov, nslice);
       % [oasrf, t1, t2] = computeIls(v1, fchan, opd, thetac, hfov);
 
       % save convolutions in column order

@@ -31,6 +31,7 @@
 *.mexa64
 
 # backup files
+*.svn
 *.bak
 *~
 

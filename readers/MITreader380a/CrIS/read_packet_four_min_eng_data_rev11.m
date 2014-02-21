@@ -337,6 +337,9 @@ for b=1:3
     
 end
 
+% update the applied bit trim values
+bittrim_update
+
 %*** Spare *******************************************************************
 % Words 3145 to 3145: 1 Words -> 2 Bytes
 dummy=fread(fid,1,'bit32');

@@ -1,5 +1,5 @@
 
-function [BitTrimBitsRetained, BitTrimIndex, BitTrimNpts] = init_btrim_lowres
+function [BitTrimBitsRetained, BitTrimIndex, BitTrimNpts] = btrim_lowres
 
 BitTrimBitsRetained = ...
   [ 12    13    10

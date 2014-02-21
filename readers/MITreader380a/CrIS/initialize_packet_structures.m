@@ -210,13 +210,4 @@ data.HK_time=[];
 data.HK=zeros(8,1,42,'uint16');
 data.HK8=zeros(1,619,'uint16');
 
-% ----------------------------------------------
-% TEMPORARY hard-coded high res bit trim values
-% ----------------------------------------------
-
-[t1, t2, t3] = initialize_bittrim;
-packet.BitTrimBitsRetained = t1;
-packet.BitTrimIndex = t2;
-packet.BitTrimNpts = t3;
-
 end

@@ -1,5 +1,5 @@
 
-function [BitTrimBitsRetained, BitTrimIndex, BitTrimNpts] = init_btrim_hires
+function [BitTrimBitsRetained, BitTrimIndex, BitTrimNpts] = btrim_hires2
 
 BitTrimBitsRetained = ...
   [ 11    10     8
