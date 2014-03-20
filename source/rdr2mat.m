@@ -26,17 +26,17 @@
 function rdr2mat(doy, hdir, mdir)
 
 % path to MIT readers
-addpath ../readers/MITreader380
-addpath ../readers/MITreader380/CrIS
+addpath ../readers/MITreader380a
+addpath ../readers/MITreader380a/CrIS
 
 % default path to HDF RDR year
 if nargin < 2
-  hdir = '/asl/data/cris/rdr60/hdf/2012/';
+  hdir = '/asl/data/cris/rdr60/hdf/2014/';
 end
 
 % default path to matlab RDR year
 if nargin < 3
-  mdir = '/asl/data/cris/rdr60/mat/2012/';
+  mdir = '/asl/data/cris/rdr60/mat/2014/';
 end
 
 % full path to RDR h5 data source

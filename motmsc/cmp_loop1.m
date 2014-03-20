@@ -9,7 +9,7 @@ addpath asl
 addpath ../source
 
 % select day-of-the-year
-doy = '264';
+doy = '001';
 
 % parameters to save
 ifor = 15;
@@ -17,7 +17,7 @@ sv1 = 655;
 sv2 = 675;
 
 % get a list of bcast files for the day
-byear = '/asl/data/cris/ccast/sdr60/2012';
+byear = '/asl/data/cris/ccast/sdr60/2014';
 bdir  = fullfile(byear, doy);
 blist = dir(fullfile(bdir, 'SDR*.mat'));
 
@@ -26,7 +26,7 @@ wlaser = 773.1301;
 [inst, user] = inst_params('LW', wlaser);
 
 % get the path to the IDPS SDR data
-syear = '/asl/data/cris/sdr60/hdf/2012';
+syear = '/asl/data/cris/sdr60/hdf/2014';
 sdir  = fullfile(syear, doy);
 sfile_old = '';
 

@@ -42,7 +42,7 @@
 %      c) work with new DC level model function which uses Vinst as background contribution and V in units of volts.
 %
 %   8 Dec 2013, HM, 
-%      - added hard coded ModEff values, below
+%      - added hard coded ModEff values for now, below
 %      - replaced v and control with sensor-grid struct "inst"
 %      - added numeric filter as a field sNF of the inst struct
 %
@@ -100,6 +100,31 @@ switch upper(band)
     PGAgain = pgaGain_now.sw(iFov);
 end
 
+%%%%%% begin hack block
+% [nlcorr_cxs2,extra2] = nlc_dt(band,iFov,v,scene_cxs,space_cxs,PGA_Gain,inst);
+
+% normalize NF to match Dave's 2008 filter
+switch upper(band)
+  case 'LW',  inst.sNF = 1.6047 * inst.sNF ./ max(inst.sNF);
+  case 'MW',  inst.sNF = 0.9826 * inst.sNF ./ max(inst.sNF);
+  case 'SW',  inst.sNF = 0.2046 * inst.sNF ./ max(inst.sNF);
+end
+
+% DClevel_file = '../inst_data/DClevel_parameters_22July2008.mat';
+% cris_NF_file = '../inst_data/cris_NF_dct_20080617modified.mat';
+% 
+% control = load(DClevel_file);
+% control.NF = load(cris_NF_file);
+% control.NF = control.NF.NF;
+% NF = control.NF;
+% 
+% switch upper(band)
+%   case 'LW',  inst.sNF = NF.lw; v_lo = min(NF.vlw); v_hi = max(NF.vlw);
+%   case 'MW',  inst.sNF = NF.mw; v_lo = min(NF.vmw); v_hi = max(NF.vmw);
+%   case 'SW',  inst.sNF = NF.sw; v_lo = min(NF.vsw); v_hi = max(NF.vsw);
+% end
+%%%%%% end hack block
+
 % divide the complex spectra by the numerical filter
 scene_cxs = scene_cxs ./ inst.sNF;
 space_cxs = space_cxs ./ inst.sNF;
@@ -110,6 +135,9 @@ norm_factor = 1/(inst.df*inst.npts);
 
 % Compute the DC level
 [Vdc,F_target_minus_space] = DClevel_model(inst.freq,scene_cxs,space_cxs,norm_factor,modEff,vinst,PGAgain);
+
+% [Vdc,F_target_minus_space] = ...
+%    DClevel_model_dt(inst.freq,v_lo, v_hi, scene_cxs,space_cxs,norm_factor,modEff,vinst,PGAgain);
 
 % Compute 2*a2*Vdc*CXS as the "linear" cross-term of the quadratic nonlinearity correction
 lincorr_cxs = 2.*a2.*Vdc.*scene_cxs;
@@ -135,3 +163,30 @@ if nargout == 2
   extra.Vdc = Vdc;
   extra.F_target_minus_space = F_target_minus_space;
 end
+
+%%%%% begin hack block
+% 
+% extra.band = band;
+% extra.iFov = iFov;
+% extra.a2 = a2;
+% extra.norm_factor = norm_factor;
+% extra.modEff = modEff;
+% extra.vinst = vinst;
+% extra.Vdc = Vdc;
+% extra.F_target_minus_space = F_target_minus_space;
+% 
+% [isequaln(extra, extra2), isequaln(nlcorr_cxs, nlcorr_cxs2)]
+% 
+% if ~isequaln(extra, extra2) || ~isequaln(nlcorr_cxs, nlcorr_cxs2)
+%   keyboard
+% end
+% 
+% if strcmp(band, 'MW')
+%   extra, extra2
+%   plot(inst.freq, pcorr2(nlcorr_cxs), inst.freq, pcorr2(nlcorr_cxs2))
+%   legend('new', 'old')
+%   keyboard
+% end
+% 
+%%%%% end hack block
+
