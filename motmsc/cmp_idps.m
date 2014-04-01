@@ -10,7 +10,7 @@ addpath ./asl
 addpath ../source
 
 % select day-of-the-year
-doy = '001';
+doy = '061';
 
 % get a list of files for this day
 byear = '/asl/data/cris/ccast/sdr60/2014/';  
@@ -18,12 +18,12 @@ bdir  = fullfile(byear, doy);
 blist = dir(fullfile(bdir, 'SDR*.mat'));
 
 % choose and load particular file
-fi = 5;
+fi = 93;
 bfile = fullfile(bdir, blist(fi).name);
 load(bfile)
 
 % select a ccast scan index
-bi = 32;
+bi = 31;
 
 % find the corresponding IDPS SDR file time and scan index
 gid = geo.sdr_gid(bi, :);

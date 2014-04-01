@@ -9,7 +9,7 @@ addpath asl
 addpath ../source
 
 % select day-of-the-year
-doy = '001';
+doy = '061';
 
 % parameters to save
 ifor = 15;
@@ -43,8 +43,7 @@ rlat = [];
 rlon = [];
 
 % loop on bcast files
-% for fi = 1 : length(blist)
-for fi = 1 : 38
+for fi = 1 : length(blist)
 
   bfile = fullfile(bdir, blist(fi).name);
   load(bfile)

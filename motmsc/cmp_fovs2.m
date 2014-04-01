@@ -16,7 +16,7 @@ addpath utils
 
 % path to SDR mat files
 % sdir = '/asl/data/cris/ccast/sdr60/2012/264/';  % 20 Sep 2012
-sdir = '/asl/data/cris/ccast/sdr60_hr/2013/239';  % hires day 2
+sdir = '/asl/data/cris/ccast/sdr60_hr/2013/240';  % hires day 2
 
 % get a list of files
 flist = dir(fullfile(sdir, 'SDR*.mat'));

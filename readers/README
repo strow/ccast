@@ -1,0 +1,24 @@
+
+MITreader380a -- the MIT v380 reader modified (and significantly
+simplified) to work with Dan's new general-purpose interferogram
+upacking function bit_unpack_all.c and to read bit trim values from
+either eng packets or a cached value until the first eng packet is
+found.  I added read_cris_ccsds.m to read CCSDS format test data,
+and tested these against both MITreader380 and an early version of
+the MIT reader from around 2007.
+
+main top-level procedures
+  read_cris_hdf5_rdr  - read a CrIS RDR file
+  read_cris_ccsds     - read a CrIS CCSDS packet file
+
+read_cris_ccsds is just a stripped down version of the RDR reader,
+and a expects a single file.  So (at least for now) if you want to
+run on a set of CCSDS files they should be concatenated first.
+
+For regular ccast processing, the procedure source/checkRDR.m puts
+interferogram data from the MIT reader in time order.  obs times are
+sorted, merged, and duplicates are dropped, and some sanity checks
+are done on the resulting timeline.
+
+H Motteler, 20 Feb 2014
+
