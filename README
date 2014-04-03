@@ -1,8 +1,8 @@
 
-ccast v 0.9, beta release  
---------------------------
+ccast v 0.95, beta release  
+----------------------------
 
-H. Motteler, 1 Aug 2013
+H. Motteler, 1 Apr 2014
 
 Overview
 ---------
@@ -14,9 +14,8 @@ still evolving.
 
 The to-do list includes better documentation, regularized output,
 probably new output formats, a more closely integrated RDR reader,
-file-spanning moving averages, a high resolution version of the LW
-non-linearity correction, retaining the complex component for the
-matlab SDR output, possibly changing SDR variable names to match
+file-spanning moving averages, retaining the complex component for
+the matlab SDR output, possibly changing SDR variable names to match
 the IDPS and ADL conventions, and an option for locally calculated
 geolocation.
 
