@@ -102,8 +102,8 @@ for wi = 1 : length(wlist)
       hfov = frad(j);
 
       % call oaffov2
-      [oafreq, oasrf] = oaffov_p(v1, fchan, opd, thetac, hfov, nslice, npts);
-      % [oafreq, oasrf] = oaffov2(v1, fchan, opd, thetac, hfov, nslice);
+      [oafreq, oasrf] = oaffov2(v1, fchan, opd, thetac, hfov, nslice);
+      % [oafreq, oasrf] = oaffov_p(v1, fchan, opd, thetac, hfov, nslice, npts);
       % [oasrf, t1, t2] = computeIls(v1, fchan, opd, thetac, hfov);
 
       % save convolutions in column order

@@ -5,7 +5,7 @@
 addpath ../source
 
 % get the new time domain filter
-band = 'LW';
+band = 'SW';
 wlaser = 773.1301;
 opts = struct;
 opts.resmode = 'hires2';

@@ -3,15 +3,14 @@
 %
 
 addpath ../source
+% sfile = 'SDR_d20130828_t0238580.mat';
+sfile = 'SDR_d20130828_t0614568.mat';
+sdir1 = '/asl/data/cris/ccast/sdr60_hr_p/2013/240';
+sdir2 = '/asl/data/cris/ccast/sdr60_hr/2013/240';
+sname1 = 'psinc';
+sname2 = 'sinc';
 
-sfile = 'SDR_d20120920_t0117090.mat';
-% sfile = 'SDR_d20120920_t2037024.mat';
-sdir1 = '/asl/data/cris/ccast/sdr60/2012/264';
-sdir2 = '/asl/data/cris/ccast/sdr60_old/2012/264';
-sname1 = 'new';
-sname2 = 'old';
-
-band = 'LW';
+band = 'SW';
 
 sfile1 = fullfile(sdir1, sfile);
 sfile2 = fullfile(sdir2, sfile);
@@ -53,14 +52,14 @@ subplot(2,1,1)
 plot(vg, x1, vg, x2)
 title(sprintf('%s FOV %d FOR %d Scan %d', rtmp, ifov, ifor, iscan))
 ylabel('BT, K')
-legend(sname1, sname2, 'location', 'best')
+legend(sname1, sname2, 'location', 'southeast')
 grid on; zoom on
 
 subplot(2,1,2)
 plot(vg, x1 - x2)
 xlabel('wavenumber')
 ylabel('BT, K')
-legend([sname1, ' - ', sname2], 'location', 'best')
+legend([sname1, ' - ', sname2], 'location', 'southeast')
 grid on; zoom on
 
 %----------------------------------------------
@@ -70,13 +69,10 @@ grid on; zoom on
 w1 = real(rad2bt(vg, r1(i1, :, ifor, iscan)));
 w2 = real(rad2bt(vg, r2(i2, :, ifor, iscan)));
 
-fovnames = {'FOV 1','FOV 2','FOV 3',...
-            'FOV 4','FOV 5','FOV 6',...
-            'FOV 7','FOV 8','FOV 9'};
-
 figure(2); clf
+set(gcf, 'DefaultAxesColorOrder', fovcolors);
 plot(vg, w1 - w2)
-legend(fovnames, 'location', 'best')
+legend(fovnames, 'location', 'southeast')
 title(sprintf('%s FOR %d Scan %d', rtmp, ifor, iscan))
 xlabel('wavenumber')
 ylabel('BT, K')

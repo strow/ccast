@@ -5,11 +5,11 @@
 function [nlcorr_cxs, extra] = ...
     nlc(band, iFov, v, scene_cxs, space_cxs, PGA_Gain, control)
 
-if strcmp(upper(band), 'LW')
-  [nlcorr_cxs, extra] = ...
-    nlc_lowres(band, iFov, v, scene_cxs, space_cxs, PGA_Gain, control);
-else
+if strcmp(upper(band), 'SW')
   nlcorr_cxs = scene_cxs;
   extra = struct;
+else
+  [nlcorr_cxs, extra] = ...
+     nlc_tmp(band, iFov, v, scene_cxs, space_cxs, PGA_Gain, control);
 end
 

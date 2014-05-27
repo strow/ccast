@@ -122,7 +122,7 @@ nobs = length(igmTime);
 % initialize output arrays to NaNs
 igmLW = ones(n1, 9, nobs) * NaN;
 igmMW = ones(n2, 9, nobs) * NaN;
-igmsW = ones(n3, 9, nobs) * NaN;
+igmSW = ones(n3, 9, nobs) * NaN;
 
 tmp1FOR = ones(9, nobs) * NaN;
 tmp2FOR = ones(9, nobs) * NaN;

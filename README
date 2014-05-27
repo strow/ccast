@@ -7,6 +7,13 @@ H. Motteler, 1 Apr 2014
 Overview
 ---------
 
+ccast is software to take telemetery data for the Cross-track
+Infrared Sounder (CrIS), a Fourier transform spectrometer for the
+Suomi NPP and JPSS weather satellites, and produce high-quality
+calibrated radiances.  Input is a CCSDS packet stream, typically
+with an HDF wrapper, and the output is HDF5.  matlab_sdr.txt has
+more info on the output format.
+
 This is a "beta" release.  The key procedures rdr2mat, geo_daily,
 and rdr2sdr, which together take HDF RDR to Matlab SDR data, have
 been tested extensively, but the wrappers and user environment are

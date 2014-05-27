@@ -12,11 +12,13 @@
 % change all the uppercase names, e.g. SW to MW, to change bands
 % 
 
-addpath utils
+addpath ./utils
+addpath ../source
 
 % path to SDR mat files
-% sdir = '/asl/data/cris/ccast/sdr60/2012/264/';  % 20 Sep 2012
-sdir = '/asl/data/cris/ccast/sdr60_hr/2013/240';  % hires day 2
+% sdir = '/asl/data/cris/ccast/sdr60/2012/264/';    % 20 Sep 2012
+  sdir = '/asl/data/cris/ccast/sdr60_hr/2013/240';  % hires day 2
+  sdir = '/asl/data/cris/ccast/sdr60/2014/060';     % 1 Mar 2014
 
 % get a list of files
 flist = dir(fullfile(sdir, 'SDR*.mat'));
@@ -45,7 +47,7 @@ for fi = 1 : length(flist);
 
   % search for FORs with similar FOVs
   dmin = 1e6;
-  for i = 11 : 20
+  for i = 15 : 16
     for j = 1 : nscan
       fovbt = real(rad2bt(vgrid, rMW(ix, :, i, j)));
       t1 = max(rmscol(fovbt - fovbt(:,5) * ones(1,9)));

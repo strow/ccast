@@ -59,17 +59,17 @@ for i = 1 : nfile
       end
 
       % update the standard deviations
-      [istd_re_LW, ntot] = rec_std(d1.iavg_re_LW, istd_re_LW, ntmp, igm_re_LW);
-      [istd_im_LW, ntot] = rec_std(d1.iavg_im_LW, istd_im_LW, ntmp, igm_im_LW);
-      [istd_re_MW, ntot] = rec_std(d1.iavg_re_MW, istd_re_MW, ntmp, igm_re_MW);
-      [istd_im_MW, ntot] = rec_std(d1.iavg_im_MW, istd_im_MW, ntmp, igm_im_MW);
-      [istd_re_SW, ntot] = rec_std(d1.iavg_re_SW, istd_re_SW, ntmp, igm_re_SW);
-      [istd_im_SW, ntot] = rec_std(d1.iavg_im_SW, istd_im_SW, ntmp, igm_im_SW);
+      [istd_re_LW, ntot] = rec_var(d1.iavg_re_LW, istd_re_LW, ntmp, igm_re_LW);
+      [istd_im_LW, ntot] = rec_var(d1.iavg_im_LW, istd_im_LW, ntmp, igm_im_LW);
+      [istd_re_MW, ntot] = rec_var(d1.iavg_re_MW, istd_re_MW, ntmp, igm_re_MW);
+      [istd_im_MW, ntot] = rec_var(d1.iavg_im_MW, istd_im_MW, ntmp, igm_im_MW);
+      [istd_re_SW, ntot] = rec_var(d1.iavg_re_SW, istd_re_SW, ntmp, igm_re_SW);
+      [istd_im_SW, ntot] = rec_var(d1.iavg_im_SW, istd_im_SW, ntmp, igm_im_SW);
     end
   end
 end
 
-% note rec_std returns std^2
+% note rec_var returns std^2
 istd_re_LW = sqrt(istd_re_LW);
 istd_im_LW = sqrt(istd_im_LW);
 istd_re_MW = sqrt(istd_re_MW);

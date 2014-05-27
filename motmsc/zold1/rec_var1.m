@@ -1,9 +1,9 @@
 %
 % NAME
-%   rec_std -- recursive standard deviation
+%   rec_var -- recursive variance
 %
 % SYNOPSIS
-%   [s2, n2] = rec_std(m, s1, n1, x)
+%   [s2, n2] = rec_var(m, s1, n1, x)
 %
 % INPUTS
 %   m    - mean of the full, final sequence
@@ -34,7 +34,7 @@
 %  H. Motteler, 6 Nov 2012
 %
 
-function [s2, n2] = rec_std(m, s1, n1, x)
+function [s2, n2] = rec_var(m, s1, n1, x)
 
 m = m(:);
 x = x(:);

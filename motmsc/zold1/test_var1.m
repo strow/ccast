@@ -1,5 +1,5 @@
 
-% test of recursive std
+% test of old recursive variance function
 
 nrow = 100;
 ncol = 200;
@@ -12,7 +12,7 @@ m = mean(x, 2);
 
 for i = 1 : ncol
 
-  [s, n] =  rec_std(m, s, n, x(:,i));
+  [s, n] =  rec_var1(m, s, n, x(:,i));
 
 end
 

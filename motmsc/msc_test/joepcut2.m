@@ -26,10 +26,20 @@ d34 = -d30*(d31/2)*1e-7;        % -OPD
 e34 = -d34;                     % +OPD
 d35 = 1/(2*e34);                % dv 
 d36 = d35 * d33;                % alias width
-d38 = d37 - d36/2;              % desired first channel center
-d9 = mod(round(d38/d35),d33);   % cut point
-e9 = (d33*inst.vbase + d9) * d35; % first channel center
-e17 = (d33*(inst.vbase+1) + d9 - 1) * d35; % last channel center
+d38 = d35*floor(d37/d35 - d33/2);       % desired first DFT chan center
+e38 = d35*floor(d37/d35 + d33/2 - 1);   % desired last DFT chan center
+d9  = mod(round(d38/d35),d33);          % first chan center index 
+e9  = (d33*inst.vbase + d9) * d35;      % first chan center wavenum
+d17 = d9 - 1;                           % last chan center index
+e17 = (d33*(inst.vbase+1) + d17) * d35; % last chan center wavenum
+
+% old values
+d38x = d37 - d36/2;                       % desired first DFT chan center
+e38x = d37 + d36/2 - d35;                 % desired last DFT chan center
+d9x  = mod(round(d38x/d35),d33);          % first chan center index
+e9x  = (d33*inst.vbase + d9x) * d35;      % first chan center wavenum
+d17x = d9x - 1;                           % last chan center index
+e17x = (d33*(inst.vbase+1) + d17x) * d35; % last chan center wavenum
 
 % check
 [ isclose(inst.opd, e34), ...

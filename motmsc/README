@@ -1,23 +1,23 @@
 
-drivers and plots
+drivers and tests
 ------------------
 ccast_main   - wrapper to process matlab RDR to SDR data
 do_rdr2mat   - multi-day driver script for rdr2mat
-sci_daily    - save sci and eng data from RDR mat files
+nsci_daily    - save sci and eng data from RDR mat files
 plot_allsci  - sample plots of sci and eng data
 
 mkSRFwl      - build SRF matrix tables for interpolation
 mkSRFwl_run  - demo wrapper for the above
 
 cmp_sdr      - compare spectra from two ccast SDR files
-cmp_idps     - compare spectra from b/ccast and IPDS files
+cmp_idps     - compare spectra from ccast and ipds files
 cmp_fovs     - find a FOR with similar FOVs and compare them
-cmp_loop1    - loop on bcast SDR files, compare with IDPS 
-cmp_ecmwf1   - loop on ECMWF rtp, match with IDPS, compare
+cmp_loop1    - loop on ccast SDR files, compare with IDPS 
+cmp_ecmwf1   - loop on ECMWF RTP, match with IDPS, compare
 cmp_ecmwf2   - compare ecmwf, idps, and ccast radiances
 
-idps_mean    - compare idps FOV means over a set of files
-ccast_mean   - compare ccast FOV means over a set of files
+mean_cfovs   - compare ccast FOV means over a set of files
+mean_ifovs   - compare idps FOV means over a set of files
 interp_test  - finterp validation 
 nf_test      - numeric filter tests
 
@@ -100,6 +100,8 @@ iet2tai      - take IET to AIRS TAI
 tai2iet      - take AIRS TAI to IET
 seq_match    - return closest matching pairs from two sequences
 mkhamm       - build a sparse matrix for fast hamming convolutions
+fovnames     - FOV names for plot legends
+fovcolors    - colors for 9 FOV plots
 
 zold1
 ------
