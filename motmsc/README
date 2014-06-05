@@ -1,4 +1,4 @@
-
+\
 drivers and tests
 ------------------
 ccast_main   - wrapper to process matlab RDR to SDR data
@@ -6,8 +6,8 @@ do_rdr2mat   - multi-day driver script for rdr2mat
 nsci_daily    - save sci and eng data from RDR mat files
 plot_allsci  - sample plots of sci and eng data
 
-mkSRFwl      - build SRF matrix tables for interpolation
-mkSRFwl_run  - demo wrapper for the above
+mkSRFtab      - build SRF matrix tables for interpolation
+mkSRFrun      - example using  mkSRFtab with typical values
 
 cmp_sdr      - compare spectra from two ccast SDR files
 cmp_idps     - compare spectra from ccast and ipds files

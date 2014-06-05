@@ -1,9 +1,9 @@
 %
 % NAME
-%   mkSRF_p -  build SRF matrix tables for interpolation
+%   mkSRFtab -  build SRF matrix tables for interpolation
 %
 % SYNOPSIS
-%   function mkSRF_p(band, wlist, sfile, opts)
+%   function mkSRFtab(band, wlist, sfile, opts)
 %
 % INPUTS
 %   band   - band string, 'LW', 'MW', or 'SW'
@@ -19,11 +19,11 @@
 %   and the "inst" struct from the last wlaser value
 %
 % NOTES
-%   paired with getSRFwl, derived from mkSRFwl, modified to work
-%   with newILS-type ILS functions, with no band-edge extension
+%   works with with getSRFwl, derived from mkSRFwl, modified to work
+%   with newILS with no band-edge extension
 %
 
-function mkSRF_p(band, wlist, sfile, opts)
+function mkSRFtab(band, wlist, sfile, opts)
 
 band = upper(band);
 wlist = sort(wlist(:));
@@ -55,8 +55,8 @@ for wi = 1 : length(wlist)
     % loop on FOVs
     for j = 1 : 9
 
-      % call newILS_p
-      smat(:, i, j) = newILS_p(j, inst, inst.freq(i), inst.freq);
+      % call newILS
+      smat(:, i, j) = newILS(j, inst, inst.freq(i), inst.freq, 2000);
 
     end
     fprintf(1,'.');

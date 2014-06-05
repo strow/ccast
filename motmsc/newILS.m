@@ -3,16 +3,17 @@
 %   newILS -- cris ILS test function
 %
 % SYNOPSIS
-%   ILS = newILS(ifov, inst, vref, vgrid)
+%   ILS = newILS(ifov, inst, vref, vgrid, narc)
 %
 % INPUTS
 %   ifov   - FOV index
 %   inst   - cris sensor grid params
 %   vref   - channel or reference frequency
 %   vgrid  - output frequency grid
+%   narc   - optional number of arcs
 %
 % OUTPUTS
-%   ILS    - CrIS ILS at vgrid frequencies
+%   ILS    - ILS for vref at vgrid frequencies
 %
 % DISCUSSION
 %   derived from cris_igm3, in the cris_sim repo.
@@ -21,10 +22,11 @@
 %  H. Motteler, 14 May 2014
 %
 
-function ILS = newILS(ifov, inst, vref, vgrid)
+function ILS = newILS(ifov, inst, vref, vgrid, narc)
 
-narc = 1000;
-% narc = 2001;
+if nargin < 5
+  narc = 1000;
+end
 
 a  = inst.foax(ifov);   % FOV off-axis angle
 r2 = inst.frad(ifov);   % FOV radius
@@ -43,8 +45,8 @@ w = alpha .* r1;                   % integral half-arc lengths
 ILS = zeros(length(vgrid), 1);
 
 for i = 1 : narc
-% ILS = ILS + w(i) * psinc(2*pi*inst.opd*(vgrid - vref*cos(r1(i))), inst.npts);
-  ILS = ILS + w(i) * rsinc(2*pi*inst.opd*(vgrid - vref*cos(r1(i))));
+  ILS = ILS + w(i) * psinc(2*pi*inst.opd*(vgrid - vref*cos(r1(i))), inst.npts);
+% ILS = ILS + w(i) * rsinc(2*pi*inst.opd*(vgrid - vref*cos(r1(i))));
 % ILS = ILS + w(i) * rsinc(2*pi*inst.opd*cos(r1(i)) * (vgrid - vref*cos(r1(i))));
 % ILS = ILS + w(i) * rsinc(2*pi*inst.opd*cos(r1(i)) * (vgrid - vref));
 end

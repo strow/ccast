@@ -25,12 +25,13 @@ fchan  = freq(floor(0.6*npts));
 % fchan = user.v1 + .8 * (user.v2 - user.v1);
 
 % new test ILS
-srf1 = newILS(ifov, inst, fchan, freq);
+narc = 2001;
+srf1 = newILS(ifov, inst, fchan, freq, narc);
 
 % old UMBC ILS
 nslice = 2001;
-% [t1, srf2] = oaffov2(freq, fchan, opd, theta, hfov, nslice);
-[t1, srf2] = oaffov_p(freq, fchan, opd, theta, hfov, nslice, npts);
+[t1, srf2] = oaffov2(freq, fchan, opd, theta, hfov, nslice);
+% [t1, srf2] = oaffov_p(freq, fchan, opd, theta, hfov, nslice, npts);
 srf2 = srf2(:);
 
 % Dave's UW ILS
