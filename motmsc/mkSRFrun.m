@@ -7,15 +7,15 @@ addpath ../source
 addpath ../motmsc/utils
 
 opts = struct;
-opts.resmode = 'hires1';
+opts.resmode = 'lowres';
 wlist = [773.1300, 773.1305];
 
-sfile = 'SRF_v33aHR1_LW.mat';
+sfile = 'SRF_v33aLR_LW.mat';
 mkSRFtab('LW', wlist, sfile, opts)
 
-sfile = 'SRF_v33aHR1_MW.mat';
+sfile = 'SRF_v33aLR_MW.mat';
 mkSRFtab('MW', wlist, sfile, opts)
 
-sfile = 'SRF_v33aHR1_SW.mat';
+sfile = 'SRF_v33aLR_SW.mat';
 mkSRFtab('SW', wlist, sfile, opts)
 
