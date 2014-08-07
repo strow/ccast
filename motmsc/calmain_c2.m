@@ -26,13 +26,14 @@
 % DISCUSSION
 %   The calibration equation is
 %
-%     r_obs = F * r_ict * f * SA-1 * f * (ES-SP)/(ICT-SP)
+%     r_obs = F * r_ict * f * (SA-1*N-1*(ES-SP)) / (SA-1*N-1*(ICT-SP))
 %
 %   r_obs - calibrated radiance at the user grid
 %   F     - fourier interpolation to the user grid
 %   r_ict - expected ICT radiance at the sensor grid
 %   f     - raised-cosine bandpass filter
 %   SA-1  - inverse of the ILS matrix
+%   N-1   - inverse of the numeric filter
 %   ES    - earth-scene count spectra
 %   IT    - calibration target count spectra
 %   SP    - space-look count spectra
@@ -51,7 +52,9 @@ inst.sNF = specNF(inst, opts.specNF_file);
 [nchan, n, k, nscan] = size(rcnt);
 
 % initialize the output array
-rcal = ones(nchan, 9, 30, nscan) * NaN;
+rcaln = ones(nchan, 9, 30, nscan) * NaN;
+rcald = ones(nchan, 9, 30, nscan) * NaN;
+rcal  = ones(nchan, 9, 30, nscan) * NaN;
 
 % initialize working arrays
 es_nlc = ones(nchan, 1) * NaN;
@@ -135,8 +138,10 @@ for si = 1 : nscan   % loop on scans
                    eng.PGA_Gain, inst);   
 
       % calculate (ES-SP)/(ICT-SP), accounting for sweep direction
-      rcal(:, iFov, iES, si) = ...
-              (es_nlc - sp_nlc(:,k)) ./ (it_nlc(:,k) - sp_nlc(:,k));
+      rcaln(:, iFov, iES, si) = es_nlc - sp_nlc(:,k);
+      rcald(:, iFov, iES, si) = it_nlc(:,k) - sp_nlc(:,k);
+%     rcal(:, iFov, iES, si) = ...
+%             (es_nlc - sp_nlc(:,k)) ./ (it_nlc(:,k) - sp_nlc(:,k));
 
     end     % loop on ES
   end       % loop on FOVs
@@ -145,11 +150,16 @@ for si = 1 : nscan   % loop on scans
   % note we are vectorizing in chunks of size nchan x 30 here
   for fi = 1 : 9
 
-    rtmp = squeeze(real(rcal(:,fi,:,si)));  
+    rtmpn = squeeze(rcaln(:,fi,:,si));  
+    rtmpd = squeeze(rcald(:,fi,:,si));  
 
-    rtmp = bandpass(vinst, rtmp, uv1, uv2, uvr);
+%   rtmpn = bandpass(vinst, rtmpn, uv1, uv2, uvr);
+%   rtmpd = bandpass(vinst, rtmpd, uv1, uv2, uvr);
 
-    rtmp = rIT .* (Sinv(:,:,fi) * rtmp);
+    rtmpn = Sinv(:,:,fi) * rtmpn;
+    rtmpd = Sinv(:,:,fi) * rtmpd;
+
+    rtmp = rIT .* real(rtmpn ./ rtmpd);
 
     rtmp = bandpass(vinst, rtmp, uv1, uv2, uvr);
 

@@ -4,12 +4,13 @@
 
 # data & misc
 *.h5
+*.hdf
 *.mat
 *.fig
 *.log
 *.core
 
-# tex & xfig
+# tex & docs
 *.aux
 *.toc
 *.snm
@@ -23,6 +24,7 @@
 *.tgz
 *.tar
 *.zip
+*.bz2
 
 # libs and object files
 *.a

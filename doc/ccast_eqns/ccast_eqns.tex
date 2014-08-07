@@ -1,0 +1,84 @@
+\documentclass[11pt]{beamer}
+% \usetheme{Boadilla}
+  \usetheme{default}
+
+\input{crisdefs.tex}
+
+\title{ccast calibration equations}
+\author{H.~E.~Motteler and L.~L.~Strow}
+\institute{
+  UMBC Atmospheric Spectroscopy Lab \\
+  Joint Center for Earth Systems Technology \\
+}
+\date{\today}
+\begin{document}
+
+%----------- slide --------------------------------------------------%
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{calibration equation}
+
+The \ccast\ reference calibration equation is
+
+\[r_{\mbox{\tiny OBS}} = F \cdot r_{\mbox{\tiny ICT}}\cdot f \cdot
+  \SA^{-1}\cdot f \cdot \frac{\ES - \SP}{\IT - \SP} \]
+
+\begin{itemize}
+  \item $r_{\mbox{\tiny OBS}}$ is calibrated radiance at the user grid
+  \item $F$ is Fourier interpolation from sensor to user grid
+  \item $f$ is a raised-cosine bandpass filter
+  \item $r_{\mbox{\tiny ICT}}$ is expected ICT radiance at the sensor grid
+  \item $\SA^{-1}$ is the inverse of the ILS matrix
+  \item $\ES$ is earth-scene count spectra
+  \item $\IT$ is calibration target count spectra
+  \item $\SP$ is space-look count spectra
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{notes}
+
+\begin{itemize}
+  \item the $\IT$ and $\SP$ looks are averaged over several scans
+  \item we divide the count spectra by the numeric filter
+    at the sensor grid, but this cancels out in the ratio $(\ES - \SP) /
+    (\IT - \SP)$
+  \item $F$ is a zero-filled double Fourier interpolation
+  \item $f \cdot \SA^{-1} \cdot f$ can be considered as a
+    physically-based smoothing of the rows and columns of $\SA^{-1}$
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{CrIS ILS}
+
+the \cris\ \ils\ for $\fov_i$ can be represented as
+
+\[\int_{\mbox{\tiny FOV}_i} \!\!\!\! w_i(\theta)\, \sinc(2 \pi
+                 d(v - v_0 \cos \theta ))\, d\theta \]
+
+% f_{v_0}(v) = 
+% \int_{\mbox{\tiny FOV}_i}
+% \int_{a_i}^{b_i}
+
+\begin{itemize}
+  \item $d$ is max \opd
+  \item $v$ is frequency
+  \item $v_0$ is reference or channel frequency
+  \item $\sinc(x) = sin(x)/x$ for $x \ne 0$,  $1$ for $x = 0$.
+  \item $\sinc(2 \pi d(v - v_0 \cos \theta ))$ gives the ILS for a
+    single ray at off-axis angle $\theta$
+  \item integration is over the intersection of on-axis arcs with
+    $\fov_i$, with $w_i(\theta)$ the length of an intersecting arc
+    at off-axis angle $\theta$
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\end{document}
+

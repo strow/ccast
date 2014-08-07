@@ -3,12 +3,13 @@
 %   rdr2mat - process RDR h5 files to mat files 
 %
 % SYNOPSIS
-%   rdr2mat(doy, hdir, mdir)
+%   rdr2mat(doy, hdir, mdir, btrim)
 %
 % INPUTS
 %   doy   - day-of-year directory, a 3-char string
 %   hdir  - path to HDF RDR year (input)
 %   mdir  - path to matlab RDR year (output)
+%   btrim - optional bit trim mask cache file
 %
 % OUTPUT
 %   a mat file RDR_<rid>.mat containing structs d1 and m1, as read
@@ -23,20 +24,21 @@
 %   be slightly less verbose
 %
 
-function rdr2mat(doy, hdir, mdir)
+function rdr2mat(doy, hdir, mdir, btrim)
 
-% path to MIT readers
-addpath ../readers/MITreader380a
-addpath ../readers/MITreader380a/CrIS
-
-% default path to HDF RDR year
-if nargin < 2
-  hdir = '/asl/data/cris/rdr60/hdf/2014/';
+% default bit trim cache file
+if nargin < 4
+  btrim = 'btrim_cache.mat';
 end
 
-% default path to matlab RDR year
-if nargin < 3
-  mdir = '/asl/data/cris/rdr60/mat/2014/';
+% get a CCSDS temp filename
+jdir = getenv('JOB_SCRATCH_DIR');
+pstr = getenv('SLURM_PROCID');
+if ~isempty(jdir) && ~isempty(pstr)
+  ctmp = fullfile(jdir, sprintf('ccsds_%s.tmp', pstr));
+else
+  rng('shuffle');
+  ctmp = sprintf('ccsds_%03d.tmp', randi(999));
 end
 
 % full path to RDR h5 data source
@@ -89,15 +91,17 @@ for ix = 1 : length(hlist)
   % call the MIT RDR reader
   fprintf(1, 'rdr2mat: processing %s...\n', rid)
   try
-    [d1, m1] = read_cris_hdf5_rdr(hfile);
+    [d1, m1] = read_cris_hdf5_rdr(hfile, ctmp, btrim);
   catch me
     fprintf(1, 'rdr2mat: processing failed\n')
     fclose('all');
+    delete(ctmp);
     continue
   end
 
-  % close any dangling file handles
+  % clean up
   fclose('all');
+  delete(ctmp);
 
   % save the results
   save(rfile, 'd1', 'm1');

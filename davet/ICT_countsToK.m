@@ -31,6 +31,7 @@ function OUT = ICT_countsToK(Temp,TempCoeffs,Nkeep)
 %       ict_temps = ICT_countsToK(d1.data.sci.Temp,d1.packet.TempCoeffs,Nkeep)
 %
 % History:
+%   Bug in calculation of t_CCA found by LAB and fixed by DCT, 11-June-2014
 %   Renamed ICT_countsToK.m and adapted by DCT on 4 Nov 2011 to work with MIT reader packets.
 %   ICT_countsToK_TVAC3 created by JKT, SSEC, University of Wisconsin-Madison
 %   based on code supplied by D. Mooney, MIT
@@ -64,8 +65,10 @@ function OUT = ICT_countsToK(Temp,TempCoeffs,Nkeep)
 
 resp0 = (TempCoeffs.ICT_HighCalibResis.Ro - TempCoeffs.ICT_LowCalibResis.Ro) ./ (Temp.ICT_HighCalibResis.Pts(1:Nkeep) - Temp.ICT_LowCalibResis.Pts(1:Nkeep));
 R_CCA = TempCoeffs.ICT_LowCalibResis.Ro + resp0 .* (Temp.IE_CCA_CalibResTemp.Pts(1:Nkeep) - Temp.ICT_LowCalibResis.Pts(1:Nkeep));
-t_CCA = (R_CCA - TempCoeffs.ICT_LowCalibResis.Ro) / (TempCoeffs.ICT_IE_CCA_CalibResis.A * TempCoeffs.ICT_IE_CCA_CalibResis.Ro);
-%%%%t_CCA = (R_CCA - TempCoeffs.ICT_IE_CCA_CalibResis.Ro)/TempCoeffs.ICT_IE_CCA_CalibResis.Ro/TempCoeffs.ICT_IE_CCA_CalibResis.A;
+%t_CCA = (R_CCA - TempCoeffs.ICT_LowCalibResis.Ro) / (TempCoeffs.ICT_IE_CCA_CalibResis.A * TempCoeffs.ICT_IE_CCA_CalibResis.Ro);
+
+%% Above calculation of t_CCA should be:
+t_CCA = (R_CCA - TempCoeffs.ICT_IE_CCA_CalibResis.Ro) / (TempCoeffs.ICT_IE_CCA_CalibResis.A * TempCoeffs.ICT_IE_CCA_CalibResis.Ro);
 
 % Correct the two calibration resistors for temperature
 RH = TempCoeffs.ICT_HighCalibResis.Ro * (1 + TempCoeffs.ICT_HighCalibResis.A * t_CCA);

@@ -1,0 +1,35 @@
+
+\begin{itemize}
+  \item describe the test design
+
+  \item review the \ccast\ self-apodization correction
+
+  \item look at the 12 March and 27--28 Aug 2014 high res tests
+
+  \item look at obs minus calc and bias stats for the Aug test
+
+\end{itemize}
+
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{ccast self-apodization correction}
+
+\begin{itemize}
+  \item calculate and normalize the ILS for each sensor grid
+    channel, at the sensor grid frequences, over a significantly
+    extended interval
+
+  \item truncate these to the sensor grid 
+
+  \item these becomes the columns of the ILS as a linear transform
+
+  \item let ILS-1 be the inverse of this matrix, and B the user-grid
+    bandpass filter, as a linear transform.
+
+ \item then B * ILS-1 * B gives the self apodization correction,
+   with B acting here as a physically based stabilization of both
+   rows and columns of the ILS inverse.
+
+\end{itemize}
+
+\end{frame}

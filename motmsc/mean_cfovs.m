@@ -13,19 +13,20 @@ addpath ../source
 % test parameters
 %-----------------
 band = 'SW';
-res = 'hires1';  % lowres, hires1, hires2
+res = 'hires2';  % lowres, hires1, hires2
 sFOR = 15:16;    % fields of regard, 1-30
 adflag = 1;      % ascending/descending flag
 iref = 5;        % index of reference FOV
 
 % path to SDR year
 % syear = '/asl/data/cris/ccast/sdr60/2013';
-  syear = '/asl/data/cris/ccast/sdr60_hr/2013';
-% syear = '/asl/data/cris/ccast/sdr60_hr_old/2013';
+% syear = '/asl/data/cris/ccast/sdr60_hr/2013';
+% syear = '/asl/data/cris/ccast/sdr60_hr_f3/2013';
+  syear = '/asl/data/cris/ccast/sdr60_hr_c2/2013';
 
 % SDR days of the year
-  sdays = 71;         % high res test 1
-% sdays = 239 : 240;  % high res test 2
+% sdays = 71;         % high res test 1
+  sdays = 239 : 240;  % high res test 2
 % sdays = 238;
 % sdays = 64 : 77;
 % sdays = 60 : 62;

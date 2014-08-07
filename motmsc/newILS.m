@@ -37,19 +37,11 @@ r1 = b : d/(narc-1) : a + r2;      % integral discrete angle steps
 x = (a^2 + r1.^2 - r2^2) / (2*a);  % x val of FOV and arc intersection
 alpha = real(acos(x ./ r1));       % angle to FOV and arc intersection 
 w = alpha .* r1;                   % integral half-arc lengths
-
-% figure(3); clf
-% subplot(2,1,1); plot(1:narc, w); title('w')
-% subplot(2,1,2); plot(1:narc, r1); title('r1')
+w = w / sum(w);                    % normalize the weights
 
 ILS = zeros(length(vgrid), 1);
 
 for i = 1 : narc
   ILS = ILS + w(i) * psinc(2*pi*inst.opd*(vgrid - vref*cos(r1(i))), inst.npts);
-% ILS = ILS + w(i) * rsinc(2*pi*inst.opd*(vgrid - vref*cos(r1(i))));
-% ILS = ILS + w(i) * rsinc(2*pi*inst.opd*cos(r1(i)) * (vgrid - vref*cos(r1(i))));
-% ILS = ILS + w(i) * rsinc(2*pi*inst.opd*cos(r1(i)) * (vgrid - vref));
 end
-
-ILS = ILS / sum(ILS);
 

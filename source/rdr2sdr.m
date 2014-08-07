@@ -137,6 +137,10 @@ for fi = 1 : nfile
 
   % get wlaser from the eng packet data
   wlaser = metlaser(eng.NeonCal);
+  if isnan(wlaser)
+    fprintf(1, 'rdr2sdr: no valid wlaser value, skipping file %s\n', rid)
+    continue
+  end
 
   % get instrument and user grid parameters
   [instLW, userLW] = inst_params('LW', wlaser, opts);

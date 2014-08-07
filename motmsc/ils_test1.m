@@ -68,5 +68,5 @@ plot(freq, srf1 - srf3)
 title('new ILS - UW ILS')
 zoom on; grid on
 
-[rms(srf1 - srf2), rms(srf1 - srf3)]
+[rms(srf1(:) - srf2(:)), rms(srf1(:) - srf3(:))]
 

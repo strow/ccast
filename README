@@ -1,23 +1,24 @@
 
-ccast v 0.95, beta release  
-----------------------------
+ccast v 1.00
+-------------
 
-H. Motteler, 1 Apr 2014
+H. Motteler, 8 Aug 2014
 
 Overview
 ---------
 
-ccast is software to take telemetery data for the Cross-track
+ccast is software to take level zero data for the Cross-track
 Infrared Sounder (CrIS), a Fourier transform spectrometer for the
 Suomi NPP and JPSS weather satellites, and produce high-quality
 calibrated radiances.  Input is a CCSDS packet stream, typically
 with an HDF wrapper, and the output is HDF5.  matlab_sdr.txt has
 more info on the output format.
 
-This is a "beta" release.  The key procedures rdr2mat, geo_daily,
-and rdr2sdr, which together take HDF RDR to Matlab SDR data, have
-been tested extensively, but the wrappers and user environment are
-still evolving.  
+The software is under development.  The key procedures rdr2mat,
+geo_daily, and rdr2sdr, which together take HDF RDR to Matlab SDR
+data, have been tested extensively, including reprocessing all data
+from near mission start, but the wrappers and user environment are
+still evolving.
 
 The to-do list includes better documentation, regularized output,
 probably new output formats, a more closely integrated RDR reader,
@@ -27,10 +28,10 @@ the IDPS and ADL conventions, and an option for locally calculated
 geolocation.
 
 Documentation is sparse.  There are detailed comments at the start
-of most major procedures, doc/matlab_sdr.txt gives the ccast matlab
-SDR format, and motmsc/README a summary of the test and development
-scripts there.  We need an ATBD, at least an overview, and a user's
-guide.
+of most major procedures.  doc/ccast_eqns is a short presentation 
+of the ILS and calibration equations, doc/matlab_sdr.txt gives the
+ccast matlab SDR format, and motmsc/README is a summary of the test
+and development scripts there.  There is no user's guide yet.
 
 Design choices for output format and features such as file-spanning
 moving averages depend on the RDR reader and its integration with the
@@ -54,10 +55,9 @@ Top level directories
   motmsc    - my development and utils
   hires     - high res code and params
   davet     - Dave's code
-  strow     - Larrabee's code
+  runs      - batch scripts
   readers   - MIT readers with local mods
   inst_data - instrument data:  nonlinearity, emissivity, etc.
-  demo      - end-to-end demo with a small dataset
 
 Matlab and data paths 
 ----------------------

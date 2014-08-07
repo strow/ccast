@@ -2,44 +2,40 @@
 #
 # usage: sbatch ccast_batch.sh doy yyyy
 #
+# ccast_batch.sh d1 yyyy started with m tasks will process days d1,
+# d1+1, d1+2, ..., d1+4*m-1, in 4 job steps.  For m tasks, the job
+# step offsets should be 0, m, 2*m, and 3*m
 
 # sbatch options
 #SBATCH --job-name=ccast
 #SBATCH --partition=batch
 #SBATCH --qos=long_contrib
 #SBATCH --account=pi_strow
-#SBATCH --ntasks=30
 #SBATCH --mem-per-cpu=8000
-# #SBATCH --nodes=2
-# #SBATCH --ntasks-per-node=2
-# #SBATCH --output=ccast_test.out
-# #SBATCH --error=ccast_test.err
-# #SBATCH --qos=medium
+#SBATCH --ntasks=30
+
+# #SBATCH --nodes=30
+# #SBATCH --ntasks-per-node=1
+# #SBATCH --exclusive
 # #SBATCH --begin=now+6hours
 
-# srun options
-# OUTPUT='--output=ccast_%j_%t.out'
-# ERROR='--error=ccast_%j.err'
-# LABEL='--label'
-
 # matlab options
-MATLAB=matlab
-# MATLAB=/usr/cluster/matlab/r2013a/bin/matlab
+MATLAB=/usr/cluster/matlab/2014a/bin/matlab
 MATOPT='-nojvm -nodisplay -nosplash'
 
-# run the matlab wrapper
+# job step 1
 srun --output=ccast_%j_0_%t.out \
     $MATLAB $MATOPT -r "ccast_batch($1, $2); exit"
 
-# run the matlab wrapper
+# job step 2
 srun --output=ccast_%j_1_%t.out \
     $MATLAB $MATOPT -r "ccast_batch($1+30, $2); exit"
 
-# run the matlab wrapper
+# job step 3
 srun --output=ccast_%j_2_%t.out \
     $MATLAB $MATOPT -r "ccast_batch($1+60, $2); exit"
 
-# run the matlab wrapper
+# job step 4
 srun --output=ccast_%j_3_%t.out \
    $MATLAB $MATOPT -r "ccast_batch($1+90, $2); exit"
 

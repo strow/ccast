@@ -3,12 +3,13 @@
 %
 
 addpath ../source
-% sfile = 'SDR_d20130828_t0238580.mat';
-sfile = 'SDR_d20130828_t0614568.mat';
-sdir1 = '/asl/data/cris/ccast/sdr60_hr_p/2013/240';
-sdir2 = '/asl/data/cris/ccast/sdr60_hr/2013/240';
-sname1 = 'psinc';
-sname2 = 'sinc';
+addpath utils
+
+sfile = 'SDR_d20130828_t0230581.mat';
+sdir1 = '/asl/data/cris/ccast/sdr60_hr/2013/240';
+sdir2 = '/asl/data/cris/ccast/sdr60_hr_f3/2013/240';
+sname1 = 'ref cal';
+sname2 = 'alt cal';
 
 band = 'SW';
 
@@ -42,7 +43,7 @@ i2 = interp1(v2, 1:n2, vg, 'nearest');
 %---------------------------------------
 ifov = 1;
 ifor = 15;
-iscan = 32;
+iscan = 31;
 
 x1 = real(rad2bt(vg, r1(i1, ifov, ifor, iscan)));
 x2 = real(rad2bt(vg, r2(i2, ifov, ifor, iscan)));

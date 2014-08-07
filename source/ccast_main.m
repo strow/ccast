@@ -3,7 +3,7 @@
 %   ccast_main -- wrapper to process matlab RDR to SDR data
 %
 % SYNOPSIS
-%   ccast_main(doy)
+%   ccast_main(doy, year)
 %
 % INPUTS
 %   day   - integer day of year
