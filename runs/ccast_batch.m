@@ -21,10 +21,8 @@ function ccast_batch(d1, year)
 
 more off
 
-addpath /home/motteler/cris/ccast/davet
-addpath /home/motteler/cris/ccast/motmsc
-addpath /home/motteler/cris/ccast/motmsc/utils
-addpath /home/motteler/cris/ccast/source
+addpath ../davet
+addpath ../source
 
 procid = str2num(getenv('SLURM_PROCID'));
 nprocs = str2num(getenv('SLURM_NPROCS'));

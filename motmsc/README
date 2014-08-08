@@ -1,14 +1,6 @@
 \
-drivers and tests
-------------------
-ccast_main   - wrapper to process matlab RDR to SDR data
-do_rdr2mat   - multi-day driver script for rdr2mat
-sci_daily    - save sci and eng data from RDR mat files
-plot_allsci  - sample plots of sci and eng data
-
-mkSRFtab     - build SRF matrix tables for interpolation
-mkSRFrun     - example using mkSRFtab with typical values
-
+recent tests
+-------------
 cmp_sdr      - compare spectra from two ccast SDR files
 cmp_idps     - compare spectra from ccast and ipds files
 cmp_fovs     - find a FOR with similar FOVs and compare them
@@ -18,11 +10,11 @@ cmp_ecmwf2   - compare ecmwf, idps, and ccast radiances
 
 mean_cfovs   - compare ccast FOV means over a set of files
 mean_ifovs   - compare idps FOV means over a set of files
+
 interp_test  - finterp validation 
 nf_test      - numeric filter tests
 
-bcast_dump   - call rdr2dmp to dump regular RDR data
-hires_dump   - call rdr2dmp to dump high-res RDR data 
+plot_allsci  - sample plots of sci and eng data
 
 msc_test
 ---------
@@ -41,12 +33,10 @@ bcast_rdr4   - call rdr2sdr4 on regular or high-res data
 rdr2mat4     - process 4-scan RDR h5 files to mat files
 rdr2sdr4     - rdr2sdr to check for out-of-order 4-scan data
 idps_check   - quick look a day's worth of SDR data
-checkRDR     - validate MIT RDR data
 read_test1   - misc MIT reader tests
 
 hires
 ------
-nlc         - dummy nlc skips non-linearity correction
 srf_lowres  - compare low res SRFs by FOV at mid-band
 srf_hires1  - compare high res SRFs by FOV at mid-band
 srf_hires2  - compare high res SRFs by FOV at low end of band
@@ -80,19 +70,14 @@ mask_test1   - plot IGM obs along with high res bit-trim mask
 utils
 ------
 header       - man-page style function boilerplate 
-bt2rad       - translate brightness temperature to radiance
-rad2bt       - translate radiance to brightness temperature
-finterp      - interferometric fourier interpolation
 finterp2     - fourier interpolation, wrapper for interpft
 hires_bmask  - high res bit trim mask with max and min bounds
 isclose      - test for rms relative difference less than eps
 ntail        - find the non-NaN end a vector or array
 oaffov2      - compute the off axis SRF
 readbc_rtp   - translate bcast SDR data to RTP profiles
-rdr2dmp      - save selected internal values from rdr2sdr
 rec_std      - recursive standard deviation
 rec_mean     - recursive (mean
-rms          - returns RMS average of vector or matrix
 rmscol       - return rms value for each column
 iet2mat      - take IET time to matlab serial date number
 tai2mat      - take AIRS TAI to matlab serial date number
@@ -110,13 +95,10 @@ ngas_batch3  - process data with the NGAS reader
 ngas_flags   - NGAS scan status flags
 readspec6    - get spectra from a CrIS RDR interferogram
 scancat      - concatenat scan blocks from RDRs
-scancat3     - concatenate 3 x 3 scan blocks from RDRs
 sftab1       - tabulate non-zero scan flags
 testBitTrim  - scan RDR records for bit trim mask changes
 testload     - load selected MIT and NGAS records
 testspecs    - compare readspec, inst_params, and spectral_params
-tileplot1    - simple tiling plot
-plot_sdr1    - quick look at SDR data
 
 zold2
 ------

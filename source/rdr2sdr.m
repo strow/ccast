@@ -26,15 +26,15 @@
 %
 % major processing steps are
 %   checkRDR   - validate the RDR data
-%   scipack    - process sci and eng packets
-%   readspec   - take igms to count spectra
+%   scipack    - process sci and eng packet data
+%   igm2spec   - take igms to count spectra
 %   scanorder  - group data into scans
+%   geo_match  - match GCRSO and RDR scans
 %   movavg_app - calculate or load moving averages
 %   calmain    - radiometric and spectral calibration
 %
 % rdr2sdr is part of a processing chain in which the major steps
 % communicate by files, with the following naming scheme
-%
 %   RDR_<rid>.mat  -- RDR mat files, from rdr2mat
 %   avg_<rid>.mat  -- moving average files, from movavg_pre
 %   SDR_<rid>.mat  -- SDR mat files, from this procedure

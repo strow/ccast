@@ -48,11 +48,9 @@ function ccast_prepro(d1, d2, year)
 more off
 
 % set ccast paths
-addpath /home/motteler/cris/ccast/davet
-addpath /home/motteler/cris/ccast/source
-addpath /home/motteler/cris/ccast/motmsc
-addpath /home/motteler/cris/ccast/motmsc/utils
-addpath /home/motteler/cris/ccast/readers/MITreader380a
+addpath ../davet
+addpath ../source
+addpath ../readers/MITreader380a
 
 % set data paths
 hdir = '/asl/data/cris/rdr60/hdf';    % HDF RDR files

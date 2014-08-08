@@ -1,0 +1,25 @@
+
+Design choices for output format and features such as file-spanning
+moving averages depend on the RDR reader and its integration with the
+validation code in checkRDRf.  It was convenient for development but
+we should probably move away from a one-to-one correspondence between
+RDR and SDR files, and present the SDR data in a more regularized way.
+The current geo preprocessing step is needed mainly because the GCRSO
+geo and RDR files don't match up.
+
+Despite these problems the calibration code--both the UMBC and davet
+branches--works well and for the most part is in close agreement with
+the IDPS and ADL codes.  Differences that remain are more likely due
+to different physical assumptions and modeling than any problems that
+are purely with the code.
+
+The use of the geo summary file may be temporary, the geo_match
+procedure could be modified to read the GCRSO files directly.  But
+it only takes a couple of minutes to build the summary file for a
+day's worth of data.
+
+The moving average preprocessing, to allow moving averages to span
+the 60-scan RDR files, has been tested with earlier versions of the
+code but is not yet integrated with the current release.  This may
+wait on a more general rewrite of the lower layers of the code.
+

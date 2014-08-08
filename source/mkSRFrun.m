@@ -3,8 +3,6 @@
 %
 
 more off
-addpath ../source
-addpath ../motmsc/utils
 
 opts = struct;
 opts.resmode = 'lowres';

@@ -23,20 +23,6 @@
 
 function sci_daily(doy, rdir, odir)
 
-% set paths here, for now
-addpath ../source
-addpath ../davet
-
-% default path to matlab RDR year
-if nargin < 2
-  rdir = '/asl/data/cris/rdr60/mat/2012/';
-end
-
-% default output directory
-if nargin < 3
-  odir = '/home/motteler/cris/data/2012/daily/';  
-end
-
 % full path to matlab RDR data
 rsrc = fullfile(rdir, doy);
 

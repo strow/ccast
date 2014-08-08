@@ -1,5 +1,5 @@
 
-ccast v 1.00
+ccast v 1.02
 -------------
 
 H. Motteler, 8 Aug 2014
@@ -30,61 +30,34 @@ geolocation.
 Documentation is sparse.  There are detailed comments at the start
 of most major procedures.  doc/ccast_eqns is a short presentation 
 of the ILS and calibration equations, doc/matlab_sdr.txt gives the
-ccast matlab SDR format, and motmsc/README is a summary of the test
-and development scripts there.  There is no user's guide yet.
+matlab SDR format, source/README lists functions there by category,
+and motmsc/README is a summary of the test and development scripts
+there.  There is no user's guide yet.
 
-Design choices for output format and features such as file-spanning
-moving averages depend on the RDR reader and its integration with the
-validation code in checkRDRf.  It was convenient for development but
-we should probably move away from a one-to-one correspondence between
-RDR and SDR files, and present the SDR data in a more regularized way.
-The current geo preprocessing step is needed mainly because the GCRSO
-geo and RDR files don't match up.
-
-Despite these problems the calibration code--both the UMBC and davet
-branches--works well and for the most part is in close agreement with
-the IDPS and ADL codes.  Differences that remain are more likely due
-to different physical assumptions and modeling than any problems that
-are purely with the code.
 
 Top level directories
 ----------------------
 
   docs      - documentation
   source    - main source directory
-  motmsc    - my development and utils
-  hires     - high res code and params
-  davet     - Dave's code
-  runs      - batch scripts
-  readers   - MIT readers with local mods
-  inst_data - instrument data:  nonlinearity, emissivity, etc.
+  davet     - Dave Tobin/UW components
+  motmsc    - test and development
+  runs      - batch and top-level scripts
+  readers   - MIT reader with local mods
+  inst_data - numeric filter and tabulated SRFs
 
-Matlab and data paths 
-----------------------
 
-I'd like to allow for a limited set of different versions of some
-procedures by careful management of the matlab path.  This lets us
-have things like a highres/inst_params.m and a source/inst_params.m,
-or a source/calmain.m and a davet/calmain.m.  Mostly this just means
-if you're working in your own directory you can, as an option, run
-your own version of some of the code.
+Top level scripts
+------------------
 
-The search order for matlab procedures is the current directory and
-then the reverse order they are set with addpath.  So for example if
-you do
+  ccast_prepro  - ccast HDF to matlab preprocessing
+  ccast_main    - ccast top-level wrapper procedure
 
-     addpath ../davet
-     addpath ../source
+ccast_prepro.m is in the runs directory, where it is paired with the
+batch processing script ccast_prepro.sh.  ccast_main is in the source
+directory and is the main top-level script, where various parameters 
+can be set.
 
-and then run in motmsc, files there will take precence, then files
-from source, and finally files from davet.
-
-matlab paths here are relative, they assume you are running one
-level below the bcast installation home.  Paths to data are set up
-as ../yyyy/doy/ but that's just a convention, doy can be any subset
-of the day's data.  The only restriction is that the current setup
-uses doy to match the geo daily summary, so doy can't be a subset
-that spans days.
 
 Main processing steps
 ----------------------
@@ -92,22 +65,19 @@ Main processing steps
   rdr2mat    - wrapper and some QC for the MIT reader
   geo_daily  - save a day of GCRSO data in a mat file
   sci_daily  - science and engineering packet summary
-  avg_daily  - optional moving average preprocessing
   rdr2sdr    - main function for RDR to SDR processing
 
 rdr2mat, sci_daily, and geo_daily are called by a wrapper script
-motmsc/do_rdr2mat.m, that loops over days.  sci_daily is not needed
-for bcast processing but is useful for monitoring various instrument
-parameters, see motmsc/plot_allsci.m for some examples.  bcast_main
-is a wrapper for rdr2sd4 that sets paths, files, and options.
+ccast_prepro, that loops over days.  sci_daily is not needed for
+ccast processing but is useful for monitoring various instrument
+parameters.  ccast_main is a wrapper for rdr2sdr that sets paths,
+files, and options.  rdr2sdr implements the main processing loop
+as follows:
 
-The use of the geo summary file may be temporary, the geo_match
-procedure could be modified to read the GCRSO files directly.  But
-it only takes a couple of minutes to build the summary file for a
-day's worth of data.
-
-The moving average preprocessing, to allow moving averages to span
-the 60-scan RDR files, has been tested with earlier versions of the
-code but is not yet integrated with the current release.  This may
-wait on a more general rewrite of the lower layers of the code.
+  checkRDR   - check and order RDR data from the MIT reader
+  scipack    - process sci and eng packets
+  igm2spec   - take interferograms to count spectra
+  scanorder  - use FOR values to group data into scans
+  geo_match  - match GCRSO and RDR scans
+  calmain    - main calibration procedure
 
