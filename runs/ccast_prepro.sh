@@ -3,7 +3,7 @@
 # usage: sbatch ccast_prepro.sh doy1 doy2 yyyy 
 #
 
-#SBATCH --job-name=rdr2mat
+#SBATCH --job-name=prepro
 #SBATCH --partition=batch
 #SBATCH --qos=long_contrib
 #SBATCH --account=pi_strow

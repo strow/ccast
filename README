@@ -1,38 +1,35 @@
 
-ccast v 1.02
+CCAST v 1.04
 -------------
 
-H. Motteler, 8 Aug 2014
+H. Motteler, 14 Aug 2014
 
 Overview
 ---------
 
-ccast is software to take level zero data for the Cross-track
-Infrared Sounder (CrIS), a Fourier transform spectrometer for the
+CCAST is software to take level zero data from the Cross-track
+Infrared Sounder (CrIS), a Fourier transform spectrometer on the
 Suomi NPP and JPSS weather satellites, and produce high-quality
-calibrated radiances.  Input is a CCSDS packet stream, typically
-with an HDF wrapper, and the output is HDF5.  matlab_sdr.txt has
-more info on the output format.
+calibrated radiances.  It is written primarily in Matlab, allowing
+for easy interaction, modification, and data visualization.  Input
+is a CCSDS packet stream, typically with an HDF5 wrapper, and the
+output is Matlab-format HDF5.
 
-The software is under development.  The key procedures rdr2mat,
-geo_daily, and rdr2sdr, which together take HDF RDR to Matlab SDR
-data, have been tested extensively, including reprocessing all data
-from near mission start, but the wrappers and user environment are
-still evolving.
 
-The to-do list includes better documentation, regularized output,
-probably new output formats, a more closely integrated RDR reader,
-file-spanning moving averages, retaining the complex component for
-the matlab SDR output, possibly changing SDR variable names to match
-the IDPS and ADL conventions, and an option for locally calculated
-geolocation.
+Documentation
+-------------
 
-Documentation is sparse.  There are detailed comments at the start
-of most major procedures.  doc/ccast_eqns is a short presentation 
-of the ILS and calibration equations, doc/matlab_sdr.txt gives the
-matlab SDR format, source/README lists functions there by category,
-and motmsc/README is a summary of the test and development scripts
-there.  There is no user's guide yet.
+  doc/ccast_intro.pdf  - an overview of design and project status
+  doc/ccast_eqns.pdf   - intro to the ILS and calibration equations
+  doc/matlab_sdr.txt   - the matlab SDR format field definitions
+  doc/finterp.pdf      - some notes on Fourier interpolation
+  doc/status.txt       - ccast status report as of 12 Dec 2013
+
+  source/README        - a list source functions and scripts
+  motmsc/README        - a list of test and development scripts
+
+There are detailed comments at the start of most of the major and
+many of the minor procedures.
 
 
 Top level directories
@@ -45,39 +42,4 @@ Top level directories
   runs      - batch and top-level scripts
   readers   - MIT reader with local mods
   inst_data - numeric filter and tabulated SRFs
-
-
-Top level scripts
-------------------
-
-  ccast_prepro  - ccast HDF to matlab preprocessing
-  ccast_main    - ccast top-level wrapper procedure
-
-ccast_prepro.m is in the runs directory, where it is paired with the
-batch processing script ccast_prepro.sh.  ccast_main is in the source
-directory and is the main top-level script, where various parameters 
-can be set.
-
-
-Main processing steps
-----------------------
-
-  rdr2mat    - wrapper and some QC for the MIT reader
-  geo_daily  - save a day of GCRSO data in a mat file
-  sci_daily  - science and engineering packet summary
-  rdr2sdr    - main function for RDR to SDR processing
-
-rdr2mat, sci_daily, and geo_daily are called by a wrapper script
-ccast_prepro, that loops over days.  sci_daily is not needed for
-ccast processing but is useful for monitoring various instrument
-parameters.  ccast_main is a wrapper for rdr2sdr that sets paths,
-files, and options.  rdr2sdr implements the main processing loop
-as follows:
-
-  checkRDR   - check and order RDR data from the MIT reader
-  scipack    - process sci and eng packets
-  igm2spec   - take interferograms to count spectra
-  scanorder  - use FOR values to group data into scans
-  geo_match  - match GCRSO and RDR scans
-  calmain    - main calibration procedure
 

@@ -1,4 +1,4 @@
-\
+
 recent tests
 -------------
 cmp_sdr      - compare spectra from two ccast SDR files
@@ -7,14 +7,13 @@ cmp_fovs     - find a FOR with similar FOVs and compare them
 cmp_loop1    - loop on ccast SDR files, compare with IDPS 
 cmp_ecmwf1   - loop on ECMWF RTP, match with IDPS, compare
 cmp_ecmwf2   - compare ecmwf, idps, and ccast radiances
+plot_allsci  - sample plots of sci and eng data
 
 mean_cfovs   - compare ccast FOV means over a set of files
 mean_ifovs   - compare idps FOV means over a set of files
 
-interp_test  - finterp validation 
 nf_test      - numeric filter tests
-
-plot_allsci  - sample plots of sci and eng data
+interp_test  - finterp validation 
 
 msc_test
 ---------
@@ -87,20 +86,4 @@ seq_match    - return closest matching pairs from two sequences
 mkhamm       - build a sparse matrix for fast hamming convolutions
 fovnames     - FOV names for plot legends
 fovcolors    - colors for 9 FOV plots
-
-zold1
-------
-h5test1      - split up a fat h5 granule
-ngas_batch3  - process data with the NGAS reader
-ngas_flags   - NGAS scan status flags
-readspec6    - get spectra from a CrIS RDR interferogram
-scancat      - concatenat scan blocks from RDRs
-sftab1       - tabulate non-zero scan flags
-testBitTrim  - scan RDR records for bit trim mask changes
-testload     - load selected MIT and NGAS records
-testspecs    - compare readspec, inst_params, and spectral_params
-
-zold2
-------
-msc old stuff
 

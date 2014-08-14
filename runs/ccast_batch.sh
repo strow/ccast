@@ -4,7 +4,7 @@
 #
 # ccast_batch.sh d1 yyyy started with m tasks will process days d1,
 # d1+1, d1+2, ..., d1+4*m-1, in 4 job steps.  For m tasks, the job
-# step offsets should be 0, m, 2*m, and 3*m
+# step offsets should be 0, m, 2*m, 3*m, etc.
 
 # sbatch options
 #SBATCH --job-name=ccast

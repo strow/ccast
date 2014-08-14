@@ -1,0 +1,232 @@
+\documentclass[11pt]{beamer}
+% \usetheme{Boadilla}
+  \usetheme{default}
+
+\input{crisdefs.tex}
+
+\title{ccast intro and overview}
+\author{H.~E.~Motteler}
+\institute{
+  UMBC Atmospheric Spectroscopy Lab \\
+  Joint Center for Earth Systems Technology \\
+}
+\date{\today}
+\begin{document}
+
+%----------- slide --------------------------------------------------%
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{introduction}
+
+\ccast\ takes level zero data from the Cross-track Infrared Sounder
+(CrIS), a Fourier transform spectrometer on the Suomi NPP and JPSS
+weather satellites, and produce high-quality calibrated radiances.
+It is written primarily in Matlab, allowing for easy interaction,
+modification, and data visualization.  We give a brief overview of
+the design, implementation, and use.
+
+\hspace{2cm}
+
+The authors of the \umbc\ \ccast\ are Howard E.~Motteler, David Tobin,
+L.~Larrabee Strow, and Dan Mooney, with interferometric parameters
+in spreadsheet form from Joe Predina.
+
+\hspace{2cm}
+
+\ccast\ is available from a GitHub public repository, distributed
+under the terms of the GNU GPL v3.
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{history}
+
+\begin{itemize}
+  \item \ccast\ started as a collaboration of \umbc\ and \uw\ in the
+    fall of 2010, with major components from the 2007-2008 FM1 bench
+    and TVAC tests.
+
+  \item H.~Motteler wrote the L1a processing, starting with Dan
+    Mooney's RDR reader, and L.~Strow, Dave Tobin, and H.~Motteler
+    all collaborated on the L1b 
+
+  \item this forked into a \uw\ version with Fred Nagel's geo that
+    got first light, and a \umbc\ version with \noaa\ geo that got
+    the first high res obs a month later.
+
+  \item in the summer of 2012 H.~Motteler updated the UW code to 
+    run in the \umbc\ environment, and for some time maintained both
+    versions while continuing to develop the \umbc\ branch.
+
+  \item major portions of the \uw\ branch, including \ict\ modeling
+    and the non-linearity correction, were updated and merged into
+    the \umbc\ branch.
+\end{itemize}
+
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{preprocessing}
+
+\begin{center}
+  \includegraphics[scale=0.4]{figures/prepro.pdf}
+\end{center}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{preprocessing}
+
+\ccast\ processing is done in two passes---the first takes HDF and
+CCSDS data to Matlab files, and the second takes the Matlab files to
+calibrated radiances.  The preprocessing is done by ccast\_prepro.
+The main steps are
+
+\begin{itemize}
+  \item rdr2mat -- read \noaa\ RDR files (CCSDS level 0 data with an
+    HDF-5 wrapper) and produce Matlab RDR files, our working level~0
+    format.
+
+  \item geo\_daily -- read \noaa\ GCRSO HDF-5 geo files and produce a
+    daily abstract of CrIS geo data, as matlab files.
+
+  \item sci\_daily -- read Matlab RDR files and produce a daily
+    abstract of ``science'' (8~second) and ``engineering''
+    (4~minute) support data, as matlab files.
+
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{main processing}
+
+\begin{center}
+  \includegraphics[scale=0.4]{figures/mainpro.pdf}
+\end{center}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{main processing}
+
+ccast\_main sets parameters and paths and calls rdr2sdr, which 
+loops on Matlab RDR files, typically one day per call.  The main
+processing steps in rdr2sdr are
+
+\begin{itemize}
+  \item checkRDR -- validate and order the RDR data
+  \item scipack  -- process sci and eng packet data
+  \item inst\_params -- user and sensor grid parameters
+  \item igm2spec -- take interferograms to count spectra
+  \item scanorder -- group data into scans
+  \item geo\_match  -- match GCRSO and RDR scans
+  \item movavg\_app -- calculate moving averages
+  \item calmain  -- radiometric and spectral calibration
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{design notes}
+
+Some high-level design choices reflect past expedience and
+incremental development.
+
+\begin{itemize}
+  \item there is no granule structure, data is organized as
+    sets of scans
+
+  \item the \noaa\ RDR files can start and stop at any field of
+    regard (FOR), and the output SDR files follow this organization.
+
+  \item the translation to count spectra should be done later, right
+    before taking moving averages
+
+  \item there is no explicit quality control for the final
+    calibrated product.  There is extensive low-level data QC, and
+    most output and working arrays are initialized with NaNs as a
+    sanity check on processing
+
+  \item the use of the geo summary files was originally meant to be
+    temporary; the geo\_match procedure could read the GCRSO files
+    directly
+
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{performance}
+
+\begin{itemize} 
+  \item \ccast\ produces high-quality calibrated radiances.
+    Although it borrows significantly from the NOAA ATBD, key
+    features such as the ILS, SA interpolation, and the form of the
+    calibration equation were developed independently and in some
+    cases have been adopted by other groups.
+
+  \item runtime performance is very good.  Running as a single task
+    rdr2sdr processes 60-scan files at a rate of slightly less than
+    one file per minute
+
+  \item reliability is very good.  We have repeatedly reprocessed
+    all data from mission start with no problems.
+
+\end{itemize} 
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{to-do list}
+
+\begin{itemize}
+  \item continue to improve the documentation.
+
+  \item regularize the output and expand the draft matlab\_sdr.txt
+    into more user-friendly data definitions
+
+  \item vectorize the non-linearity correction and set non-linearity
+    parameters in inst\_params.
+
+  \item add file spanning moving averages.  This was on hold pending
+    possible lower level regularization or the addition of a granule
+    structure.
+
+  \item add some QC for the final calibrated product, including the
+    residual complex component from the calibrated radiances
+
+  \item consider switching to a faster RDR reader.  Dan Mooney's
+    reader (with some local mods) has been very reliable, but is
+    idiosyncratic and slow relative to the rest of the processing.
+
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{getting started}
+
+\begin{itemize} 
+   \item to download the ccast repo \\ 
+     \hspace{10pt} git clone https://github.com/strow/ccast.git
+   \item to update a local copy of the ccast repo \\ 
+     \hspace{10pt} git pull origin master
+   \item see the README and source/README files
+   \item in the doc directory, see
+     \begin{itemize}
+       \item ccast\_intro.pdf -- this document
+       \item ccast\_eqns.pdf -- ILS and main calibration equations
+       \item finterp.pdf -- notes on Fourier interpolation
+       \item matlab\_sdr.txt -- output data format and fields
+     \end{itemize} 
+   \item sample test RDR test data is available at
+\end{itemize} 
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\end{document}

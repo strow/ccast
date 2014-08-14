@@ -55,6 +55,50 @@ The \ccast\ reference calibration equation is
 \end{frame}
 %----------- slide --------------------------------------------------%
 \begin{frame}
+\frametitle{alternate calibration equation 2}
+
+Alternate calibration equation c2 is
+
+\[r_{\mbox{\tiny OBS}} = F \cdot r_{\mbox{\tiny ICT}}\cdot f \cdot
+   \frac{\SA^{-1}N^{-1}(\ES - \SP)}{\SA^{-1}N^{-1}(\IT - \SP)} \]
+
+\begin{itemize}
+  \item $r_{\mbox{\tiny OBS}}$ is calibrated radiance at the user grid
+  \item $F$ is Fourier interpolation from sensor to user grid
+  \item $f$ is a raised-cosine bandpass filter
+  \item $r_{\mbox{\tiny ICT}}$ is calculated ICT radiance at the sensor grid
+  \item $\SA^{-1}$ is the inverse of the ILS matrix
+  \item $N^{-1}$ is the inverse of the numeric filter
+  \item $\ES$ is earth-scene count spectra
+  \item $\IT$ is calibration target count spectra
+  \item $\SP$ is space-look count spectra
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{alternate calibration equation 1}
+
+Alternate calibration equation c1 is
+
+\[r_{\mbox{\tiny OBS}} = F \cdot r_{\mbox{\tiny ICT}}\cdot f \cdot
+   \frac{\SA^{-1}\cdot f \cdot N^{-1}(\ES - \SP)}{\SA^{-1}\cdot f \cdot N^{-1}(\IT - \SP)} \]
+
+\begin{itemize}
+  \item $r_{\mbox{\tiny OBS}}$ is calibrated radiance at the user grid
+  \item $F$ is Fourier interpolation from sensor to user grid
+  \item $f$ is a raised-cosine bandpass filter
+  \item $r_{\mbox{\tiny ICT}}$ is expected ICT radiance at the sensor grid
+  \item $\SA^{-1}$ is the inverse of the ILS matrix
+  \item $N^{-1}$ is the inverse of the numeric filter
+  \item $\ES$ is earth-scene count spectra
+  \item $\IT$ is calibration target count spectra
+  \item $\SP$ is space-look count spectra
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
 \frametitle{CrIS ILS}
 
 the \cris\ \ils\ for $\fov_i$ can be represented as
