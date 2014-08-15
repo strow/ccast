@@ -1,7 +1,7 @@
 
 AUTHORS
 
-  Howard Motteler
+  Howard E. Motteler
   David Tobin
   L. Larrabee Strow
   Dan Mooney
@@ -9,21 +9,24 @@ AUTHORS
 
 HISTORY
 
-  ccast started as a collaboration of UMBC and UW in the fall of
-  2010, though some of the code goes back to the 2007-2008 FM1 bench
-  and TVAC tests.  I wrote the L1a and initial L1b support, based on
-  Dan Mooney's RDR reader, and Larrabee, Dave, and I all worked on
-  calibration.  That forked into a UW version that got first light
-  and a UMBC version that got the first high res obs a month later.
-  By summer of 2011 I merged these to run in the same environment,
-  and since then have maintained a version of the UW branch while
-  continuing to develop the UMBC branch and support code.
+  ccast started as a collaboration between UMBC and UW in fall 2010,
+  with major components from the 2007-2008 FM1 bench and TVAC tests.
+  H. Motteler wrote the L1a processing, starting with Dan Mooney's RDR
+  reader, and L. Strow, Dave Tobin, and H.~Motteler all collaborated
+  on the L1b.  This forked into a UW version with Fred Nagel's geo
+  that got first light, and a UMBC version with NOAA geo that got the
+  first high res obs a month later.  In the summer of 2012 H.~Motteler
+  updated the UW code to run in the UMBC environment, and for some
+  time maintained both versions while continuing to develop the UMBC
+  branch.  Major portions of the UW branch, including ICT modeling and
+  the non-linearity correction, were updated and merged into the UMBC
+  branch.
 
-  The UW branch is closer in some ways to the ATBD and the original
+  The UW branch was closer in some ways to the ATBD and the original
   design.  The UMBC branch works for both regular and high resolution
   modes, interpolates the ILS matrix as a function of the metrology
   laser wavelength, uses slightly different forms of the calibration
-  equation, different bandpass filters, and uses a matlab version of
+  equation, different bandpass filters, and uses a Matlab version of
   Joe Predina's spreadsheet to calculate interferometric parameters.
   The UMBC branch uses UW code for the ICT modeling, non-linearity
   correction, and the metrology laser wavelength calculation.

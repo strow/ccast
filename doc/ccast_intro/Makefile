@@ -1,4 +1,6 @@
-# basic makefile
+#
+# makefile for ccast_intro
+#
 
 ccast_intro: ccast_intro.pdf
 
@@ -10,5 +12,8 @@ show: ccast_intro.pdf
 
 clean:
 	rm ccast_intro.log ccast_intro.aux ccast_intro.toc \
-	ccast_intro.snm ccast_intro.nav ccast_intro.out 2> /dev/null || true
+	   ccast_intro.snm ccast_intro.nav ccast_intro.out 2> /dev/null || true
+
+install: ccast_intro.pdf
+	cp -a ccast_intro.pdf ..
 

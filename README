@@ -56,7 +56,7 @@ Before starting, read doc/ccast_intro.pdf to understand what the
 test is going to do.
 
 The versions of ccast_main and ccast_prepro in ccast/demo have paths
-set for a demo.  Sample NOAA RDR (level 0) and GCRSO (geo) files for
+set for the demo.  Sample NOAA RDR (level 0) and GCRSO (geo) files for
 1 Apr 2014 are available at
 
   http://asl.umbc.edu/pub/data/ccast/demo/rdr60_hdf/2014/091/
@@ -76,7 +76,8 @@ preprocessor for the 1 Apr 2014 sample data, give the commands
   ccast_prepro(91, 91, 2014)
 
 This will produce a lot of annoying status messages from the MIT
-reader, and if the run is successful Matlab RDR and summary data in
+reader, and if the run is successful will leave matlab-format RDR
+and summary data in
 
   rdr60_mat/2014/091/
   daily_mat/2014/
@@ -85,8 +86,8 @@ Now you can run the main ccast processing for 1 Apr 2014,
 
   ccast_main(91, 2014)
 
-When running without errors this will produce a one-line status
-message per granule, and will leave data in 
+This should produce a one-line status message per granule, and will
+leave data in
 
   sdr60_mat/2014/091/
 
