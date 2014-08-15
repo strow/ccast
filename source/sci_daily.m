@@ -26,6 +26,9 @@ function sci_daily(doy, rdir, odir)
 % full path to matlab RDR data
 rsrc = fullfile(rdir, doy);
 
+% create the output path, if needed
+unix(['mkdir -p ', odir]);
+
 % list of RDR mat files
 flist = dir(fullfile(rsrc, 'RDR*.mat'));
 

@@ -16,5 +16,5 @@ MATOPT='-nojvm -nodisplay -nosplash'
 
 # run the matlab wrapper
 srun --output=ccast_prepro_%j.out \
-    $MATLAB $MATOPT -r "ccast_prepro($1, $2, $3); exit"
+    $MATLAB $MATOPT -r "addpath ../source; ccast_prepro($1, $2, $3); exit"
 

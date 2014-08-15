@@ -44,18 +44,18 @@ addpath ../davet
 addpath ../source
 
 % path to matlab RDR input files
-rhome = '/asl/data/cris/ccast/rdr60/';
+rhome = '../demo/rdr60_mat';
 rdir = fullfile(rhome, ystr, dstr);
 flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(61:64);
 
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/sdr60/';  
+shome = '../demo/sdr60_mat';  
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
 % path to geo data, allgeo<yyyymmdd>.mat
-ghome = '/asl/data/cris/ccast/daily/';
+ghome = '../demo/daily_mat';
 tmp = datestr(datenum(year,1,1) + doy - 1, 30);
 geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 

@@ -69,16 +69,6 @@
 
 function orbst2 = geo_daily(doy, gdir, odir, orbst1)
 
-% default path to geo year
-if nargin < 2
-  gdir = '/asl/data/cris/sdr60/hdf/2012/';
-end
-
-% default output directory
-if nargin < 3
-  odir = '/home/motteler/cris/data/2012/daily/';  
-end
-
 % default orbit start time is undefined
 if nargin < 4
   orbst1 = NaN;
@@ -90,6 +80,9 @@ orbst2 = NaN;
 
 % full path to SDR and geo h5 data
 gsrc = fullfile(gdir, doy);
+
+% create the output path, if needed
+unix(['mkdir -p ', odir]);
 
 % list all the geo files for this date
 glist = dir(fullfile(gsrc, 'GCRSO_npp*.h5'));
