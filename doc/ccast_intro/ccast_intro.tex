@@ -81,22 +81,23 @@ under the terms of the GNU GPL v3.
 \begin{frame}
 \frametitle{preprocessing}
 
-\ccast\ processing is done in two passes---the first takes HDF and
-CCSDS data to Matlab files, and the second takes the Matlab files to
-calibrated radiances.  The preprocessing is done by ccast\_prepro.
-The main steps are
+\ccast\ processing is done in two passes---the first takes HDF 
+and CCSDS data to Matlab files, and the second takes those files 
+
+to calibrated radiances.  The top-level preprocessing  script is
+ccast\_prepro.  The main steps are
 
 \begin{itemize}
   \item rdr2mat -- read \noaa\ RDR files (CCSDS level 0 data with an
     HDF-5 wrapper) and produce Matlab RDR files, our working level~0
     format.
 
-  \item geo\_daily -- read \noaa\ GCRSO HDF-5 geo files and produce a
-    daily abstract of CrIS geo data, as matlab files.
+  \item geo\_daily -- read \noaa\ GCRSO HDF-5 geo files and produce
+    daily abstracts of CrIS geo data, as Matlab files.
 
-  \item sci\_daily -- read Matlab RDR files and produce a daily
-    abstract of ``science'' (8~second) and ``engineering''
-    (4~minute) support data, as matlab files.
+  \item sci\_daily -- read Matlab RDR files and produce daily
+    abstracts of ``science'' (8~second) and ``engineering''
+    (4~minute) support data, as Matlab files.
 
 \end{itemize}
 
@@ -114,9 +115,9 @@ The main steps are
 \begin{frame}
 \frametitle{main processing}
 
-ccast\_main sets parameters and paths and calls rdr2sdr, which 
-loops on Matlab RDR files, typically one day per call.  The main
-processing steps in rdr2sdr are
+ccast\_main sets parameters and paths and calls rdr2sdr, which loops
+on Matlab RDR files, typically one set per day.  The main processing
+steps in rdr2sdr are
 
 \begin{itemize}
   \item checkRDR -- validate and order the RDR data
@@ -138,11 +139,33 @@ Some high-level design choices reflect past expedience and
 incremental development.
 
 \begin{itemize}
-  \item there is no granule structure, data is organized as
-    sets of scans
 
-  \item the \noaa\ RDR files can start and stop at any field of
-    regard (FOR), and the output SDR files follow this organization.
+ \item there is no granule structure.  Interferogram data is ordered
+   by channel, FOV, and obs time and then grouped into scans.
+  
+ \item the intent was to facilitate a moving window design, and if
+   desired add our own granule structure
+
+ \item although we use \noaa\ GCRSO data, we do not use the
+   \noaa\ granule structure.  The RDR files can start and stop at
+   any field of regard (FOR), and for now the ccast SDR files
+   simply track this
+
+  \item the use of geo summary files was originally meant to be
+    temporary; the geo\_match procedure could use GCRSO or other geo
+    data directly
+
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{design notes}
+
+\begin{itemize}
+
+  \item interferometric and instrument parameters are set centrally,
+    in the function inst\_params
 
   \item the translation to count spectra should be done later, right
     before taking moving averages
@@ -152,9 +175,12 @@ incremental development.
     most output and working arrays are initialized with NaNs as a
     sanity check on processing
 
-  \item the use of the geo summary files was originally meant to be
-    temporary; the geo\_match procedure could read the GCRSO files
-    directly
+  \item error logging is basic, and mainly from the L1a processing.
+    These messages are merged with error or other messages from the
+    Matlab interpreter
+
+  \item control flow is transparent, with almost no use of control
+    flags or global variables
 
 \end{itemize}
 
@@ -164,18 +190,19 @@ incremental development.
 \frametitle{performance}
 
 \begin{itemize} 
-  \item \ccast\ produces high-quality calibrated radiances.
-    Although it borrows significantly from the NOAA ATBD, key
+  \item \ccast\ produces high-quality calibrated radiancesm, and
+    high resolution processing has been an option from the start
+
+  \item although it borrows significantly from the \noaa\ ATBD, key
     features such as the ILS, SA interpolation, and the form of the
     calibration equation were developed independently and in some
     cases have been adopted by other groups.
 
-  \item runtime performance is very good.  Running as a single task
-    rdr2sdr processes 60-scan files at a rate of slightly less than
-    one file per minute
+  \item runtime performance is good.  Running as a single task
+    rdr2sdr takes just over a minute to processes a 60-scan file
 
-  \item reliability is very good.  We have repeatedly reprocessed
-    all data from mission start with no problems.
+  \item reliability is good.  We have repeatedly reprocessed all
+    data from mission start with no problems.
 
 \end{itemize} 
 
@@ -187,11 +214,11 @@ incremental development.
 \begin{itemize}
   \item continue to improve the documentation.
 
-  \item regularize the output and expand the draft matlab\_sdr.txt
-    into more user-friendly data definitions
-
   \item vectorize the non-linearity correction and set non-linearity
     parameters in inst\_params.
+
+  \item regularize the output and expand the draft matlab\_sdr.txt
+    into more user-friendly data definitions
 
   \item add file spanning moving averages.  This was on hold pending
     possible lower level regularization or the addition of a granule
