@@ -49,6 +49,9 @@ for wi = 1 : length(wlist)
   % calculate interferometric parameters
   inst = inst_params(band, wlist(wi), opts);
 
+  % initialize the ILS tabulation
+  smat = zeros(inst.npts, inst.npts, 9);
+
   % loop on channels
   for i = 1 : inst.npts
   

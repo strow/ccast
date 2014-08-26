@@ -12,7 +12,6 @@
 %   opts   - for now, everything else
 %
 % opts fields
-%   avgdir   - directory for moving averages
 %   mvspan   - span for local moving averages
 %   sfileLW, MW, SW  - SRF matrix file by band
 %   
@@ -22,9 +21,9 @@
 %
 % DISCUSSION
 %
-% rdr2sdr is the main function for RDR to SDR processing.
+% rdr2sdr takes matlab RDR to matlab SDR data
 %
-% major processing steps are
+% the major processing steps are
 %   checkRDR   - validate the RDR data
 %   scipack    - process sci and eng packet data
 %   igm2spec   - take igms to count spectra
@@ -33,22 +32,12 @@
 %   movavg_app - calculate or load moving averages
 %   calmain    - radiometric and spectral calibration
 %
-% rdr2sdr is part of a processing chain in which the major steps
-% communicate by files, with the following naming scheme
+% the input RDR and output SDR files use the naming scheme 
 %   RDR_<rid>.mat  -- RDR mat files, from rdr2mat
-%   avg_<rid>.mat  -- moving average files, from movavg_pre
-%   SDR_<rid>.mat  -- SDR mat files, from this procedure
-%
-% where <rid> is a string of the form tYYYYMMDD_dHHMMSSS taken
-% from the original RDR HDF5 file.
-%
-% rdr2sdr does not directly load the filenames in flist, it builds
-% the expected names from <rid> and tries to load that.  The idea is
-% that anything that fails to conform to the naming scheme should be
-% a fatal error.
-%
-% If we find pre-calculated moving average files in avgdir, we use
-% those instead of locally calculated values
+%   SDR_<rid>.mat  -- SDR mat files, from rdr2sdr
+% where <rid> is a string of the form tYYYYMMDD_dHHMMSSS from 
+% the RDR HDF5 file.  rdr2sdr ignores files that do not follow 
+% this convention
 %
 % AUTHOR
 %  H. Motteler, 20 Feb 2012
@@ -56,15 +45,23 @@
 
 function [slist, msc] = rdr2sdr(flist, rdir, sdir, opts);
 
+%----------------
+% initialization
+%----------------
+
 % number of RDR files to process
 nfile = length(flist);
 
 % moving average span is 2 * mvspan + 1
-mvspan = 4;
+mvspan = opts.mvspan;
 
 % initialize sci and eng packet struct's
 eng1 = struct([]);
 allsci = struct([]);
+
+% initialize scan tail
+scTail = struct;
+scTail.nans = [];
 
 % initialize output structs
 msc = struct;
@@ -79,28 +76,24 @@ else
   return
 end
 
-% -------------------------
-% loop on MIT RDR mat files
-% -------------------------
+% ----------------------
+% loop on RDR mat files
+% ----------------------
 
 for fi = 1 : nfile
 
-  % --------------------------
-  % load and validate MIT data
-  % --------------------------
+  % -------------------------------
+  % load and validate the RDR data
+  % -------------------------------
 
-  % MIT matlab RDR data file
+  % matlab RDR input file
   rid = flist(fi).name(5:22);
   rtmp = ['RDR_', rid, '.mat'];
   rfile = fullfile(rdir, rtmp);
 
-  % our matlab SDR output file
+  % matlab SDR output file
   stmp = ['SDR_', rid, '.mat'];
   sfile = fullfile(sdir, stmp);
-
-  % moving average filenames
-  % atmp = ['AVG_', rid, '.mat'];
-  % afile = fullfile(opts.avgdir, atmp);
 
   % print a short status message
   if exist(rfile, 'file')
@@ -111,11 +104,11 @@ for fi = 1 : nfile
     continue
   end
 
-  % load the RDR data, defines structures d1 and m1
+  % load the RDR data, this defines structures d1 and m1
   load(rfile)
 
-  % RDR validation.  checkRDR returns data as nchan x 9 x nobs
-  % arrays, ordered by time
+  % RDR validation and ordering.  checkRDR returns data in column
+  % order as nchan x 9 x nobs arrays, with nobs being the time steps
   [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR(d1, rid);
 
   if isempty(igmTime)
@@ -123,33 +116,36 @@ for fi = 1 : nfile
     continue
   end
 
+  %-----------------------------
   % process sci and eng packets
+  %-----------------------------
+
   [sci, eng] = scipack(d1, eng1);
 
   % this frees up a big chunk of memory
   clear d1
 
-  % skip to next file if we don't have any science packets
+  % check that we have sci data before we continue
   if isempty(sci)
     fprintf(1, 'rdr2sdr: no science packets, skipping file %s\n', rid)
     continue
   end
 
-  % get wlaser from the eng packet data
+  % get the current wlaser from the eng packet data
   wlaser = metlaser(eng.NeonCal);
   if isnan(wlaser)
     fprintf(1, 'rdr2sdr: no valid wlaser value, skipping file %s\n', rid)
     continue
   end
 
+  % -----------------
+  % get count spectra
+  % -----------------
+
   % get instrument and user grid parameters
   [instLW, userLW] = inst_params('LW', wlaser, opts);
   [instMW, userMW] = inst_params('MW', wlaser, opts);
   [instSW, userSW] = inst_params('SW', wlaser, opts);
-
-  % -----------------
-  % get count spectra
-  % -----------------
 
   rcLW = igm2spec(igmLW, instLW);
   rcMW = igm2spec(igmMW, instMW);
@@ -171,12 +167,15 @@ for fi = 1 : nfile
   % Note that if the data from checkRDR has no time or FOR gaps and
   % starts with FOR 1, this is just a reshape.
 
-  [scLW, scMW, scSW, scTime, scFOR] = ...
-           scanorder(rcLW, rcMW, rcSW, igmTime, igmFOR, igmSDR, rid);
+  [scLW, scMW, scSW, scTime] = ...
+         scanorder(rcLW, rcMW, rcSW, igmTime, igmFOR, igmSDR, rid);
 
-  [m, n, k, nscan] = size(scLW);
-
+  % clean up checkRDR output
   clear rcLW rcMW rcSW
+
+  % shift tails so scans start at FOR 1
+  [scLW, scMW, scSW, scTime, scTail] = ...
+         scantail(scLW, scMW, scSW, scTime, scTail);
 
   % match geo data to scanorder grid
   geo = geo_match(allgeo, scTime);
@@ -185,13 +184,9 @@ for fi = 1 : nfile
   % get moving averages of SP and IT count spectra
   % ----------------------------------------------
 
-% if exist(afile) == 2
-%   load(afile)
-% else
-    [avgLWSP, avgLWIT] = movavg_app(scLW(:, :, 31:34, :), mvspan);
-    [avgMWSP, avgMWIT] = movavg_app(scMW(:, :, 31:34, :), mvspan);
-    [avgSWSP, avgSWIT] = movavg_app(scSW(:, :, 31:34, :), mvspan);
-% end
+  [avgLWSP, avgLWIT] = movavg_app(scLW(:, :, 31:34, :), mvspan);
+  [avgMWSP, avgMWIT] = movavg_app(scMW(:, :, 31:34, :), mvspan);
+  [avgSWSP, avgSWIT] = movavg_app(scSW(:, :, 31:34, :), mvspan);
 
   % -----------------------
   % radiometric calibration

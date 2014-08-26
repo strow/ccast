@@ -3,7 +3,7 @@
 %   scanorder - use FOR values to group data into scans
 %
 % SYNOPSIS
-%   [swLW, swMW, swSW, swTime, swSDR] = ...
+%   [swLW, swMW, swSW, swTime] = ...
 %         scanorder(rcLW, rcMW, rcSW, igmTime, igmFOR, igmSDR, rid);
 % INPUTS
 %   rcLW    - nchan x 9 x nobs, LW rad counts
@@ -19,7 +19,6 @@
 %   swMW   - nchan x 9 x 34 x nscan, MW rad counts
 %   swSW   - nchan x 9 x 34 x nscan, SW rad counts
 %   swTime - 34 x nscan, rad count times
-%   swSDR  - 34 x nscan, rad count SDRs
 %
 % DISCUSSION
 %
@@ -36,7 +35,7 @@
 %   H. Motteler, 30 Oct 2011
 %
 
-function [swLW, swMW, swSW, swTime, swSDR] = ...
+function [swLW, swMW, swSW, swTime] = ...
           scanorder(rcLW, rcMW, rcSW, igmTime, igmFOR, igmSDR, rid);
 
 [nchLW, m, n] = size(rcLW);
@@ -95,7 +94,6 @@ for si = 1 : nscan
   swTime(itmp, si) = igmTime(iES);  
 
   % assign SP and IT data by sweep direction
-% itmp = 31 + igmSDR(iSP);
   itmp = 31 + (1 - igmSDR(iSP));
   swLW(:, :, itmp, si) = rcLW(:, :, iSP);
   swMW(:, :, itmp, si) = rcMW(:, :, iSP);
@@ -104,7 +102,6 @@ for si = 1 : nscan
   swSDR(itmp, si) = igmSDR(iSP);  
   swTime(itmp, si) = igmTime(iSP);  
 
-% itmp = 33 + igmSDR(iIT);
   itmp = 33 + (1 - igmSDR(iIT));
   swLW(:, :, itmp, si) = rcLW(:, :, iIT);
   swMW(:, :, itmp, si) = rcMW(:, :, iIT);
