@@ -46,7 +46,7 @@ under the terms of the GNU GPL v3.
 
 \begin{itemize}
   \item \ccast\ started as a collaboration between \umbc\ and
-    \uw\ in fall 2010, with major components from the 2007-2008 FM1
+    \uw\ in fall 2011, with major components from the 2007-2008 FM1
     bench and TVAC tests.
 
   \item H.~Motteler wrote the L1a processing, starting with Dan
@@ -81,11 +81,10 @@ under the terms of the GNU GPL v3.
 \begin{frame}
 \frametitle{preprocessing}
 
-\ccast\ processing is done in two passes---the first takes HDF 
-and CCSDS data to Matlab files, and the second takes those files 
-
-to calibrated radiances.  The top-level preprocessing  script is
-ccast\_prepro.  The main steps are
+\ccast\ processing is done in two passes---the first takes HDF and
+CCSDS data to Matlab files, and the second takes the Matlab files 
+to calibrated radiances.  The top-level preprocessing script is
+ccast\_prepro.  The main steps there are
 
 \begin{itemize}
   \item rdr2mat -- read \noaa\ RDR files (CCSDS level 0 data with an
@@ -120,41 +119,14 @@ on Matlab RDR files, typically one set per day.  The main processing
 steps in rdr2sdr are
 
 \begin{itemize}
-  \item checkRDR -- validate and order the RDR data
-  \item scipack  -- process sci and eng packet data
-  \item inst\_params -- user and sensor grid parameters
-  \item igm2spec -- take interferograms to count spectra
-  \item scanorder -- group data into scans
-  \item geo\_match  -- match GCRSO and RDR scans
-  \item movavg\_app -- calculate moving averages
-  \item calmain  -- radiometric and spectral calibration
-\end{itemize}
-
-\end{frame}
-%----------- slide --------------------------------------------------%
-\begin{frame}
-\frametitle{design notes}
-
-Some high-level design choices reflect past expedience and
-incremental development.
-
-\begin{itemize}
-
- \item there is no granule structure.  Interferogram data is ordered
-   by channel, FOV, and obs time and then grouped into scans.
-  
- \item the intent was to facilitate a moving window design, and if
-   desired add our own granule structure
-
- \item although we use \noaa\ GCRSO data, we do not use the
-   \noaa\ granule structure.  The RDR files can start and stop at
-   any field of regard (FOR), and for now the ccast SDR files
-   simply track this
-
-  \item the use of geo summary files was originally meant to be
-    temporary; the geo\_match procedure could use GCRSO or other geo
-    data directly
-
+  \item load the matlab RDR data
+  \item process sci and eng support data
+  \item order and validate interferogram data
+  \item group interferogram data into scans
+  \item take interferograms to count spectra
+  \item take ICT and space look moving averages
+  \item radiometric and spectral calibration
+  \item save the matlab SDR data
 \end{itemize}
 
 \end{frame}
@@ -164,23 +136,19 @@ incremental development.
 
 \begin{itemize}
 
-  \item interferometric and instrument parameters are set centrally,
-    in the function inst\_params
+  \item control flow is transparent, with almost no control flags
+    and no global variables
 
-  \item the translation to count spectra should be done later, right
-    before taking moving averages
+  \item interferometric and instrument parameters are set in the
+    function inst\_params, and runtime parameters in ccast\_main.
 
-  \item there is no explicit quality control for the final
-    calibrated product.  There is extensive low-level data QC, and
-    most output and working arrays are initialized with NaNs as a
-    sanity check on processing
-
-  \item error logging is basic, and mainly from the L1a processing.
-    These messages are merged with error or other messages from the
-    Matlab interpreter
-
-  \item control flow is transparent, with almost no use of control
-    flags or global variables
+  \item data is organized by scans rather than granules.  The output
+    SDR files follow the \noaa\ RDR input files but shift the data
+    so that the SDR files always start with FOR 1.
+   
+  \item there is extensive L0 to L1a quality control but currently
+    no explicit QC for the final calibrated product beyond keeping
+    the complex residual
 
 \end{itemize}
 
@@ -190,12 +158,12 @@ incremental development.
 \frametitle{performance}
 
 \begin{itemize} 
-  \item \ccast\ produces high-quality calibrated radiancesm, and
-    high resolution processing has been an option from the start
+  \item \ccast\ produces high-quality calibrated radiances and high
+    resolution processing has been an option from the start
 
   \item although it borrows significantly from the \noaa\ ATBD, key
     features such as the ILS, SA interpolation, and the form of the
-    calibration equation were developed independently and in some
+    calibration equation were developed independently and in many
     cases have been adopted by other groups.
 
   \item runtime performance is good.  Running as a single task
@@ -205,33 +173,6 @@ incremental development.
     data from mission start with no problems.
 
 \end{itemize} 
-
-\end{frame}
-%----------- slide --------------------------------------------------%
-\begin{frame}
-\frametitle{to-do list}
-
-\begin{itemize}
-  \item continue to improve the documentation.
-
-  \item vectorize the non-linearity correction and set non-linearity
-    parameters in inst\_params.
-
-  \item regularize the output and expand the draft matlab\_sdr.txt
-    into more user-friendly data definitions
-
-  \item add file spanning moving averages.  This was on hold pending
-    possible lower level regularization or the addition of a granule
-    structure.
-
-  \item add some QC for the final calibrated product, including the
-    residual complex component from the calibrated radiances
-
-  \item consider switching to a faster RDR reader.  Dan Mooney's
-    reader (with some local mods) has been very reliable, but is
-    idiosyncratic and slow relative to the rest of the processing.
-
-\end{itemize}
 
 \end{frame}
 %----------- slide --------------------------------------------------%

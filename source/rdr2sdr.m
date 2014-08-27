@@ -1,9 +1,9 @@
 %
 % NAME
-%   rdr2sdr -- process RDR mat files to SDR mat files
+%   rdr2sdr -- take matlab RDR to matlab SDR data
 %
 % SYNOPSIS
-%   [slist, msc] = rdr2sdr(flist, rdir, sdir, opts)
+%   rdr2sdr(flist, rdir, sdir, opts)
 %
 % INPUTS
 %   flist  - list of RDR mat files
@@ -13,33 +13,34 @@
 %
 % opts fields
 %   mvspan   - span for local moving averages
-%   sfileLW, MW, SW  - SRF matrix file by band
+%   geofile  - filename for geo daily summary 
+%   sfileLW, MW, SW  - ILS matrix file by band
 %   
-% OUTPUTS
-%   slist  - list of SDR mat files
-%   msc    - optional output struct
+% OUTPUT
+%   SDR mat files
 %
 % DISCUSSION
 %
-% rdr2sdr takes matlab RDR to matlab SDR data.  The files are
-% RDR_<rid>.mat and SDR_<rid>.mat, where <rid> is a date and time
-% string of the form tYYYYMMDD_dHHMMSSS, taken from the RDR HDF5
-% file.  rdr2sdr ignores files that do not follow this convention
+%   The main processing steps are:
+%       - load the matlab RDR data
+%       - process sci and eng packets
+%       - order and validate igm data
+%       - group igm data into scans
+%       - take igms to count spectra
+%       - calculate moving averages
+%       - do L1a to L1b calibration
+%       - save the matlab SDR data
 %
-% the major processing steps are
-%   checkRDR   - validate the RDR data
-%   scipack    - process sci and eng packet data
-%   igm2spec   - take igms to count spectra
-%   scanorder  - group data into scans
-%   geo_match  - match GCRSO and RDR scans
-%   movavg_app - calculate or load moving averages
-%   calmain    - radiometric and spectral calibration
+%   The files are RDR_<rid>.mat and SDR_<rid>.mat, where <rid> is a
+%   date and time string of the form tYYYYMMDD_dHHMMSSS, taken from
+%   the RDR HDF5 file.  rdr2sdr ignores files that do not follow this
+%   convention
 %
 % AUTHOR
 %  H. Motteler, 20 Feb 2012
 %
 
-function [slist, msc] = rdr2sdr(flist, rdir, sdir, opts);
+function rdr2sdr(flist, rdir, sdir, opts);
 
 %----------------
 % initialization
@@ -57,11 +58,6 @@ eng = struct([]);
 % initialize scan tail
 scTail = struct;
 scTail.nans = [];
-
-% initialize output
-msc = struct;
-slist = struct([]);
-nout = 0;
 
 % load geo data, defines structs allgeo, allgid
 if exist(opts.geofile, 'file')
@@ -172,9 +168,9 @@ for fi = 1 : nfile
   rcMW = igm2spec(scMW, instMW);
   rcSW = igm2spec(scSW, instSW);
 
-  % -----------------------
-  % radiometric calibration
-  % -----------------------
+  % -------------------------------------
+  % radiometric and spectral calibration
+  % -------------------------------------
   
   % get moving averages of SP and IT count spectra
   [avgLWSP, avgLWIT] = movavg_app(rcLW(:, :, 31:34, :), mvspan);
@@ -194,14 +190,27 @@ for fi = 1 : nfile
   % save the SDR data
   %-------------------
 
+  % trim channel sets to user grid plus 2 guard channels
+
+  dv = userLW.dv;
+  ugrid = userLW.v1 - 2*dv : dv : userLW.v2 + 2*dv;
+  ix = interp1(vLW, 1:length(vLW), ugrid, 'nearest');
+  rLW = rLW(ix, :, :, :); vLW = vLW(ix);
+
+  dv = userMW.dv;
+  ugrid = userMW.v1 - 2*dv : dv : userMW.v2 + 2*dv;
+  ix = interp1(vMW, 1:length(vMW), ugrid, 'nearest');
+  rMW = rMW(ix, :, :, :); vMW = vMW(ix);
+
+  dv = userSW.dv;
+  ugrid = userSW.v1 - 2*dv : dv : userSW.v2 + 2*dv;
+  ix = interp1(vSW, 1:length(vSW), ugrid, 'nearest');
+  rSW = rSW(ix, :, :, :); vSW = vSW(ix);
+
   save(sfile, ...
        'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
        'rLW', 'vLW', 'rMW', 'vMW', 'rSW', 'vSW', 'scTime', ...
        'sci', 'eng', 'geo', 'rid', '-v7.3')
   
-  % keep a list of the SDR files
-  nout = nout + 1;
-  slist(nout).file = sfile;
-
 end
 

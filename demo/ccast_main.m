@@ -83,7 +83,7 @@ opts.specNF_file = '../inst_data/FIR_19_Mar_2012.txt';
 % profile clear
 % profile on
 
-[slist, msc] = rdr2sdr(flist, rdir, sdir, opts);
+rdr2sdr(flist, rdir, sdir, opts);
 
 % profile viewer
 

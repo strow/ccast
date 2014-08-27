@@ -2,7 +2,7 @@
 ccast matlab SDR format
 ------------------------
 
-H. Motteler, 16 Nov 2013
+H. Motteler, 28 Aug 2014
 
 
 The ccast Matlab SDR files are mainly just a dump of working
@@ -82,22 +82,11 @@ from the RDR filename and used in the SDR filename.
 Notes on radiance data
 -----------------------
 
-Radiance data is at the user grid dv, but vLW, vMW and vSW are
-supersets of the user grid band span, and that superset can change
-based on ccast options.  So to use this data you need to match
-frequencies.  For example
-
-  ugrid = userLW.v1 : userLW.dv : userLW.v2;
-  ix = interp1(vLW, 1:length(vLW), ugrid, 'nearest');
-  rLW = rLW(ix, :, :, :);
-
-The RDR files that ccast reads can start and stop at any FOR index,
-and this is reflected in the output data.  Probably the best way to
-deal with this is to use scTime as a valid data indicator.  scTime 
-is a 34 x nscan array, with indices 1-30 the earth scene positions.
-When this is NaN there is no data for that FOR.  Typically if file 
-n ends at FOR k then file n + 1 will begin at FOR k + 1 but this is
-not guaranteed, for example if there are gaps in the data.
+Radiance data is at the user grid dv but includes two "guard
+channels" at the start and end of each CrIS band that extend the
+user grid.  These are included for compatibility with fast models
+and convolution codes but are not really valid data because they 
+are outside the passband of the filters used for CrIS processing.
 
 
 Geo fields
