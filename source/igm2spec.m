@@ -6,21 +6,18 @@
 %   spec = igm2spec(igm, inst);
 %
 % INPUTS
-%   igm   - nchan x 9 x nobs interferograms
+%   igm   - nchan x 9 x 34 x nscan interferograms
 %   inst  - instrument interferometric specs
 % 
 % OUTPUTS
-%   spec  - nchan x 9 x nobs count spectra
+%   spec  - nchan x 9 x 34 x nscan count spectra
 %
 % DISCUSSION
 %   the input array actually has nchan+2 points in the first
-%   dimension, but the first and last are "guard points" are
-%   simply dropped here.
+%   dimension, but the first and last are "guard points" and 
+%   are dropped
 %
-%   derived from readspecX and the ccast function ifg2spectra.m
-%   with parameter calc's split off into inst_params.m
-%
-%   needs to be updated to use matlab fftshift w/ proper dimension
+%   could be updated to use matlab fftshift w/ proper dimension
 %   parameter
 %
 % AUTHOR
@@ -31,29 +28,25 @@ function spec = igm2spec(igm, inst)
 
 band = upper(inst.band);
 
-% shape of input data
-[m,n,nifg] = size(igm);
+% get number of scans
+[m,n,k,nscan] = size(igm);
 
 % instrument params
 npts = inst.npts;
 cind = inst.cind;
 
-% use tind in place of the built-in fftshift, as we don't want 
-% a true 2D fft shift, just a shift of all columns in an array
-% tind = [npts/2+1 : npts, 1 : npts/2]';
-
-% fix tind so it mimics fftshift for odd-sized point sets
+% tind mimics fftshift for odd-sized point sets
 tind = [ceil(npts/2)+1 : npts, 1 : ceil(npts/2)]';
 
 % initialize the output array
-spec = zeros(npts, 9, nifg);
+spec = zeros(npts, 9, 34, nscan);
 
 % drop the guard points before the FFT
-itmp = igm(2:npts+1, :, :);
+itmp = igm(2:npts+1, :, :, :);
 
 % do an FFT of shifted data.
-stmp = fft(itmp(tind, :, :));
+stmp = fft(itmp(tind, :, :, :));
 
 % permute the spectra to match the frequency scale
-spec = stmp(cind, :, :);
+spec = stmp(cind, :, :, :);
 

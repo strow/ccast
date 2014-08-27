@@ -69,12 +69,17 @@ end
 
 if ~isempty(scTail.nans)
 
-  % save the tail 
+  % save the tail
   scTail.scLW = scLW(:, :, :, end);
   scTail.scMW = scMW(:, :, :, end);
   scTail.scSW = scSW(:, :, :, end);
   scTail.scTime = scTime(:, end);
   scTail.last = scTime(max(tail_isok), end);
 
-end
+  % trim the returned data
+  scLW = scLW(:, :, :, 1:end-1);
+  scMW = scMW(:, :, :, 1:end-1);
+  scSW = scSW(:, :, :, 1:end-1);
+  scTime = scTime(:, 1:end-1);
 
+end

@@ -21,7 +21,10 @@
 %
 % DISCUSSION
 %
-% rdr2sdr takes matlab RDR to matlab SDR data
+% rdr2sdr takes matlab RDR to matlab SDR data.  The files are
+% RDR_<rid>.mat and SDR_<rid>.mat, where <rid> is a date and time
+% string of the form tYYYYMMDD_dHHMMSSS, taken from the RDR HDF5
+% file.  rdr2sdr ignores files that do not follow this convention
 %
 % the major processing steps are
 %   checkRDR   - validate the RDR data
@@ -31,13 +34,6 @@
 %   geo_match  - match GCRSO and RDR scans
 %   movavg_app - calculate or load moving averages
 %   calmain    - radiometric and spectral calibration
-%
-% the input RDR and output SDR files use the naming scheme 
-%   RDR_<rid>.mat  -- RDR mat files, from rdr2mat
-%   SDR_<rid>.mat  -- SDR mat files, from rdr2sdr
-% where <rid> is a string of the form tYYYYMMDD_dHHMMSSS from 
-% the RDR HDF5 file.  rdr2sdr ignores files that do not follow 
-% this convention
 %
 % AUTHOR
 %  H. Motteler, 20 Feb 2012
@@ -55,15 +51,14 @@ nfile = length(flist);
 % moving average span is 2 * mvspan + 1
 mvspan = opts.mvspan;
 
-% initialize sci and eng packet struct's
-eng1 = struct([]);
-allsci = struct([]);
+% initial eng packet
+eng = struct([]);
 
 % initialize scan tail
 scTail = struct;
 scTail.nans = [];
 
-% initialize output structs
+% initialize output
 msc = struct;
 slist = struct([]);
 nout = 0;
@@ -82,9 +77,9 @@ end
 
 for fi = 1 : nfile
 
-  % -------------------------------
-  % load and validate the RDR data
-  % -------------------------------
+  % -------------------------
+  % load the matlab RDR data
+  % -------------------------
 
   % matlab RDR input file
   rid = flist(fi).name(5:22);
@@ -107,23 +102,11 @@ for fi = 1 : nfile
   % load the RDR data, this defines structures d1 and m1
   load(rfile)
 
-  % RDR validation and ordering.  checkRDR returns data in column
-  % order as nchan x 9 x nobs arrays, with nobs being the time steps
-  [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR(d1, rid);
-
-  if isempty(igmTime)
-    fprintf(1, 'rdr2sdr: no valid data, skipping file %s\n', rid)
-    continue
-  end
-
   %-----------------------------
   % process sci and eng packets
   %-----------------------------
 
-  [sci, eng] = scipack(d1, eng1);
-
-  % this frees up a big chunk of memory
-  clear d1
+  [sci, eng] = scipack(d1, eng);
 
   % check that we have sci data before we continue
   if isempty(sci)
@@ -138,6 +121,44 @@ for fi = 1 : nfile
     continue
   end
 
+  %-----------------------------
+  % order and validate igm data
+  %-----------------------------
+
+  % RDR validation and ordering.  checkRDR returns data in column
+  % order as nchan x 9 x nobs arrays, with nobs being the time steps
+
+  [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR(d1, rid);
+
+  % this frees up a lot of of memory
+  clear d1
+
+  if isempty(igmTime)
+    fprintf(1, 'rdr2sdr: no valid data, skipping file %s\n', rid)
+    continue
+  end
+
+  % --------------------------
+  % group igm data into scans
+  % --------------------------
+
+  % Move obs to an nchan x 9 x 34 x nscan array, with gaps filled
+  % with NaNs.  In the 3rd dim, indices 1:30 are ES data, 31:32 SP,
+  % and 33:34 IT.  The time and FOR outputs are 34 x nscan arrays.  
+
+  [scLW, scMW, scSW, scTime] = ...
+         scanorder(igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR, rid);
+
+  % done with checkRDR output
+  clear igmLW igmMW igmSW igmTime igmFOR imgSDR
+
+  % shift tails so scans start at FOR 1
+  [scLW, scMW, scSW, scTime, scTail] = ...
+         scantail(scLW, scMW, scSW, scTime, scTail);
+
+  % match geo data to scanorder grid
+  geo = geo_match(allgeo, scTime);
+
   % -----------------
   % get count spectra
   % -----------------
@@ -147,65 +168,36 @@ for fi = 1 : nfile
   [instMW, userMW] = inst_params('MW', wlaser, opts);
   [instSW, userSW] = inst_params('SW', wlaser, opts);
 
-  rcLW = igm2spec(igmLW, instLW);
-  rcMW = igm2spec(igmMW, instMW);
-  rcSW = igm2spec(igmSW, instSW);
-
-  [nchLW, m, n] = size(rcLW);
-  [nchMW, m, n] = size(rcMW);
-  [nchSW, m, n] = size(rcSW);
-
-  clear igmLW igmMW igmSW
-
-  % ---------------------
-  % group data into scans
-  % ---------------------
-
-  % Move obs to an nchan x 9 x 34 x nscan array, with gaps filled
-  % with NaNs.  In the 3rd dim, indices 1:30 are ES data, 31:32 SP,
-  % and 33:34 IT.  The time and FOR outputs are 34 x nscan arrays.  
-  % Note that if the data from checkRDR has no time or FOR gaps and
-  % starts with FOR 1, this is just a reshape.
-
-  [scLW, scMW, scSW, scTime] = ...
-         scanorder(rcLW, rcMW, rcSW, igmTime, igmFOR, igmSDR, rid);
-
-  % clean up checkRDR output
-  clear rcLW rcMW rcSW
-
-  % shift tails so scans start at FOR 1
-  [scLW, scMW, scSW, scTime, scTail] = ...
-         scantail(scLW, scMW, scSW, scTime, scTail);
-
-  % match geo data to scanorder grid
-  geo = geo_match(allgeo, scTime);
-
-  % ----------------------------------------------
-  % get moving averages of SP and IT count spectra
-  % ----------------------------------------------
-
-  [avgLWSP, avgLWIT] = movavg_app(scLW(:, :, 31:34, :), mvspan);
-  [avgMWSP, avgMWIT] = movavg_app(scMW(:, :, 31:34, :), mvspan);
-  [avgSWSP, avgSWIT] = movavg_app(scSW(:, :, 31:34, :), mvspan);
+  rcLW = igm2spec(scLW, instLW);
+  rcMW = igm2spec(scMW, instMW);
+  rcSW = igm2spec(scSW, instSW);
 
   % -----------------------
   % radiometric calibration
   % -----------------------
   
-  [rLW, vLW] = calmain(instLW, userLW, scLW, scTime, ...
+  % get moving averages of SP and IT count spectra
+  [avgLWSP, avgLWIT] = movavg_app(rcLW(:, :, 31:34, :), mvspan);
+  [avgMWSP, avgMWIT] = movavg_app(rcMW(:, :, 31:34, :), mvspan);
+  [avgSWSP, avgSWIT] = movavg_app(rcSW(:, :, 31:34, :), mvspan);
+
+  [rLW, vLW] = calmain(instLW, userLW, rcLW, scTime, ...
                         avgLWIT, avgLWSP, sci, eng, geo, opts);
 
-  [rMW, vMW] = calmain(instMW, userMW, scMW, scTime, ...
+  [rMW, vMW] = calmain(instMW, userMW, rcMW, scTime, ...
                         avgMWIT, avgMWSP, sci, eng, geo, opts);
 
-  [rSW, vSW] = calmain(instSW, userSW, scSW, scTime, ...
+  [rSW, vSW] = calmain(instSW, userSW, rcSW, scTime, ...
                         avgSWIT, avgSWSP, sci, eng, geo, opts);
 
-  % save data as an SDR mat file
+  %-------------------
+  % save the SDR data
+  %-------------------
+
   save(sfile, ...
        'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
        'rLW', 'vLW', 'rMW', 'vMW', 'rSW', 'vSW', 'scTime', ...
-       'sci', 'eng', 'geo', 'rid')
+       'sci', 'eng', 'geo', 'rid', '-v7.3')
   
   % keep a list of the SDR files
   nout = nout + 1;
