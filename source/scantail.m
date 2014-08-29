@@ -33,23 +33,33 @@ head_isok = find(~isnan(scTime(:, 1)));
 
 % this should never happen...
 if isempty(head_isok)
-  fprintf(1, 'scanorder: first column of scTime is all NaNs')
+  fprintf(1, 'scantail: first column of scTime is all NaNs')
 end
 
-% check if head and previous tail match
+% check if head and prev tail NaNs match
 if ~isempty(head_nans) ...
      &&  ~isempty(scTail.nans) ...
-     &&  isequal([head_nans; scTail.nans], (1:34)')    
+     &&  isequal(head_isok, scTail.nans)
   
-  head_first = scTime(min(head_isok), 1);
-  if head_first - scTail.last < 620
+  % check that channel sets match
+  [m1, n, k] = size(scSW);
+  [m2, n, k] = size(scTail.scSW);
+  if m1 == m2 
   
-    % copy data from the tail
-    scLW(:, :, head_nans, 1) = scTail.scLW(:, :, head_nans);
-    scMW(:, :, head_nans, 1) = scTail.scMW(:, :, head_nans);
-    scSW(:, :, head_nans, 1) = scTail.scSW(:, :, head_nans);
-    scTime(head_nans, 1) = scTail.scTime(head_nans);
+    % check that time step is OK
+    head_first = scTime(min(head_isok), 1);
+    if head_first - scTail.last < 620
 
+      % copy data from the tail
+      scLW(:, :, head_nans, 1) = scTail.scLW(:, :, head_nans);
+      scMW(:, :, head_nans, 1) = scTail.scMW(:, :, head_nans);
+      scSW(:, :, head_nans, 1) = scTail.scSW(:, :, head_nans);
+      scTime(head_nans, 1) = scTail.scTime(head_nans);
+    else
+      fprintf(1, 'scantail: time mismatch\n')
+    end
+  else
+   fprintf(1, 'scantail: channel set mismatch\n')
   end
 end
 
@@ -64,7 +74,7 @@ tail_isok = find(~isnan(scTime(:, end)));
 
 % this should never happen
 if isempty(tail_isok)
-  fprintf(1, 'scanorder: last column of scTime is all NaNs')
+  fprintf(1, 'scantail: last column of scTime is all NaNs')
 end
 
 if ~isempty(scTail.nans)

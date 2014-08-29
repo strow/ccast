@@ -1,0 +1,58 @@
+------------------------
+
+same gap with the final 4-scan offset:
+
+rdr2sdr: processing index 177 file d20120507_t2335241
+checkRDR: time step 64200 too big, file d20120507_t2335241
+scanorder: ES time step 64200 too big, scan 41 file
+d20120507_t2335241
+geo_match: max dt out 6.4e+04 ms, int 0.0002441 ms
+
+rdr2sdr: processing index 177 file d20120507_t2335241
+checkRDR: time step 64200 too big, file d20120507_t2335241
+scanorder: ES time step 64200 too big, scan 41 file
+d20120507_t2335241
+geo_match: max dt out 6.4e+04 ms, int 0.001221 ms
+
+------------------------
+time gap on 7 May 2012
+
+rdr2sdr: processing index 152 file d20120507_t2335241
+checkRDR: time step 64200 too big, file d20120507_t2335241
+scanorder: ES time step 64200 too big, scan 41 file d20120507_t2335241
+geo_match: max dt out 6.4e+04 ms, int 0.001221 ms
+
+This shows how things are working: checkRDR finds the time gap in
+the data as a sequence, scanorder finds it in terms of both time and
+scan index, and geo_match has a good internal match but can't find a
+single scan index to match all the data.  
+
+This is a case where we have something like (for example) scan k
+with ES 1-10, a time gap, and then scan k+1 with ES 21-30.  In this
+situation scanorder is concatenating the two scans to save space.
+
+It would probably be safer to either leave the gap or rewrite
+geo_match to output a match by linear rather than by scan indices.
+It does that already internally but condenses that info to a scan 
+index becase that significantly simplifies taking the desired geo
+subset.
+
+------------------------
+data gap
+
+geo_match: no matching RDR values within 1 ms
+rdr2sdr: processing index 58 file d20120508_t1103203
+geo_match: no matching RDR values within 1 ms
+rdr2sdr: processing index 59 file d20120508_t1111202
+geo_match: no matching RDR values within 1 ms
+rdr2sdr: processing index 60 file d20120508_t1119202
+geo_match: no matching RDR values within 1 ms
+rdr2sdr: processing index 61 file d20120508_t1127201
+geo_match: no matching RDR values within 1 ms
+rdr2sdr: processing index 62 file d20120508_t1135201
+geo_match: no matching RDR values within 1 ms
+rdr2sdr: processing index 63 file d20120508_t1143200
+geo_match: no matching RDR values within 1 ms
+rdr2sdr: processing index 64 file d20120508_t1151200
+geo_match: no matching RDR values within 1 ms
+
