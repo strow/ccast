@@ -134,6 +134,11 @@ for fi = 1 : nfile
     continue
   end
 
+  if ~isempty(find(igmFOR > 31))
+    fprintf(1, 'rdr2sdr: bad FOR values, skipping file %s\n', rid)
+    continue
+  end
+
   % --------------------------
   % group igm data into scans
   % --------------------------
