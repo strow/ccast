@@ -3,14 +3,14 @@
 %   geo_match - match GCRSO and RDR scans
 %
 % SYNOPSIS
-%   geo_out = geo_match(geo_in, swTime)
+%   geo_out = geo_match(geo_in, scTime)
 %
 % INPUTS
 %   geo_in   - geo struct from do_allgeo
-%   swTime   - 34 x nscan, rad count time
+%   scTime   - 34 x nscan, rad count time
 %
 % OUTPUTS
-%   geo_out  - geo struct subset match for swTime
+%   geo_out  - geo struct subset match for scTime
 %
 % DISCUSSION
 %
@@ -19,7 +19,7 @@
 %   then copied to the RDR scan timeline, which is also the bcast
 %   SDR timeline.
 %
-%   if the residual difference between swTime and geo_out.FORTime 
+%   if the residual difference between scTime and geo_out.FORTime 
 %   is greater than 1 ms, this is reported in a warning message
 %
 %   geo_match take into account the 3 Jul 2012 RDR 1 second time
@@ -29,10 +29,10 @@
 %   H. Motteler, 2 May 2012
 %
 
-function geo_out = geo_match(geo_in, swTime)
+function geo_out = geo_match(geo_in, scTime)
 
 [m1, nscan1] = size(geo_in.FORTime);
-[m2, nscan2] = size(swTime);
+[m2, nscan2] = size(scTime);
 
 if m1 ~= 30 || m2 ~= 34
   error('bad input size')
@@ -52,7 +52,7 @@ t1 = mwt * (mt1 - mt0);  % IET time for CrIS start
 t2 = mwt * (mt2 - mt0);  % IET time for RDR 1 sec shift
 
 % set the RDR offset from SDR time, in ms
-tx = min(swTime(:));  
+tx = min(scTime(:));  
 if t1 <= tx && tx < t2
   dtRDR = 1817 + 4 * 8000;
 else
@@ -87,6 +87,8 @@ geo_out.Orbit_Start_Time = ones(nscan2, 1) * NaN;
 geo_out.sdr_gid = char(ones(nscan2, 1) * double(gfill));
 geo_out.sdr_ind = ones(nscan2, 1) * NaN;
 
+geo_out.dtRDR = dtRDR;
+
 %-------------------
 % geo time and index
 %-------------------
@@ -106,7 +108,7 @@ i2 = i2(ix);   % index of g2 in g1, g2 = g1(i2)
 %-------------------
 % RDR time and index
 %-------------------
-r1 = swTime(1:30, :);
+r1 = scTime(1:30, :);
 r1 = r1(:);
 j1 = (1 : length(r1))';
 
@@ -207,13 +209,13 @@ geo_out.sdr_ind(rind)   = geo_in.sdr_ind(sind);
 % time sanity check
 %------------------
 tmp1 = geo_out.FORTime / 1000;
-tmp2 = swTime(1:30, :) + dtRDR;
+tmp2 = scTime(1:30, :) + dtRDR;
 % plot(tmp1(:) - tmp2(:))
 
 % max difference between 
 dtout = max(abs(tmp1(:) - tmp2(:)));
 
-% report residual differences between swTime and geo_out.FORTime
+% report residual differences between scTime and geo_out.FORTime
 % that are greater than 1 ms.  This should be rare but can happen
 % (if there are gaps in the timeline) because we match by FOR but
 % copy by column.

@@ -131,14 +131,14 @@ for i = 1 : ncol
   rad1b(v1ind:v2ind) = rad1a;
 
   % transform spectral data to an interferogram
-  intf1 = real(ifft([rad1b; flipud(rad1b(2:n1-1,1))]));
+  intf1 = ifft([rad1b; flipud(rad1b(2:n1-1,1))]);
 
   % extend (with zero fill) if n1 < n2, or truncate if n1 > n2
   intf2 = zeros(n2, 1);
   intf2(1:min(n1,n2)) = intf1(1:min(n1,n2));
 
   % transform the new interferogram back to radiances
-  rad2a = real(fft([intf2; flipud(intf2(2:n2-1,1))]));
+  rad2a = fft([intf2; flipud(intf2(2:n2-1,1))]);
 
   % select radiances from the input band
   rad2(:,i) = rad2a(v1ind2:v2ind2);

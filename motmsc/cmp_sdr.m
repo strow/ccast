@@ -1,17 +1,21 @@
 %
-% cmp_sdr - compare two b/ccast SDR files
+% cmp_sdr - compare two ccast SDR files
 %
 
 addpath ../source
 addpath utils
 
-sfile = 'SDR_d20130828_t0230581.mat';
-sdir1 = '/asl/data/cris/ccast/sdr60_hr/2013/240';
-sdir2 = '/asl/data/cris/ccast/sdr60_hr_f3/2013/240';
-sname1 = 'ref cal';
-sname2 = 'alt cal';
+% second 2013 high res test
+% sdir1 = '/asl/data/cris/ccast/sdr60_hr/2013/240';
+% sdir2 = '/asl/data/cris/ccast/sdr60_hr_c2/2013/240';
 
-band = 'SW';
+sfile = 'SDR_d20140402_t0041408.mat';
+sdir1 = '/asl/data/cris/ccast/sdr60/2014/092';
+sdir2 = '/asl/data/cris/ccast/sdr60_ng/2014/092';
+sname1 = 'old cal';
+sname2 = 'new cal';
+
+band = 'LW';
 
 sfile1 = fullfile(sdir1, sfile);
 sfile2 = fullfile(sdir2, sfile);

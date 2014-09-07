@@ -81,15 +81,14 @@ under the terms of the GNU GPL v3.
 \begin{frame}
 \frametitle{preprocessing}
 
-\ccast\ processing is done in two passes---the first takes HDF and
-CCSDS data to Matlab files, and the second takes the Matlab files 
-to calibrated radiances.  The top-level preprocessing script is
-ccast\_prepro.  The main steps there are
+\ccast\ processing is done in two passes---the first pass takes HDF
+and CCSDS data to Matlab RDR files, and the second takes the Matlab
+RDR files to calibrated radiances.  The top-level preprocessing
+script is ccast\_prepro.  The main steps there are
 
 \begin{itemize}
   \item rdr2mat -- read \noaa\ RDR files (CCSDS level 0 data with an
-    HDF-5 wrapper) and produce Matlab RDR files, our working level~0
-    format.
+    HDF-5 wrapper) and produce Matlab RDR files
 
   \item geo\_daily -- read \noaa\ GCRSO HDF-5 geo files and produce
     daily abstracts of CrIS geo data, as Matlab files.
@@ -119,14 +118,14 @@ on Matlab RDR files, typically one set per day.  The main processing
 steps in rdr2sdr are
 
 \begin{itemize}
-  \item load the matlab RDR data
+  \item load the Matlab RDR data
   \item process sci and eng support data
   \item order and validate interferogram data
   \item group interferogram data into scans
   \item take interferograms to count spectra
   \item take ICT and space look moving averages
-  \item radiometric and spectral calibration
-  \item save the matlab SDR data
+  \item do radiometric and spectral calibration
+  \item save the SDR data as HDF5 mat files
 \end{itemize}
 
 \end{frame}
@@ -166,8 +165,9 @@ steps in rdr2sdr are
     calibration equation were developed independently and in many
     cases have been adopted by other groups.
 
-  \item runtime performance is good.  Running as a single task
-    rdr2sdr takes just over a minute to processes a 60-scan file
+  \item runtime performance is reasonable.  Running as a single
+    task, rdr2sdr takes between one and two minutes to processes 
+    a 60-scan RDR file
 
   \item reliability is good.  We have repeatedly reprocessed all
     data from mission start with no problems.
@@ -190,7 +190,7 @@ steps in rdr2sdr are
      \begin{itemize}
        \item ccast\_intro.pdf -- this document
        \item ccast\_eqns.pdf -- ILS and main calibration equations
-       \item matlab\_sdr.txt -- output data format and fields
+       \item ccast\_sdr.txt -- SDR output data format and fields
        \item finterp.pdf -- notes on Fourier interpolation
      \end{itemize} 
 \end{itemize} 

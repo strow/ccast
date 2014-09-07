@@ -56,10 +56,10 @@ if ~isempty(head_nans) ...
       scSW(:, :, head_nans, 1) = scTail.scSW(:, :, head_nans);
       scTime(head_nans, 1) = scTail.scTime(head_nans);
     else
-      fprintf(1, 'scantail: time mismatch\n')
+      fprintf(1, 'scantail: time mismatch, discarding tail\n')
     end
   else
-   fprintf(1, 'scantail: channel set mismatch\n')
+   fprintf(1, 'scantail: channel set mismatch, discarding tail\n')
   end
 end
 

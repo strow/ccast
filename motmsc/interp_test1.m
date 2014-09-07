@@ -1,6 +1,10 @@
 % 
-% finterp test
+% interp_test1 -- test finterp as used in CrIS processing
 % 
+% compare kcarta convolved to kc2cris at the cris user grid with
+% kcarta convolved to kc2cris at the sensor grid and interpolated
+% to the user grid with finterp.
+%
 
 % use my bcast utils and HDF libs
 addpath /home/motteler/cris/ccast/source

@@ -160,6 +160,27 @@ for fi = 1 : nfile
   % match geo data to scanorder grid
   geo = geo_match(allgeo, scTime);
 
+  if isempty(find(~isnan(geo.FORTime)))
+    fprintf(1, 'rdr2sdr: no geo match, skipping file %s\n', rid)
+    continue
+  end
+
+  % set the L1a error flag
+  [m, nscan] = size(scTime);
+  L1a_err = isnan(geo.FORTime) | geo.FORTime < 0 | isnan(scTime(1:30, :)) ...
+            | abs(geo.FORTime ./ 1000 - (scTime(1:30, :) + geo.dtRDR)) > 1;
+
+  if isempty(find(~L1a_err))
+    fprintf(1, 'rdr2sdr: no valid L1a values, skipping file %s\n', rid)
+    continue
+  end
+
+  % bad FOR warning message
+  m = sum(L1a_err(:));
+  if m > 0
+    fprintf(1, 'rdr2sdr: warning - flagging %d bad FORs, file %s\n', m, rid)
+  end
+
   % -----------------
   % get count spectra
   % -----------------
@@ -196,26 +217,33 @@ for fi = 1 : nfile
   %-------------------
 
   % trim channel sets to user grid plus 2 guard channels
+  % and return separate real values and complex residuals
 
   dv = userLW.dv;
   ugrid = userLW.v1 - 2*dv : dv : userLW.v2 + 2*dv;
   ix = interp1(vLW, 1:length(vLW), ugrid, 'nearest');
-  rLW = rLW(ix, :, :, :); vLW = vLW(ix);
+  cLW = single(imag(rLW(ix, :, :, :))); 
+  rLW = single(real(rLW(ix, :, :, :)));  
+  vLW = vLW(ix);
 
   dv = userMW.dv;
   ugrid = userMW.v1 - 2*dv : dv : userMW.v2 + 2*dv;
   ix = interp1(vMW, 1:length(vMW), ugrid, 'nearest');
-  rMW = rMW(ix, :, :, :); vMW = vMW(ix);
+  cMW = single(imag(rMW(ix, :, :, :))); 
+  rMW = single(real(rMW(ix, :, :, :))); 
+  vMW = vMW(ix);
 
   dv = userSW.dv;
   ugrid = userSW.v1 - 2*dv : dv : userSW.v2 + 2*dv;
   ix = interp1(vSW, 1:length(vSW), ugrid, 'nearest');
-  rSW = rSW(ix, :, :, :); vSW = vSW(ix);
+  cSW = single(imag(rSW(ix, :, :, :))); 
+  rSW = single(real(rSW(ix, :, :, :))); 
+  vSW = vSW(ix);
 
   save(sfile, ...
        'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
-       'rLW', 'vLW', 'rMW', 'vMW', 'rSW', 'vSW', 'scTime', ...
-       'sci', 'eng', 'geo', 'rid', '-v7.3')
+       'cLW', 'rLW', 'vLW', 'cMW', 'rMW', 'vMW', 'cSW', 'rSW', 'vSW', ...
+       'scTime', 'sci', 'eng', 'geo', 'L1a_err', 'rid', '-v7.3')
   
 end
 

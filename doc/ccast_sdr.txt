@@ -19,6 +19,10 @@ Matlab variables
   rMW        nchan x 9 x 30 x nscan       MW radiance data
   rSW        nchan x 9 x 30 x nscan       SW radiance data
 
+  cLW        nchan x 9 x 30 x nscan       LW complex residual
+  cMW        nchan x 9 x 30 x nscan       MW complex residual
+  cSW        nchan x 9 x 30 x nscan       SW complex residual
+
   vLW              nchan x 1              LW frequency grid
   vMW              nchan x 1              MW frequency grid
   vSW              nchan x 1              SW frequency grid
@@ -48,16 +52,19 @@ index.  nchan is the CrIS user grid plus two "guard channels" at
 the edges of each band.  nscan is typically 60 but can be less if
 there are gaps in the data.
 
-vLW, vMW, vSW - nchan x 1 vector frequencies for the calibrated
-radiances, above.
+cLW, cMW, cSW - nchan x 9 x 30 x nscan arrays of complex residuals.
+The interpretation may depend on the particular calibration equation
+being used.
 
 geo - geolocation data.  See [1] and the geo subsection, below.
 
+L1a_err - 30 x nscan array of L1a processing flags, 1 = bad, 0 = OK.
+If all L1a_err flags are set, the data is not processed further and
+processing continues with the next RDR file.
+
 scTime - 34 x nscan array of instrument internal time, currently
 around 35 seconds behind real time.  This is IET time but returned
-here as milliseconds since 1958.  It is mainly useful as a valid
-data check--if it is NaN, there is no valid data for that FOR and
-scan.
+here as milliseconds since 1958.
 
 userLW, userMW, userSW - the user grid parameters, for each band.
 The sensor grid is translated to these specs.  The fields are

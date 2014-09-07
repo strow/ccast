@@ -145,7 +145,7 @@ for si = 1 : nscan   % loop on scans
   % note we are vectorizing in chunks of size nchan x 30 here
   for fi = 1 : 9
 
-    rtmp = squeeze(real(rcal(:,fi,:,si)));  
+    rtmp = squeeze(rcal(:,fi,:,si));  
 
     rtmp = bandpass(vinst, rtmp, uv1, uv2, uvr);
 

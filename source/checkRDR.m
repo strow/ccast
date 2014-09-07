@@ -103,7 +103,7 @@ end
 dmax = max(dt0);
 if dmax > 8000
   % looks like we lost at least one scan
-  fprintf(1, 'checkRDR: time step %.0f too big, file %s\n', dmax, rid);
+  fprintf(1, 'checkRDR: time step %.0f ms too big, file %s\n', dmax, rid);
 end
 
 % save the results
