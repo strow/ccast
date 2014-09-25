@@ -3,13 +3,14 @@
 %   mkSRFtab -  build SRF matrix tables for interpolation
 %
 % SYNOPSIS
-%   function mkSRFtab(band, wlist, sfile, opts)
+%   function mkSRFtab(band, wlist, sfile, opt1, opt2)
 %
 % INPUTS
 %   band   - band string, 'LW', 'MW', or 'SW'
 %   wlist  - list of wlaser tabulation points
 %   sfile  - output file for SRF matrix tables 
-%   opts   - options for inst_params
+%   opt1   - options for inst_params
+%   opt2   - options for newILS
 %
 % OUTPUT
 %   mat file containing a structure array "s" with fields
@@ -23,31 +24,19 @@
 %   with newILS with no band-edge extension
 %
 
-function mkSRFtab(band, wlist, sfile, opts)
+function mkSRFtab(band, wlist, sfile, opt1, opt2)
 
 band = upper(band);
 wlist = sort(wlist(:));
 
-% ------------------
-% default parameters
-% ------------------
-
 % initialize output struct
 s = struct([]);
 
-% pass opts to inst_params
-if nargin < 4
-  opts = struct;
-end
-
-% ----------------------
 % loop on wlaser values
-% ----------------------
-
 for wi = 1 : length(wlist)
 
   % calculate interferometric parameters
-  inst = inst_params(band, wlist(wi), opts);
+  inst = inst_params(band, wlist(wi), opt1);
 
   % initialize the ILS tabulation
   smat = zeros(inst.npts, inst.npts, 9);
@@ -59,7 +48,7 @@ for wi = 1 : length(wlist)
     for j = 1 : 9
 
       % call newILS
-      smat(:, i, j) = newILS(j, inst, inst.freq(i), inst.freq, 2000);
+      smat(:, i, j) = newILS(j, inst, inst.freq(i), inst.freq, opt2);
 
     end
     fprintf(1,'.');

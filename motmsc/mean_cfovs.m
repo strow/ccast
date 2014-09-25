@@ -20,13 +20,12 @@ iref = 5;        % index of reference FOV
 
 % path to SDR year
 % syear = '/asl/data/cris/ccast/sdr60/2013';
-% syear = '/asl/data/cris/ccast/sdr60_hr/2013';
-% syear = '/asl/data/cris/ccast/sdr60_hr_f3/2013';
-  syear = '/asl/data/cris/ccast/sdr60_hr_c2/2013';
+  syear = '/asl/data/cris/ccast/sdr60_hr/2013';
+% syear = '/asl/data/cris/ccast/sdr60_hr_c2/2013';
 
 % SDR days of the year
-% sdays = 71;         % high res test 1
-  sdays = 239 : 240;  % high res test 2
+  sdays = 71;         % high res test 1
+% sdays = 239 : 240;  % high res test 2
 % sdays = 238;
 % sdays = 64 : 77;
 % sdays = 60 : 62;
@@ -91,6 +90,9 @@ for di = sdays
       end
       for i = 1 : nFOR
         k = nFOR * (j - 1) + i;
+        if L1a_err(i, j)
+          continue
+        end
         if ~isempty(find(isnan(btmp(:, k))))
           continue
         end

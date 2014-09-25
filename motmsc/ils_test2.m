@@ -1,5 +1,5 @@
 %
-% ILS test 2 - motILS and oaffov as functions of arc steps
+% ILS test 2 - newILS and oaffov as functions of arc steps
 %
 
 addpath ../source
@@ -25,6 +25,10 @@ ichan = floor(0.6*npts);
 fchan  = freq(ichan);
 % fchan = user.v1 + .8 * (user.v2 - user.v1);
 
+% newILS options
+opt2 = struct;
+opt2.wrap = 'sinc';
+
 % arc count list 
 alist = 1001:10:3000;
 
@@ -34,7 +38,8 @@ ils2 = zeros(npts, k);
 
 for j = 1 : k
   narc = alist(j);
-  ils1(:, j) = newILS(ifov, inst, fchan, freq, narc);
+  opt2.narc = narc;
+  ils1(:, j) = newILS(ifov, inst, fchan, freq, opt2);
   [t1, srf2] = oaffov2(freq, fchan, opd, theta, hfov, narc);
   ils2(:, j) = srf2(:);
 end

@@ -59,8 +59,8 @@ being used.
 geo - geolocation data.  See [1] and the geo subsection, below.
 
 L1a_err - 30 x nscan array of L1a processing flags, 1 = bad, 0 = OK.
-If all L1a_err flags are set, the data is not processed further and
-processing continues with the next RDR file.
+If all the L1a_err flags from an RDR file are set, L1b processing is
+skipped and the L1a processing continues with the next file.
 
 scTime - 34 x nscan array of instrument internal time, currently
 around 35 seconds behind real time.  This is IET time but returned

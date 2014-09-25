@@ -194,6 +194,8 @@ for fi = 1 : nfile
   rcMW = igm2spec(scMW, instMW);
   rcSW = igm2spec(scSW, instSW);
 
+  clear scLW scMW scSW
+
   % -------------------------------------
   % radiometric and spectral calibration
   % -------------------------------------
@@ -211,6 +213,8 @@ for fi = 1 : nfile
 
   [rSW, vSW] = calmain(instSW, userSW, rcSW, scTime, ...
                         avgSWIT, avgSWSP, sci, eng, geo, opts);
+
+  clear rcLW rcMW rcSW
 
   %-------------------
   % save the SDR data

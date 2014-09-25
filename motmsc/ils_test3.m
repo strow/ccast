@@ -28,16 +28,19 @@ n = inst1.npts;
 smat1 = zeros(n, n);
 smat2 = zeros(n, n);
 
+opt2 = struct;
+opt2.wrap = 'psinc n';
+opt2.narc = 2000;
+
 for i = 1 : n;
-  smat1(:, i) = newILS(iFOV, inst1, inst1.freq(i), inst1.freq, 2000);
-  smat2(:, i) = newILS(iFOV, inst2, inst2.freq(i), inst2.freq, 2000);
+  smat1(:, i) = newILS(iFOV, inst1, inst1.freq(i), inst1.freq, opt2);
+  smat2(:, i) = newILS(iFOV, inst2, inst2.freq(i), inst2.freq, opt2);
   if mod(i, 20) == 0, fprintf(1, '.'), end
 end
 fprintf(1, '\n')
 
 maxdif = max(smat1 - smat2);
 mindif = min(smat1 - smat2);
-
 
 figure(1); clf
 freq = inst1.freq;
@@ -48,7 +51,6 @@ legend('max diff', 'min diff', 'location', 'southeast')
 xlabel('ILS by channel freq')
 ylabel('residual')
 grid on; zoom on 
-
 
 figure(2); clf
 freq = inst1.freq;

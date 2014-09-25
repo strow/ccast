@@ -33,16 +33,16 @@ N = inst.npts;
 [frq2, srf2] = oaffov_p(fgrid, fchan, opd, thetac, hfov, nslice, N);
 
 % regular sinc single-ray ILS
-srf3 = rsinc(2*pi*(fgrid - fchan*cos(thetac))*opd);
+srf3 = rsinc(2*(fgrid - fchan*cos(thetac))*opd);
 srf3 = srf3 / sum(srf3);
 
 % periodic sinc single-ray ILS
-srf4 = psinc(2*pi*(fgrid - fchan*cos(thetac))*opd, N);
+srf4 = psinc(2*(fgrid - fchan*cos(thetac))*opd, N);
 srf4 = srf4 / sum(srf4);
 
 % periodic sinc extended
 frq5 = 0 : inst.dv : 4000;
-srf5 = psinc(2*pi*(frq5 - fchan*cos(thetac))*opd, N);
+srf5 = psinc(2*(frq5 - fchan*cos(thetac))*opd, N);
 
 % sinc and psinc ILS plots
 figure(1); clf

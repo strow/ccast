@@ -1,12 +1,11 @@
 % 
 % interp_test1 -- test finterp as used in CrIS processing
 % 
-% compare kcarta convolved to kc2cris at the cris user grid with
-% kcarta convolved to kc2cris at the sensor grid and interpolated
-% to the user grid with finterp.
+% compare kcarta convolved to the CrIS user grid with kcarta
+% convolved to the sensor grid and interpolated to the user grid
+% with finterp.
 %
 
-% use my bcast utils and HDF libs
 addpath /home/motteler/cris/ccast/source
 addpath /home/motteler/cris/airs_decon/test
 addpath /home/motteler/cris/ccast/motmsc/utils
@@ -16,55 +15,63 @@ kcdir = '/home/motteler/cris/sergio/JUNK2012/';
 flist =  dir(fullfile(kcdir, 'convolved_kcart*.mat'));
 
 % choose a kcarta file
-i = 10;
+i = 3;
 d1 = load(fullfile(kcdir, flist(i).name));
 vkc = d1.w(:); rkc = d1.r(:);
 
 % get CrIS inst and user params
-band = 'SW';
-opts = struct;
-opts.resmode = 'hires2';
-wlaser = 773.1301;  % nominal value
-[inst, user] = inst_params(band, wlaser, opts);
+band = 'LW';
+opt1 = struct;
+opt1.resmode = 'hires2';
 
-% set wlaser so inst grid == user grid
-wlaser = 1e7/(inst.df/(2*user.opd/inst.npts));
-[inst, user] = inst_params(band, wlaser, opts);
+% 1. convolve kcarta to cris at the sensor grid
+wlaser = 773.14;  % test value
+[inst1, user1] = inst_params(band, wlaser, opt1);
+[rad1, frq1] = kc2inst(inst1, user1, rkc, vkc);
 
-% convolve kcarta to cris at the user grid
-[rad1, frq1] = kc2cris(inst, user, rkc, vkc);
+% 2. convolve kcarta to cris at the user grid
+wlaser = 1e7/(inst1.df/(2*user1.opd/inst1.npts));
+[inst2, user2] = inst_params(band, wlaser, opt1);
+[rad2, frq2] = kc2inst(inst2, user2, rkc, vkc);
+% [rad2, frq2] = kc2cris(user2, rkc, vkc);
 
-% convolve kcarta to cris at an arbitrary wlaser 
-w2 = 773.1301;
-[inst2, user2] = inst_params(band, w2, opts);
-[rad2, frq2] = kc2cris(inst2, user2, rkc, vkc);
+% 3. use finterp to interpolate sensor to user grids
+opt2 = struct; opt2.tol = 1e-6;
+[rad3, frq3] = finterp_ng(rad1, frq1, user2.dv, opt2);
+% [rad3, frq3] = finterp(rad1, frq1, user2.dv, opt2);
+% frq3 = frq3(:);
 
-% interpolate back to the user grid
-opt2 = struct;
-opt2.tol = 1e-8;
-[rad3, frq3] = finterp(rad2, frq2, inst.dv, opt2);
-frq3 = frq3(:);
+% 4. use finterp to interpolate user back to sensor grids
+[rad4, frq4] = finterp_ng(rad3, frq3, inst1.dv, opt2);
+% [rad4, frq4] = finterp(rad3, frq3, inst1.dv, opt2);
+% frq4 = frq4(:);
 
-[j1, j3] = seq_match(frq1, frq3);
-rad1 = rad1(j1); frq1 = frq1(j1);
+% compare 2 & 3: interpolated sensor to user
+[j2, j3] = seq_match(frq2, frq3);
+rad2 = rad2(j2); frq2 = frq2(j2);
 rad3 = rad3(j3); frq3 = frq3(j3);
-
-bt1 = real(rad2bt(frq1, rad1));
+bt2 = real(rad2bt(frq2, rad2));
 bt3 = real(rad2bt(frq3, rad3));
 
 figure(1); clf
-plot(frq1, bt1, frq3, bt3)
-legend('true', 'interp')
-xlabel('wavenumber')
-ylabel('BT, K')
-grid on; zoom on
-
-figure(2); clf
-plot(frq1, bt3 - bt1);
-axis([user.v1, user.v2, -0.14, 0.14])
-title(sprintf('profile %d interp minus true %s %g', i, band, opt2.tol))
+plot(frq2, bt3 - bt2);
+axis([user2.v1, user2.v2, -0.1, 0.1])
+title(sprintf('profile %d finterp minus true %s', i, band))
 xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
-% saveas(gcf, sprintf('prof_%d_%s_%g', i, band, opt2.tol), 'png')
 
+% compare 1 & 4: finterp forward and back 
+[j1, j4] = seq_match(frq1, frq4);
+rad1 = rad1(j1); frq1 = frq1(j1);
+rad4 = rad4(j4); frq4 = frq4(j4);
+bt1 = real(rad2bt(frq1, rad1));
+bt4 = real(rad2bt(frq4, rad4));
+
+figure(2); clf
+plot(frq1, bt4 - bt1);
+axis([user2.v1, user2.v2, -0.3, 0.3])
+title(sprintf('profile %d finterp forward and back %s', i, band))
+xlabel('wavenumber')
+ylabel('dBT, K')
+grid on; zoom on

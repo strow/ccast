@@ -6,14 +6,17 @@ addpath ../source
 addpath utils
 
 % second 2013 high res test
-% sdir1 = '/asl/data/cris/ccast/sdr60_hr/2013/240';
-% sdir2 = '/asl/data/cris/ccast/sdr60_hr_c2/2013/240';
+sfile = 'SDR_d20130828_t0254580.mat';
+sdir1 = '/asl/data/cris/ccast/sdr60_hr_old/2013/240';
+sdir2 = '/asl/data/cris/ccast/sdr60_hr/2013/240';
+sname1 = 'old interp';
+sname2 = 'new interp';
 
-sfile = 'SDR_d20140402_t0041408.mat';
-sdir1 = '/asl/data/cris/ccast/sdr60/2014/092';
-sdir2 = '/asl/data/cris/ccast/sdr60_ng/2014/092';
-sname1 = 'old cal';
-sname2 = 'new cal';
+% sfile = 'SDR_d20140402_t0041408.mat';
+% sdir1 = '/asl/data/cris/ccast/sdr60/2014/092';
+% sdir2 = '/asl/data/cris/ccast/sdr60_ng/2014/092';
+% sname1 = 'old cal';
+% sname2 = 'new cal';
 
 band = 'LW';
 

@@ -1,5 +1,5 @@
 %
-% ILS test 1 - compare motILS, oaffov, and UW ILS
+% ILS test 1 - compare newILS, oaffov, and UW ILS
 %
 
 addpath ../source
@@ -21,12 +21,15 @@ frad = inst.frad;
 
 hfov = frad(ifov);
 theta = foax(ifov);
-fchan  = freq(floor(0.6*npts));
+  fchan  = freq(floor(0.6*npts));
 % fchan = user.v1 + .8 * (user.v2 - user.v1);
 
-% new test ILS
+% new UMBC ILS
 narc = 2001;
-srf1 = newILS(ifov, inst, fchan, freq, narc);
+opts = struct;
+opts.narc = narc;
+opts.wrap = 'sinc';
+srf1 = newILS(ifov, inst, fchan, freq, opts);
 
 % old UMBC ILS
 nslice = 2001;
@@ -36,7 +39,7 @@ srf2 = srf2(:);
 
 % Dave's UW ILS
 srf3 = computeIls(freq, fchan, opd, theta, hfov);
-srf3 = srf3 / sum(srf3);
+% srf3 = srf3 / sum(srf3);
 
 % interpolate to a finer frequency grid
 % [srf1, frq1] = finterp2(srf1(:), freq, 10);
