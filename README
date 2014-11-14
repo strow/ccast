@@ -46,7 +46,8 @@ Installation
      and install these files in ccast/inst_data
 
  (4) edit paths in source/ccast_prepro.m and source/ccast_main.m
-     as needed for the local environment
+     as needed for the local environment.  This step is not needed
+     to run the demo, described below.
 
 
 Testing

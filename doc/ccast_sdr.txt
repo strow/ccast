@@ -29,6 +29,7 @@ Matlab variables
 
   geo              structure              GCRSO geo values
   scTime           34 x nscan             instrument time
+  L1a_err          30 x nscan             L1a error flag
 
   userLW           structure              LW user params
   userMW           structure              MW user params

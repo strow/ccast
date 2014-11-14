@@ -35,13 +35,13 @@ opt2 = struct;
 opt2.tol = 1e-6;
 
 % real component real interp
-[rad1x, frq1x] = finterp_ng(rad1, frq1, user.dv, opt2);
+[rad1x, frq1x] = finterp(rad1, frq1, user.dv, opt2);
 
 % imag component real interp
-[rad2x, frq2x] = finterp_ng(rad2, frq1, user.dv, opt2);
+[rad2x, frq2x] = finterp(rad2, frq1, user.dv, opt2);
 
 % complex input complex interp
-[rad3x, frq3x] = finterp_ng(rad1 + 1i * rad2, frq1, user.dv, opt2);
+[rad3x, frq3x] = finterp(rad1 + 1i * rad2, frq1, user.dv, opt2);
 
 % compare
 isclose(rad1x, real(rad3x), 4)

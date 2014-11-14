@@ -66,13 +66,9 @@ frad = 0.008403 * ones(9,1);
 
 % process input options
 if nargin == 3
-  optvar = fieldnames(opts);
-  for i = 1 : length(optvar)
-    vname = optvar{i};
-    if exist(vname, 'var')
-      eval(sprintf('%s = opts.%s;', vname, vname));
-    end
-  end
+  if isfield(opts, 'frad'), frad = opts.frad; end
+  if isfield(opts, 'foax'), foax = opts.foax; end
+  if isfield(opts, 'resmode'), resmode = opts.resmode; end
 end
 
 switch resmode

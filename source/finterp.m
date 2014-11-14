@@ -8,19 +8,19 @@
 % INPUTS
 %   rad1   - radiances, m x n array
 %   frq1   - frequencies, m-vector
-%   dv2    - desired rad2 channel spacing
+%   dv2    - desired rad2 frequency spacing
 %   opt    - optional parameters
 %
 % opt fields
-%   tol    - optional tolerance for the rational approximation
-%            of dv1/dv2.  The default is 1e-6.
+%   info   - print some basic transform stats
+%   tol    - tolerance for the rational approximation of dv1/dv2.  
 %
 % OUTPUTS
 %   rad2   - interpolated radiances, k x n array
 %   frq2   - interpolated frequencies, k-vector
 %
 % DISCUSSION
-%   see finterp.pdf for the derivations used here.
+%   see doc/finterp.pdf for the derivations used here.
 %
 % HM, 20 Sep 2014
 %
@@ -65,19 +65,18 @@ N2 = m1 * 2^k;
 % get (and check) dx
 dx1 = 1 / (2*dv1*N1);
 dx2 = 1 / (2*dv2*N2);
-% if ~isclose(dx1, dx2)
+% if ~isclose(dx1, dx2, 4)
 %   error('dx1 and dx2 are different')
-%   keyboard
 % end
 dx = dx1;
 
 if info
-  fprintf(1, 'new finterp: N1 = %7d, N2 = %5d, dx = %6.3e\n', N1, N2, dx);
+  fprintf(1, 'finterp: N1 = %7d, N2 = %5d, dx = %6.3e\n', N1, N2, dx);
 end
 
-%-------------------------------
+%----------------------
 % do the interpolation 
-%-------------------------------
+%----------------------
 
 % embed rad1 in a 0 to Vmax grid
 ftmp = (0:N1)' * dv1;
@@ -99,7 +98,7 @@ clear igm1
 % take interferograms to radiance
 rad2 = fft([igm2(1:N2+1,:); flipud(igm2(2:N2,:))]);
 frq2 = (0:N2)' * dv2;
-clear igm2 
+clear igm2
 
 % return just the input band
 ix = find(v1 <= frq2 & frq2 <= v2);

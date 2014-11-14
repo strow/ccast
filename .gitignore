@@ -1,14 +1,14 @@
 #
-# ccast git ignore file
+# ccast git ignore
 #
 
 # data & misc
 *.h5
 *.hdf
 *.mat
-*.fig
 *.log
 *.core
+*.dat
 
 # tex & docs
 *.aux
@@ -16,8 +16,10 @@
 *.snm
 *.nav
 *.out
+*.vrb
 *.pdf
 *.png
+*.fig
 
 # archives and packages
 *.gz
