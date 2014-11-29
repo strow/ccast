@@ -1,7 +1,7 @@
 %
-% cmp_loop1 - loop on bcast SDR files, compare with IDPS 
+% cmp_loop1 - loop on ccast SDR files, compare with IDPS 
 %
-%  loop on bcast files and scans, find matching IPDS scans, and
+%  loop on ccast files and scans, find matching IPDS scans, and
 %  tabulate radiances for a selected FOR and channel subset
 %
 
@@ -9,15 +9,15 @@ addpath asl
 addpath ../source
 
 % select day-of-the-year
-doy = '061';
+doy = '293';
 
 % parameters to save
 ifor = 15;
-sv1 = 655;
-sv2 = 675;
+sv1 = 750;
+sv2 = 770;
 
-% get a list of bcast files for the day
-byear = '/asl/data/cris/ccast/sdr60/2014';
+% get a list of ccast files for the day
+byear = '/asl/data/cris/ccast/sdr60/2013';
 bdir  = fullfile(byear, doy);
 blist = dir(fullfile(bdir, 'SDR*.mat'));
 
@@ -26,7 +26,7 @@ wlaser = 773.1301;
 [inst, user] = inst_params('LW', wlaser);
 
 % get the path to the IDPS SDR data
-syear = '/asl/data/cris/sdr60/hdf/2014';
+syear = '/asl/data/cris/sdr60/hdf/2013';
 sdir  = fullfile(syear, doy);
 sfile_old = '';
 
@@ -42,7 +42,7 @@ rtime = [];
 rlat = [];
 rlon = [];
 
-% loop on bcast files
+% loop on ccast files
 for fi = 1 : length(blist)
 
   bfile = fullfile(bdir, blist(fi).name);
@@ -74,8 +74,8 @@ for fi = 1 : length(blist)
       sfile_old = sfile;
     end
 
-    % skip to next scan if the ccast FOR is an NaN
-    if isnan(scTime(ifor, bi)), continue, end
+    % skip to next scan if the ccast FOR is bad
+    if L1a_err(ifor, bi), continue, end
 
     rad1 = cat(3, rad1, rLW(ix1, :, ifor, bi));
     rad2 = cat(3, rad2, pd.ES_RealLW(ix2, :, ifor, si));
@@ -100,12 +100,14 @@ figure(1); clf
 subplot(2,1,1)
 plot(tgrid, y1 - y2)
 title(sprintf('FOV %d ccast - IDPS mean BT, %g to %g 1/cm', ifov, sv1, sv2))
+% axis([4, 9, -8, 8])
 xlabel('hours')
 ylabel('dBT, K')
 grid on; zoom on
 
 subplot(2,1,2)
 plot(tgrid, rlat(ifov,:))
+% axis([4, 9, -100, 100])
 xlabel('hours')
 ylabel('latitude')
 grid on; zoom on

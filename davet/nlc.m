@@ -1,26 +1,36 @@
 %
-% function [nlcorr_cxs,extra] = nlc(band,iFov,v,scene_cxs,space_cxs,PGA_Gain,inst)
+% function nlc_cxs = nlc(inst, iFov, scene_cxs, space_cxs, eng)
 %
 % University of Wisconsin Nonlinearity Correction for CrIS FM1
 %
 % Inputs:
-%   band            Spectral band: "lw", "mw" or "sw"
+%   inst            sensor params from inst_params, with numeric filter
 %   iFov            FOV index, 1 to 9
 %   scene_cxs       Uncorrected scene complex spectrum (Nchan x 1)
 %   space_cxs       Uncorrected space view complex spectrum (Nchan x 1) (Must be same IFG sweep 
 %                     direction as scene_cxs, and better to have this be an average of many view)
-%   PGA_Gain        Structure of RDR file PGA Gain values, as read from MIT RDR reader in d1.packet.PGA_Gain
-%   inst            sensor parameters from inst_params, including numeric filter added
+%   eng             current eng (4 min) packet struct, from the MIT RDR reader
 %
 % Outputs:
-%   nlcorr_cxs      Nonlinearity corrected scene spectrum (Nchan x 1)
+%   nlc_cxs      Nonlinearity corrected scene spectrum (Nchan x 1)
 %   extra           (Optional) A structure of various parameters used in the NLC
 %
 % Sample usage:
-%   [nlcorr_cxs,extra] = nlc('lw',1,wn,scene_cxs,space_cxs,d1.packet.PGA_Gain);
+%   [nlc_cxs, extra] = nlc(inst, 1, wn, scene_cxs, space_cxs, d1.packet);
 %
-% Required Functions:
-%       DClevel_model.m
+% University of Wisconsin DC Level Model for CrIS FM1
+%
+% This version implements the integral of the magnitude spectrum between band limits
+% using the following formula:
+%   Vdc = F(target - space)/modeff + Vinst
+%   where
+%   F(x) = twice the integral between [v1,v2] of magnitude of complex spectrum x 
+%          (factor of 2 accounts for integration over plus and minus frequencies)
+% Notes:
+%   (1) This equation assumes that the space view is colder than any potential scene views.
+%   (2) F(x) must be normalized to be consistent with a2 parameter!
+%   (3) The spectral integral should avoid band guard regions.
+%   (4) It is recommended that an average spectrum be used for the space_cxs
 %
 % History:
 %   Copyright 2008 University of Wisconsin-Madison Space Science and Engineering Center
@@ -37,107 +47,87 @@
 %   19 Nov 2012, DCT, a2 scale factors based on Fov-2-Fov analysis of IDPS/ADL processing
 %
 %   18 Aug 2013, DCT, re-written to:
-%      a) use a2 values in units of inverse volts, 
-%      b) a2, mod-eff, and Vinst values are 07 Aug 2013 UW values.
-%      c) work with new DC level model function which uses Vinst as background contribution and V in units of volts.
+%     a) use a2 values in units of inverse volts, 
+%     b) a2, mod-eff, and Vinst values are 07 Aug 2013 UW values.
+%     c) work with new DC level model function which uses Vinst as 
+%        background contribution and V in units of volts.
 %
-%   8 Dec 2013, HM, 
-%      - added hard coded ModEff values for now, below
-%      - replaced v and control with sensor-grid struct "inst"
-%      - added numeric filter as a field sNF of the inst struct
+%   8 Dec 2013, HM 
+%   - replaced v and control with sensor-grid struct "inst"
+%   - modifed to work with numeric filter from the time domain
+%     representation.  This leaves the frequency domain filter on
+%     the current sensor grid, so the old frequency matching code 
+%     was not needed.  But this does required normalizing the new
+%     filter to match the old.
 %
+%   24 Nov 2014, HM
+%   - dropped the separate "band" param, this is in the inst struct
+%   - added the full eng packet as a param, with PGAgain, modEff,
+%     and Vinst read from that.  Matlab is call-by-reference for
+%     compound objects unless the passed in parameter is modified,
+%     so there is no overhead for this.
+%   - simplified setting up parameterss for the nonlinearity calc 
+%   - folded DClevel_model into nlc because it was only two lines 
+%     of code after mods as noted above
 
-function [nlcorr_cxs,extra] = nlc(band,iFov,v,scene_cxs,space_cxs,PGA_Gain,inst)
+function nlc_cxs = nlc(inst, iFov, scene_cxs, space_cxs, eng)
 
-% Insert hard-coded Vinst values into control structure.  These are v34 EP values.
-DClevel_parameters.Vinst.lw = [1.36500  1.42370  1.42830  1.41930  1.32880  1.46600  1.47150  1.40460  1.37920];
-DClevel_parameters.Vinst.mw = [0.63620  0.60160  0.63600  0.61420  0.56100  0.65130  0.58310  0.61160  0.67520];
-DClevel_parameters.Vinst.sw = [0.00000  0.00000  0.00000  0.00000  0.00000  0.00000  0.00000  0.00000  0.00000];
-
-% hard-coded ModEff values from 'UW Parameters for DC-Level-22July08.xls'
-DClevel_parameters.ModEff.lw = [0.7560  0.7640  0.7590  0.7680  0.7950  0.7700  0.7720  0.7820  0.7710];
-DClevel_parameters.ModEff.mw = [0.7890  0.7840  0.7780  0.7890  0.8000  0.7910  0.7780  0.8040  0.7930];
-DClevel_parameters.ModEff.sw = [0.6540  0.6620  0.6430  0.6640  0.6860  0.6600  0.6670  0.6830  0.6570];
-
-% Define a2 values.  
-% These are 07-Aug-2013 UW a2 values in units of inverse volts.  
-% Ref: uw_recommended_nlc_coefficients_07Aug2013.ppt
-a2_now.lw = [0.01936  0.01433  0.01609  0.02192  0.01341  0.01637  0.01464  0.01732  0.03045];
-a2_now.mw = [0.00529  0.02156  0.02924  0.01215  0.01435  0.00372  0.10702  0.04564  0.00256];
-a2_now.sw = [0.00000  0.00000  0.00000  0.00000  0.00000  0.00000  0.00000  0.00000  0.00000];
-
-% Apply additional overall (FOV independent) emperical scale factors
-% global A2_SCALE_FACTOR
-A2_SCALE_FACTOR = 1;
-a2_now.lw = a2_now.lw * A2_SCALE_FACTOR;
-a2_now.mw = a2_now.mw * A2_SCALE_FACTOR;
-a2_now.sw = a2_now.sw * A2_SCALE_FACTOR;
-
-% Define PGA gains
-pgaGain_now.lw = PGA_Gain.Band(1).map(PGA_Gain.Band(1).Setting+1);
-pgaGain_now.mw = PGA_Gain.Band(2).map(PGA_Gain.Band(2).Setting+1);
-pgaGain_now.sw = PGA_Gain.Band(3).map(PGA_Gain.Band(3).Setting+1);
-
-% select a2, Vinst, modulation efficiency, and PGA-gain for this FOV and band
-switch upper(band)
-
- case 'LW'
-    a2 = a2_now.lw(iFov);
-    modEff = DClevel_parameters.ModEff.lw(iFov);
-    vinst = DClevel_parameters.Vinst.lw(iFov);
-    PGAgain = pgaGain_now.lw(iFov);
-
- case 'MW'
-    a2 = a2_now.mw(iFov);
-    modEff = DClevel_parameters.ModEff.mw(iFov);
-    vinst = DClevel_parameters.Vinst.mw(iFov);
-    PGAgain = pgaGain_now.mw(iFov);
-
-  case 'SW'
-    a2 = a2_now.sw(iFov);
-    modEff = DClevel_parameters.ModEff.sw(iFov);
-    vinst = DClevel_parameters.Vinst.sw(iFov);
-    PGAgain = pgaGain_now.sw(iFov);
+% band index
+switch upper(inst.band)
+  case 'LW', bi = 1;
+  case 'MW', bi = 2;  
+  case 'SW', bi = 3;
+  otherwise, error('bad band spec');
 end
 
-%%%%%% begin hack block
-% [nlcorr_cxs2,extra2] = nlc_dt(band,iFov,v,scene_cxs,space_cxs,PGA_Gain,inst);
+% get a2 from inst or eng
+if isfield(inst, 'a2') && ~isempty(inst.a2)
+  a2 = inst.a2;
+else
+  a2 = eng.Linearity_Param.Band(bi).a2;
+end
+
+% nonlinearity params from eng
+PGAgain = eng.PGA_Gain.Band(bi).map(eng.PGA_Gain.Band(bi).Setting+1);
+modEff  = eng.Modulation_eff.Band(bi).Eff;
+Vinst   = eng.Linearity_Param.Band(bi).Vinst;
+
+% modEff test hack
+% switch upper(inst.band)
+%   case 'LW', modEff = [0.7560  0.7640  0.7590  0.7680  0.7950  0.7700  0.7720  0.7820  0.7710];
+%   case 'MW', modEff = [0.7890  0.7840  0.7780  0.7890  0.8000  0.7910  0.7780  0.8040  0.7930];
+%   case 'SW', modEff = [0.6540  0.6620  0.6430  0.6640  0.6860  0.6600  0.6670  0.6830  0.6570];
+% end
+
+% choose a single FOV (for now...)
+a2 = a2(iFov);
+PGAgain = PGAgain(iFov); 
+modEff = modEff(iFov); 
+Vinst = Vinst(iFov); 
 
 % normalize NF to match Dave's 2008 filter
-switch upper(band)
+switch upper(inst.band)
   case 'LW',  inst.sNF = 1.6047 * inst.sNF ./ max(inst.sNF);
   case 'MW',  inst.sNF = 0.9826 * inst.sNF ./ max(inst.sNF);
   case 'SW',  inst.sNF = 0.2046 * inst.sNF ./ max(inst.sNF);
 end
 
-% DClevel_file = '../inst_data/DClevel_parameters_22July2008.mat';
-% cris_NF_file = '../inst_data/cris_NF_dct_20080617modified.mat';
-% 
-% control = load(DClevel_file);
-% control.NF = load(cris_NF_file);
-% control.NF = control.NF.NF;
-% NF = control.NF;
-% 
-% switch upper(band)
-%   case 'LW',  inst.sNF = NF.lw; v_lo = min(NF.vlw); v_hi = max(NF.vlw);
-%   case 'MW',  inst.sNF = NF.mw; v_lo = min(NF.vmw); v_hi = max(NF.vmw);
-%   case 'SW',  inst.sNF = NF.sw; v_lo = min(NF.vsw); v_hi = max(NF.vsw);
-% end
-%%%%%% end hack block
-
 % divide the complex spectra by the numerical filter
 scene_cxs = scene_cxs ./ inst.sNF;
 space_cxs = space_cxs ./ inst.sNF;
 
-% Compute the DC level "normalization factor".  This is required to make the 
-% sum of the magnitude integral match the unfiltered ZPD count value.
+% Compute the DC level "normalization factor".  This is required to make 
+% the sum of the magnitude integral match the unfiltered ZPD count value.
 norm_factor = 1/(inst.df*inst.npts);
 
-% Compute the DC level
-[Vdc,F_target_minus_space] = DClevel_model(inst.freq,scene_cxs,space_cxs,norm_factor,modEff,vinst,PGAgain);
+% Analog to Digital gain
+gain_AD = 8192/2.5;
 
-% [Vdc,F_target_minus_space] = ...
-%    DClevel_model_dt(inst.freq,v_lo, v_hi, scene_cxs,space_cxs,norm_factor,modEff,vinst,PGAgain);
+% integrate magnitude of scene minus space
+F_scene_minus_space = norm_factor*(2*sum(abs(scene_cxs - space_cxs)));
+
+% get the DC level
+Vdc = (F_scene_minus_space./modEff) ./ (gain_AD .* PGAgain) + Vinst;
 
 % Compute 2*a2*Vdc*CXS as the "linear" cross-term of the quadratic nonlinearity correction
 lincorr_cxs = 2.*a2.*Vdc.*scene_cxs;
@@ -146,47 +136,8 @@ lincorr_cxs = 2.*a2.*Vdc.*scene_cxs;
 sqcorr_cxs = 0;
 
 % Add computed nonlinearity correction to original complex spectrum 
-nlcorr_cxs = scene_cxs + lincorr_cxs + sqcorr_cxs;
+nlc_cxs = scene_cxs + lincorr_cxs + sqcorr_cxs;
 
 % ITT equation
-% nlcorr_cxs = scene_cxs ./ (1 - 2.*a2.*Vdc);
-
-% optional extra output
-if nargout == 2
-  extra.band = band;
-  extra.iFov = iFov;
-  extra.a2 = a2;
-  extra.norm_factor = norm_factor;
-  extra.modEff = modEff;
-  extra.vinst = vinst;
-% extra.pgaGain_now = pgaGain_now;
-  extra.Vdc = Vdc;
-  extra.F_target_minus_space = F_target_minus_space;
-end
-
-%%%%% begin hack block
-% 
-% extra.band = band;
-% extra.iFov = iFov;
-% extra.a2 = a2;
-% extra.norm_factor = norm_factor;
-% extra.modEff = modEff;
-% extra.vinst = vinst;
-% extra.Vdc = Vdc;
-% extra.F_target_minus_space = F_target_minus_space;
-% 
-% [isequaln(extra, extra2), isequaln(nlcorr_cxs, nlcorr_cxs2)]
-% 
-% if ~isequaln(extra, extra2) || ~isequaln(nlcorr_cxs, nlcorr_cxs2)
-%   keyboard
-% end
-% 
-% if strcmp(band, 'MW')
-%   extra, extra2
-%   plot(inst.freq, pcorr2(nlcorr_cxs), inst.freq, pcorr2(nlcorr_cxs2))
-%   legend('new', 'old')
-%   keyboard
-% end
-% 
-%%%%% end hack block
+% nlc_cxs = scene_cxs ./ (1 - 2.*a2.*Vdc);
 

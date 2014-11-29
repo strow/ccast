@@ -14,20 +14,21 @@
 %   resmode  - 'lowres', 'hires1', or 'hires2'
 %   foax     - focal plane off axis angles
 %   frad     - focal plane radii
+%   a2       - a2 weights for nonlinearity correction
 %   
 % OUTPUTS
 %   inst  - instrument parameters
 %   user  - user grid parameters
 %
 % DISCUSSION
-%   Defaults are low res mode and the LLS v33a focal plane.
+%   Defaults are low res, LLS v33a focal plane, and UW a2 weights
 %
 %   Note there are some very slightly different versions of v33a
 %   around.  The values below are from LLS, Feb or Mar 2012, and
 %   agree with the dg_v33a_lw.mat also circulated from around that
 %   time to roughly single precision accuracy, 10e-5 or better.
-%   The values are tabulated in column order, not as the focal 
-%   plane is viewed
+%   The off-axis angles are tabulated as a list, not as the focal
+%   plane is viewed, and are returned as columns.
 %
 % AUTHOR
 %   H. Motteler, 4 Oct 2013
@@ -36,11 +37,16 @@
 function [inst, user] = inst_params(band, wlaser, opts)
 
 band = upper(band);
+
 switch band
   case {'LW', 'MW', 'SW'}
   otherwise
     error(['bad band value ', band])
 end
+
+%--------------
+% set defaults
+%--------------
 
 % default res mode
 resmode = 'lowres';
@@ -64,17 +70,32 @@ end
 % default FOV radius from LLS v33a focal plane
 frad = 0.008403 * ones(9,1);
 
+% default UW FM1 a2 weights for nonlinearity correction
+switch band
+  case 'LW'
+    a2 = [0.01936  0.01433  0.01609  ...
+          0.02192  0.01341  0.01637  ...
+          0.01464  0.01732  0.03045];
+  case 'MW'
+    a2 = [0.00529  0.02156  0.02924  ...
+          0.01215  0.01435  0.00372  ...
+          0.10702  0.04564  0.00256];
+  case 'SW'
+    a2 = zeros(1, 9);
+end
+
 % process input options
 if nargin == 3
   if isfield(opts, 'frad'), frad = opts.frad; end
   if isfield(opts, 'foax'), foax = opts.foax; end
   if isfield(opts, 'resmode'), resmode = opts.resmode; end
+  if isfield(opts, 'a2'), a2 = opts.a2; end
 end
 
 switch resmode
   case {'lowres', 'hires1', 'hires2'}
   otherwise
-    error(['bad opt.resmode value ', resmode])
+    error(['bad resmode value ', resmode])
 end
 
 %------------
@@ -150,16 +171,20 @@ cind = [(cutpt+1:npts)' ; (1:cutpt)'];
 freq = dv * (cutpt:cutpt+npts-1)' + awidth * vbase;
 
 % instrument params
-inst.wlaser = wlaser;
-inst.df     = df;
-inst.npts   = npts;
-inst.vlaser = vlaser;
-inst.dx     = dx;
-inst.opd    = opd;
-inst.dv     = dv;
-inst.cind   = cind;
-inst.freq   = freq;
-inst.band   = band;
+inst.band    = band;
+inst.wlaser  = wlaser;
+inst.df      = df;
+inst.npts    = npts;
+inst.vlaser  = vlaser;
+inst.dx      = dx;
+inst.opd     = opd;
+inst.dv      = dv;
+inst.cind    = cind;
+inst.freq    = freq;
+inst.resmode = resmode;
+inst.foax    = foax(:);
+inst.frad    = frad(:);
+inst.a2      = a2;
 
 % mainly for tests
 inst.awidth = awidth;
@@ -167,7 +192,4 @@ inst.cutpt  = cutpt;
 inst.vdfc   = vdfc;
 inst.vbase  = vbase;
 
-% focal plane params 
-inst.foax = foax(:);
-inst.frad = frad(:);
 

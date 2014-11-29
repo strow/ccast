@@ -10,16 +10,15 @@ addpath ./asl
 addpath ../source
 
 % select day-of-the-year
-doy = '091';
-doy = '121';
+doy = '293';
 
 % get a list of files for this day
-byear = '/asl/data/cris/ccast/sdr60/2014/';  
+byear = '/asl/data/cris/ccast/sdr60/2013/';  
 bdir  = fullfile(byear, doy);
 blist = dir(fullfile(bdir, 'SDR*.mat'));
 
 % choose and load particular file
-fi = 6;
+fi = 58;
 bfile = fullfile(bdir, blist(fi).name);
 load(bfile)
 
@@ -31,7 +30,7 @@ gid = geo.sdr_gid(bi, :);
 si = geo.sdr_ind(bi, :);  
 
 % get the IDPS SDR path and filename
-syear = '/asl/data/cris/sdr60/hdf/2014';
+syear = '/asl/data/cris/sdr60/hdf/2013';
 sdir  = fullfile(syear, doy);
 slist = dir(fullfile(sdir, ['SCRIS_npp_', gid, '*.h5']));
 sfile = fullfile(sdir, slist(end).name);
@@ -53,6 +52,11 @@ wlaser = 773.1301;
 %---------------------------------------
 iFOV = 1;   % select a FOV
 iFOR = 15;  % select a FOR
+
+if L1a_err(iFOR, bi)
+  fprintf(1, 'bad obs, FOR %d scan %d\n', iFOR, bi)
+  return
+end
 
 % bcast spectra
 x1 = vLW';
