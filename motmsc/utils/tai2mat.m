@@ -1,10 +1,8 @@
 %
-% take AIRS TAI to matlab serial date numbers
+% take RTP TAI 58 to matlab date numbers
 %
 
-function sdn = tai2mat(tai)
+function dn = tai2mat(tai58)
 
-spd = 86400;    % seconds per day
-
-sdn = datenum('1 Jan 2000') + tai / spd;
+dn =  datenum('1 Jan 1958') + tai2utc(tai58) / (24 * 60 * 60);
 

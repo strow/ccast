@@ -31,11 +31,6 @@
 
 function ccast_main(doy, year)
 
-% set default year
-if nargin == 1
-  year = 2013;
-end
-
 % year and day-of-year as strings
 ystr = sprintf('%d', year);
 dstr = sprintf('%0.3d', doy);
@@ -52,7 +47,7 @@ addpath ../source
 rhome = '/asl/data/cris/ccast/rdr60_hr/';
 rdir = fullfile(rhome, ystr, dstr);
 flist = dir(fullfile(rdir, 'RDR*.mat'));
-% flist = flist(61:64);
+% flist = flist(59:end);
 
 % path to matlab SDR output files
 shome = '/asl/data/cris/ccast/sdr60_hr/';

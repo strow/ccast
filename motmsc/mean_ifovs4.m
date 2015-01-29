@@ -1,11 +1,12 @@
 %
-% mean_cfovs - compare ccast FOV means over a set of files
+% mean_ifovs - compare noaa FOV means over a set of files
 %
 % specify a set of days (or directories), take the mean and standard
 % deviation for selected FORs for each FOV, and compare these values
 % with the the values for a selected FOV
 %
 
+addpath ./asl
 addpath ./utils
 addpath ../source
 
@@ -19,20 +20,23 @@ aflag = 0;       % set to 1 for ascending
 iref = 5;        % index of reference FOV
 
 % path to SDR year
-syear = '/asl/data/cris/ccast/sdr60_hr/2014';
+syear = '/asl/data/cris/sdr4/hires/2014';
 
 % SDR days of the year
-% sdays = 71;         % high res test 1
-% sdays = 239 : 240;  % high res test 2
-% sdays = 338 : 339;  % 4-5 dec 2014
-  sdays = 340 : 342;  % 6-8 dec 2014
+% sdays = 338 : 339;
+  sdays = 340 : 342;
 
-% get user grid 
+% get user grid
 opts = struct;
 opts.resmode = res;
 [inst, user] = inst_params(band, 774, opts);
 nchan = round((user.v2 - user.v1) / user.dv) + 1;
-vgrid = user.v1 + (0:nchan-1)' * user.dv;
+vgrid = user.v1 + (0:nchan-1) * user.dv;
+
+% NOAA SDR channel frequencies
+ng = 2;  % number of guard chans
+n1 = round((user.v2 - user.v1) / user.dv) + 1;
+vtmp = user.v1 - ng * user.dv + (0 : n1 + 2*ng -1) * user.dv;
 
 % loop initialization
 nFOR = numel(sFOR);
@@ -41,26 +45,45 @@ bw = zeros(nchan * 9, 1);
 bn = 0;
 
 %------------------------
-% loop on days and files 
+% loop on days and files
 %------------------------
 for di = sdays
 
   % loop on SDR files
   doy = sprintf('%03d', di);
-  flist = dir(fullfile(syear, doy, 'SDR*.mat'));
+  flist = dir(fullfile(syear, doy, ['SCRIS_npp_*.h5']));
   for fi = 1 : length(flist);
 
-    % load the SDR data
-    rid = flist(fi).name(5:22);
-    stmp = ['SDR_', rid, '.mat'];
-    sfile = fullfile(syear, doy, stmp);
-    load(sfile)
+    % read the next SDR file
+    sid = flist(fi).name(11:28);
+    sfile = fullfile(syear, doy, flist(fi).name);
+    try 
+      pd = readsdr_rawpd(sfile);
+    catch
+      fprintf(1, 'could not read %s\n', sfile);
+      continue
+    end
+
+    % read the corresponding geo file
+    glist = dir(fullfile(syear, doy, ['GCRSO_npp_', sid, '*.h5']));
+    if isempty(glist)
+      fprintf(1, 'no corresponding geo for %s\n', sid)
+      continue
+    end
+    gtmp = glist(end).name;
+    gfile = fullfile(syear, doy, gtmp);
+    try
+      [geo, gat1] = read_GCRSO(gfile);  
+    catch
+      fprintf(1, 'could not read %s\n', gfile);
+      continue
+    end
 
     % get data and frequency grid for this band
     switch(band)
-      case 'LW', rtmp = rLW; vtmp = vLW(:);
-      case 'MW', rtmp = rMW; vtmp = vMW(:);
-      case 'SW', rtmp = rSW; vtmp = vSW(:);
+      case 'LW', rtmp = pd.ES_RealLW;
+      case 'MW', rtmp = pd.ES_RealMW;
+      case 'SW', rtmp = pd.ES_RealSW;
     end
 
     % keep the standard user grid
@@ -85,9 +108,6 @@ for di = sdays
       end
       for i = 1 : nFOR
         k = nFOR * (j - 1) + i;
-        if L1a_err(i, j)
-          continue
-        end
         if ~isempty(find(isnan(btmp(:, k))))
           continue
         end
@@ -120,10 +140,10 @@ fsuf = sprintf('%s_%s%s', yr, seq2str(sdays), t2);
 
 % print some test stats
 fprintf(1, 'residuals by FOV\n')
-fprintf(1, '%8.4f', rmscol(bavg_diff))
-fprintf(1, '\nccast %s FOV %d, test %s, bn = %d\n', band, iref, fsuf, bn)
+fprintf(1, '%8.4f', rmscol(bavg - bavg(:,iref)*ones(1,9)))
+fprintf(1, '\nnoaa %s FOV %d, test %s, bn = %d\n', band, iref, fsuf, bn)
 
 % save the data
-clear btmp rtmp geo rLW rMW rSW cLW cMW cSW
-save(sprintf('ccast_%s_%s', band, fsuf))
+clear btmp rtmp geo pd
+save(sprintf('noaa_%s_%s', band, fsuf))
 

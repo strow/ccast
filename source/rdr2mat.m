@@ -54,7 +54,7 @@ unix(['mkdir -p ', mout]);
 hlist = dir(fullfile(hsrc, 'RCRIS-RNSCA_npp*.h5'));
 
 % drop 4-scan or smaller files
-ix = find([hlist.bytes] > 7e6);
+ix = find([hlist.bytes] > 8e6);
 hlist = hlist(ix);
 
 if isempty(hlist)
