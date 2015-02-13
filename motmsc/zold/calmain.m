@@ -54,19 +54,30 @@ inst.sNF = specNF(inst, opts.specNF_file);
 rcal = ones(nchan, 9, 30, nscan) * NaN;
 
 % initialize working arrays
-es_nlc = ones(nchan, 9) * NaN;
-sp_nlc = ones(nchan, 9, 2) * NaN;
-it_nlc = ones(nchan, 9, 2) * NaN;
+es_nlc = ones(nchan, 1) * NaN;
+sp_nlc = ones(nchan, 2) * NaN;
+it_nlc = ones(nchan, 2) * NaN;
+
+% local names for some sensor grid params
+vinst = inst.freq;
+wlaser = inst.wlaser;
+band = upper(inst.band);
+
+% local names for some user grid params
+uv1 = user.v1;   % final passband lower bound
+uv2 = user.v2;   % final passband upper bound
+udv = user.dv;   % user-grid dv (for interpolation)
+uvr = user.vr;   % user-grid rolloff
 
 % select band-specific options
-switch inst.band
+switch band
   case 'LW', sfile = opts.LW_sfile;
   case 'MW', sfile = opts.MW_sfile;
   case 'SW', sfile = opts.SW_sfile;
 end
 
 % get SRF matrix for the current wlaser
-Smat = getSRFwl(inst.wlaser, sfile);
+Smat = getSRFwl(wlaser, sfile);
 
 % take the inverse after interpolation
 Sinv = zeros(nchan, nchan, 9);
@@ -74,8 +85,7 @@ for i = 1 : 9
   Sinv(:,:,i) = inv(squeeze(Smat(:,:,i)));
 end
 
-% loop on scans
-for si = 1 : nscan 
+for si = 1 : nscan   % loop on scans
  
   % check that this row has some ES's
   if isnan(max(stime(1:30, si)))
@@ -90,38 +100,38 @@ for si = 1 : nscan
   T_ICT = (sci(ix).T_PRT1 + sci(ix).T_PRT2) / 2;
 
   % Compute predicted radiance from ICT
-  B = ICTradModel(inst.band, inst.freq, T_ICT, sci(ix), eng.ICT_Param, ...
+  B = ICTradModel(band, vinst, T_ICT, sci(ix), eng.ICT_Param, ...
                   1, NaN, 1, NaN);
 
   % copy rIT across 30 columns
   rIT = B.total(:) * ones(1, 30);
 
-  % loop on sweep directions
-  for k = 1 : 2
+  for iFov = 1 : 9  % loop on FOVs
+    for k = 1 : 2   % loop on sweep directions
+ 
+      % do the ICT and space look nonlinearity corrections
+      sp_nlc(:, k) = nlc(inst, iFov, avgSP(:, iFov, k, si), ...
+                                     avgSP(:, iFov, k, si), eng);
 
-    % do the SP and IT nonlinearity corrections
-    sp_nlc(:, :, k) = nlc_vec(inst, avgSP(:, :, k, si), ...
-                                    avgSP(:, :, k, si), eng);
+      it_nlc(:, k) = nlc(inst, iFov, avgIT(:, iFov, k, si), ...
+                                     avgSP(:, iFov, k, si), eng);
+    end    
 
-    it_nlc(:, :, k) = nlc_vec(inst, avgIT(:, :, k, si), ...
-                                    avgSP(:, :, k, si), eng);
-  end
+    for iES = 1 : 30  % loop on ES
 
-  % loop on earth-scenes
-  for iES = 1 : 30
+      % the ES and cal indices have opposite parity
+      k = mod(iES, 2) + 1;
 
-    % the ES and calibration indices have opposite parity
-    k = mod(iES, 2) + 1;
+      % do the ES nonlinearity correction
+      es_nlc = nlc(inst, iFov, rcnt(:, iFov, iES, si), ...
+                              avgSP(:, iFov, k,   si), eng);   
 
-    % do the ES nonlinearity correction
-    es_nlc = nlc_vec(inst, rcnt(:, :, iES, si), ...
-                          avgSP(:, :,  k,  si), eng);   
+      % calculate (ES-SP)/(ICT-SP), accounting for sweep direction
+      rcal(:, iFov, iES, si) = ...
+              (es_nlc - sp_nlc(:,k)) ./ (it_nlc(:,k) - sp_nlc(:,k));
 
-    % calculate (ES-SP)/(ICT-SP), accounting for sweep direction
-    rcal(:, :, iES, si) = ...
-      (es_nlc - sp_nlc(:,:,k)) ./ (it_nlc(:,:,k) - sp_nlc(:,:,k));
-
-  end
+    end     % loop on ES
+  end       % loop on FOVs
 
   % loop on FOVs, apply the bandpass and SA-1 transforms
   % note we are vectorizing in chunks of size nchan x 30 here
@@ -129,15 +139,15 @@ for si = 1 : nscan
 
     rtmp = squeeze(rcal(:,fi,:,si));  
 
-    rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
+    rtmp = bandpass(vinst, rtmp, uv1, uv2, uvr);
 
     rtmp = rIT .* (Sinv(:,:,fi) * rtmp);
 
-    rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
+    rtmp = bandpass(vinst, rtmp, uv1, uv2, uvr);
 
-    [rtmp, vcal] = finterp(rtmp, inst.freq, user.dv);
+    [rtmp, vcal] = finterp(rtmp, vinst, udv);
 
-    rtmp = bandpass(vcal, rtmp, user.v1, user.v2, user.vr);
+    rtmp = bandpass(vcal, rtmp, uv1, uv2, uvr);
 
     % save the current nchan x 30 chunk
     [n,k] = size(rtmp);

@@ -7,7 +7,7 @@ addpath ../davet
 addpath ../source
 
 % load a sample ccast RDR file
-load /asl/data/cris/ccast/rdr60_hr/2015/004/RDR_d20150104_t0804144.mat
+load /asl/data/cris/ccast/rdr60_hr/2015/005/RDR_d20150105_t1948024.mat
 rid = 'd20150104_t0804144';
 
 % process sci and eng packtes
@@ -30,8 +30,8 @@ opts.resmode = 'hires2';
 spec = igm2spec(igmMW, inst);
 
 % select a FOV, FOR, scan, and sweep dir
-iFOV = 1;
-iscan = 20;
+iFOV = 9;
+iscan = 24;
 iES = find(igmSDR == 1 & igmFOR == 16);
 iIT = find(igmSDR == 1 & igmFOR == 0);
 iSP = find(igmSDR == 1 & igmFOR == 31);
