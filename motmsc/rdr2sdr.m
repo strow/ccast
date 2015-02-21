@@ -200,50 +200,21 @@ for fi = 1 : nfile
   % radiometric and spectral calibration
   % -------------------------------------
   
-  ix = ~L1a_err(:);
-
   % get moving averages of SP and IT count spectra
   [avgLWSP, avgLWIT] = movavg_app(rcLW(:, :, 31:34, :), mvspan);
   [avgMWSP, avgMWIT] = movavg_app(rcMW(:, :, 31:34, :), mvspan);
   [avgSWSP, avgSWIT] = movavg_app(rcSW(:, :, 31:34, :), mvspan);
 
-  [rLW, vLW] = calmain(instLW, userLW, rcLW, scTime, ...
-                        avgLWIT, avgLWSP, sci, eng, geo, opts);
+  [rLW, vLW, nLW] = calmain(instLW, userLW, rcLW, scTime, ...
+                            avgLWIT, avgLWSP, sci, eng, geo, opts);
 
-  [rLWx, vLWx] = calmain2(instLW, userLW, rcLW, scTime, ...
-                        avgLWIT, avgLWSP, sci, eng, geo, opts);
+  [rMW, vMW, nMW] = calmain(instMW, userMW, rcMW, scTime, ...
+                            avgMWIT, avgMWSP, sci, eng, geo, opts);
 
-  if ~isclose(rLW(:, :, ix), rLWx(:, :, ix), 4)
-     x1 = squeeze(rLW(:, :, ix)); x2 = squeeze(rLWx(:, :, ix));
-     'LW', max(x1(:) - x2(:))
-  end
-  clear rLW rLWx
+  [rSW, vSW, nSW] = calmain(instSW, userSW, rcSW, scTime, ...
+                            avgSWIT, avgSWSP, sci, eng, geo, opts);
 
-  [rMW, vMW] = calmain(instMW, userMW, rcMW, scTime, ...
-                        avgMWIT, avgMWSP, sci, eng, geo, opts);
-
-  [rMWx, vMWx] = calmain2(instMW, userMW, rcMW, scTime, ...
-                        avgMWIT, avgMWSP, sci, eng, geo, opts);
-  
-  if ~isclose(rMW(:, :, ix), rMWx(:, :, ix), 4)
-     x1 = squeeze(rMW(:, :, ix)); x2 = squeeze(rMWx(:, :, ix));
-     'MW', max(x1(:) - x2(:))
-  end
-  clear rMW rMWx
-
-  [rSW, vSW] = calmain(instSW, userSW, rcSW, scTime, ...
-                        avgSWIT, avgSWSP, sci, eng, geo, opts);
-
-  [rSWx, vSWx] = calmain2(instSW, userSW, rcSW, scTime, ...
-                        avgSWIT, avgSWSP, sci, eng, geo, opts);
-
-  if ~isclose(rSW(:, :, ix), rSWx(:, :, ix), 4)
-     x1 = squeeze(rSW(:, :, ix)); x2 = squeeze(rSWx(:, :, ix));
-     'SW', max(x1(:) - x2(:))
-  end
-  clear rSW rSWx
-
-  continue
+  clear rcLW rcMW rcSW
 
   %-------------------
   % save the SDR data
@@ -252,31 +223,32 @@ for fi = 1 : nfile
   % trim channel sets to user grid plus 2 guard channels
   % and return separate real values and complex residuals
 
-  dv = userLW.dv;
-  ugrid = userLW.v1 - 2*dv : dv : userLW.v2 + 2*dv;
+  ugrid = cris_ugrid(userLW, 2);
   ix = interp1(vLW, 1:length(vLW), ugrid, 'nearest');
   cLW = single(imag(rLW(ix, :, :, :))); 
   rLW = single(real(rLW(ix, :, :, :)));  
+  nLW = nLW(ix, :, :);
   vLW = vLW(ix);
 
-  dv = userMW.dv;
-  ugrid = userMW.v1 - 2*dv : dv : userMW.v2 + 2*dv;
+  ugrid = cris_ugrid(userMW, 2);
   ix = interp1(vMW, 1:length(vMW), ugrid, 'nearest');
   cMW = single(imag(rMW(ix, :, :, :))); 
   rMW = single(real(rMW(ix, :, :, :))); 
+  nMW = nMW(ix, :, :);
   vMW = vMW(ix);
 
-  dv = userSW.dv;
-  ugrid = userSW.v1 - 2*dv : dv : userSW.v2 + 2*dv;
+  ugrid = cris_ugrid(userSW, 2);
   ix = interp1(vSW, 1:length(vSW), ugrid, 'nearest');
   cSW = single(imag(rSW(ix, :, :, :))); 
   rSW = single(real(rSW(ix, :, :, :))); 
+  nSW = nSW(ix, :, :);
   vSW = vSW(ix);
 
   save(sfile, ...
        'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
-       'cLW', 'rLW', 'vLW', 'cMW', 'rMW', 'vMW', 'cSW', 'rSW', 'vSW', ...
-       'scTime', 'sci', 'eng', 'geo', 'L1a_err', 'rid', '-v7.3')
-  
+       'cLW', 'cMW', 'cSW', 'rLW', 'rMW', 'rSW', 'nLW', 'nMW', 'nSW', ...
+       'vLW', 'vMW', 'vSW', 'scTime', 'sci', 'eng', 'geo', 'L1a_err', ...
+       'rid', '-v7.3')
+
 end
 
