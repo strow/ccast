@@ -4,7 +4,7 @@
 
 band = 'LW';
 
-addpath ../davet
+addpath ../davet/zold
 addpath ../source
 
 % UMBC filter

@@ -1,15 +1,22 @@
 %
 % nedn_tab1 -- tabulate unfiltered nedn estimates
 %
+% This script tabulates the ccast NEdN fields nLW, nMW, and nSW 
+% over multiple days, to be used to generate a principal component
+% filter.  The ccast source data should not be filtered or flipped--
+% it should be generated with the calmain nedn filtering and flip
+% statements temporarily commented out.  Output is saved in a file
+% nedn_tab.mat
+%
 
 addpath ./utils
 addpath ../source
 
 % path to SDR year
-syear = '/asl/data/cris/ccast/sdr60_hr_tmp/2015';
+syear = '/asl/data/cris/ccast/sdr60_hr_pc/2015';
 
 % SDR days of the year
-sdays = 15 : 17;
+sdays = 46 : 48;
 
 nLWtab = [];
 nMWtab = [];

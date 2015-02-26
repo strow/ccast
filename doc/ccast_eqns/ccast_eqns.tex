@@ -103,7 +103,7 @@ Alternate calibration equation c1 is
 
 the \cris\ \ils\ for $\fov_i$ can be represented as
 
-\[\int_{\mbox{\tiny FOV}_i} \!\!\!\! w_i(\theta)\, \sinc(2 \pi
+\[\int_{\mbox{\tiny FOV}_i} \!\!\!\! w_i(\theta)\, \psinc(2 \pi
                  d(v - v_0 \cos \theta ))\, d\theta \]
 
 % f_{v_0}(v) = 
@@ -114,8 +114,9 @@ the \cris\ \ils\ for $\fov_i$ can be represented as
   \item $d$ is max \opd
   \item $v$ is frequency
   \item $v_0$ is reference or channel frequency
-  \item $\sinc(x) = sin(x)/x$ for $x \ne 0$,  $1$ for $x = 0$.
-  \item $\sinc(2 \pi d(v - v_0 \cos \theta ))$ gives the ILS for a
+  \item $\psinc(x) = sin(x)/(n \sin(x/n))$ for $x \ne 0$,  $1$ for
+    $x = 0$, where $n$ is the number of points in the sensor grid
+   \item $\psinc(2 \pi d(v - v_0 \cos \theta ))$ gives the ILS for a
     single ray at off-axis angle $\theta$
   \item integration is over the intersection of on-axis arcs with
     $\fov_i$, with $w_i(\theta)$ the length of an intersecting arc

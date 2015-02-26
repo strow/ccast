@@ -1,35 +1,40 @@
 %
 % nedn_tab2 -- save left singular vectors from tabulated NEdN data
 %
+% This script loads nedn_tab.mat from nedn_tab1.m and generates and
+% saves left singular vectors for use in a principal component filter.
+%
 
 % NEdN data
 load nedn_tab
 
 % number of basis vectors
-k = 8;
+kLW = 6;
+kMW = 5;
+kSW = 4;
 
 nLW = length(vLW);
 nMW = length(vMW);
 nSW = length(vSW);
 
-uLW = zeros(nLW, k, 9, 2);
-uMW = zeros(nMW, k, 9, 2);
-uSW = zeros(nSW, k, 9, 2);
+uLW = zeros(nLW, kLW, 9, 2);
+uMW = zeros(nMW, kMW, 9, 2);
+uSW = zeros(nSW, kSW, 9, 2);
 
-for si = 1 : 2     % loop on sweep direction
+for di = 1 : 2     % loop on sweep direction
   for fi = 1 : 9   % loop on FOVs
 
-    nedn = squeeze(nLWtab(:, fi, si, :));
+    nedn = squeeze(nLWtab(:, fi, di, :));
     [u,s,v] = svd(nedn, 0);
-    uLW(:,:,fi,si) = u(:, 1:k);
+    uLW(:,:,fi,di) = u(:, 1:kLW);
 
-    nedn = squeeze(nMWtab(:, fi, si, :));
+    nedn = squeeze(nMWtab(:, fi, di, :));
     [u,s,v] = svd(nedn, 0);
-    uMW(:,:,fi,si) = u(:, 1:k);
+    uMW(:,:,fi,di) = u(:, 1:kMW);
 
-    nedn = squeeze(nSWtab(:, fi, si, :));
+    nedn = squeeze(nSWtab(:, fi, di, :));
     [u,s,v] = svd(nedn, 0);
-    uSW(:,:,fi,si) = u(:, 1:k);
+    uSW(:,:,fi,di) = u(:, 1:kSW);
 
   end
 end
