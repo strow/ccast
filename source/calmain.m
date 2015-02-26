@@ -3,7 +3,7 @@
 %   calmain - main calibration procedure
 %
 % SYNOPSIS
-%   [rcal, vcal, msc] = ...
+%   [rcal, vcal, nedn] = ...
 %      calmain(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
 %
 % INPUTS
@@ -21,7 +21,7 @@
 % OUTPUTS
 %   rcal    - nchan x 9 x 30 x nscan, calibrated radiance
 %   vcal    - nchan x 1 frequency grid
-%   msc     - optional returned parameters
+%   nedn    - nchan x 2 NEdN estimates
 %
 % DISCUSSION
 %   The calibration equation is
@@ -41,8 +41,12 @@
 %   H. Motteler, 26 Apr 2012
 %
 
-function [rcal, vcal, msc] = ...
+function [rcal, vcal, nedn] = ...
      calmain(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts)
+
+%-------------------
+% calibration setup
+%-------------------
 
 % get the spectral space numeric filter
 inst.sNF = specNF(inst, opts.specNF_file);
@@ -57,6 +61,13 @@ rcal = ones(nchan, 9, 30, nscan) * NaN;
 es_nlc = ones(nchan, 9) * NaN;
 sp_nlc = ones(nchan, 9, 2) * NaN;
 it_nlc = ones(nchan, 9, 2) * NaN;
+
+% NEdN setup
+rICT = ones(nchan, 9, 2, nscan) * NaN;
+sp_all = rcnt(:, :, 31:32, :);
+it_all = rcnt(:, :, 33:34, :);
+sp_mean = nanmean(sp_all, 4);
+it_mean = nanmean(it_all, 4);
 
 % select band-specific options
 switch inst.band
@@ -74,7 +85,10 @@ for i = 1 : 9
   Sinv(:,:,i) = inv(squeeze(Smat(:,:,i)));
 end
 
+%---------------
 % loop on scans
+%---------------
+
 for si = 1 : nscan 
  
   % check that this row has some ES's
@@ -89,12 +103,16 @@ for si = 1 : nscan
   % compute ICT temperature
   T_ICT = (sci(ix).T_PRT1 + sci(ix).T_PRT2) / 2;
 
-  % Compute predicted radiance from ICT
+  % compute predicted radiance from ICT
   B = ICTradModel(inst.band, inst.freq, T_ICT, sci(ix), eng.ICT_Param, ...
                   1, NaN, 1, NaN);
 
   % copy rIT across 30 columns
   rIT = B.total(:) * ones(1, 30);
+
+  %-------------------------
+  % earth scene calibration
+  %-------------------------
 
   % loop on sweep directions
   for k = 1 : 2
@@ -107,7 +125,7 @@ for si = 1 : nscan
                                     avgSP(:, :, k, si), eng);
   end
 
-  % loop on earth-scenes
+  % loop on earth scenes
   for iES = 1 : 30
 
     % the ES and calibration indices have opposite parity
@@ -123,32 +141,58 @@ for si = 1 : nscan
 
   end
 
-  % loop on FOVs, apply the bandpass and SA-1 transforms
-  % note we are vectorizing in chunks of size nchan x 30 here
+  % loop on FOVs
   for fi = 1 : 9
 
+    % apply the bandpass and SA-1 transform
     rtmp = squeeze(rcal(:,fi,:,si));  
-
     rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
-
     rtmp = rIT .* (Sinv(:,:,fi) * rtmp);
-
     rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
-
     [rtmp, vcal] = finterp(rtmp, inst.freq, user.dv);
 
-    rtmp = bandpass(vcal, rtmp, user.v1, user.v2, user.vr);
-
     % save the current nchan x 30 chunk
-    [n,k] = size(rtmp);
-    n = min(n, nchan);
-    rcal(1:n,fi,:,si) = rtmp(1:n, :);
+    [n, k] = size(rtmp);
+    mchan = min(n, nchan);
+    rcal(1:mchan, fi, :, si) = rtmp(1:mchan, :);
 
-  end      % loop on FOVs
-end        % loop on scans
+  end
 
-% trim to interpolated channel set
-vcal = vcal(1:n);
-rcal = rcal(1:n, :, :, :);
-msc = struct;
+  %---------------------------
+  % IT calibration (for NEdN)
+  %---------------------------
+
+  % calculate (IT(i) - SP) / (IT - SP) for both sweep directions
+  rICT(:,:,:,si) = (it_all(:,:,:,si) - sp_mean) ./ (it_mean - sp_mean);
+
+  % loop on FOVs
+  for fi = 1 : 9
+
+    % apply the bandpass and SA-1 transforms
+    rtmp = squeeze(rICT(:, fi, :, si));
+    rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
+    rtmp = rIT(:, 1:2) .* (Sinv(:,:,fi) * rtmp);
+    rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
+    [rtmp, it_vcal] = finterp(rtmp, inst.freq, user.dv);
+
+    % save the current nchan x 2 chunk
+    rICT(1:mchan, fi, :, si) = rtmp(1:mchan, :);
+
+  end
+end
+
+%-----------
+% finish up
+%-----------
+
+% trim outputs to interpolated channel set
+vcal = vcal(1:mchan);
+rcal = rcal(1:mchan, :, :, :);
+rICT = rICT(1:mchan, :, :, :);
+
+% NEdN is the standard deviation of rICT
+nedn = nanstd(real(rICT), 0, 4);
+
+% apply principal component filter to NEdN 
+nedn = nedn_filt(user, opts.nedn_filt, vcal, nedn);
 

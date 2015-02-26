@@ -44,13 +44,13 @@ addpath ../davet
 addpath ../source
 
 % path to matlab RDR input files
-rhome = '/asl/data/cris/ccast/rdr60_hr/';
+rhome = '/asl/data/cris/ccast/rdr60_hr';
 rdir = fullfile(rhome, ystr, dstr);
 flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(59:end);
 
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/sdr60_hr/';
+shome = '/asl/data/cris/ccast/sdr60_hr';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
@@ -75,6 +75,9 @@ opts.SW_sfile = '../inst_data/SRF_v33a_HR2_Pn_SW.mat';  % SW SRF table
 
 % time-domain FIR filter 
 opts.specNF_file = '../inst_data/FIR_19_Mar_2012.txt';
+
+% principal component NEdN filter
+opts.nedn_filt = '../inst_data/nedn_filt_HR2.mat';
 
 %--------------------------------
 % process matlab RDR to SDR data 

@@ -15,8 +15,10 @@ res = 'hires2';  % lowres, hires1, hires2
 % specify a NOAA SDR file
 spath = '/asl/data/cris/sdr4/hires/2015/046';
 % sfile = 'SCRIS_npp_d20150215_t0215139_e0215437_b17106_c20150215173025525829_star_f01.h5';
-  sfile = 'SCRIS_npp_d20150215_t0448179_e0448477_b17107_c20150215180726084685_star_f01.h5';
+% sfile = 'SCRIS_npp_d20150215_t0448179_e0448477_b17107_c20150215180726084685_star_f01.h5';
 % sfile = 'SCRIS_npp_d20150215_t0615459_e0616157_b17108_c20150215183704208414_star_f01.h5';
+  sfile = 'SCRIS_npp_d20150215_t2006339_e2007037_b17116_c20150216040716829437_star_f01.h5';
+
 sboth = fullfile(spath, sfile);
 dstr = '2015-02-15';
 
