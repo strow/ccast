@@ -76,7 +76,7 @@ opts.SW_sfile = '../inst_data/SRF_v33a_HR2_Pn_SW.mat';  % SW SRF table
 % time-domain FIR filter 
 opts.specNF_file = '../inst_data/FIR_19_Mar_2012.txt';
 
-% principal component NEdN filter
+% NEdN principal component filter
 opts.nedn_filt = '../inst_data/nedn_filt_HR2.mat';
 
 %--------------------------------

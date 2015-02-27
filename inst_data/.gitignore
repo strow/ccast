@@ -1,6 +1,11 @@
 #
-# bcast/inst_data git ignore file
+# ccast/inst_data git ignore file
 #
+
+!FIR_19_Mar_2012.txt
+!btrim_hires2.mat
+!leap-seconds.list
+!nedn_filt_HR2.mat
 
 zold
 

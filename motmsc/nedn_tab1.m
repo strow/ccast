@@ -3,11 +3,9 @@
 %
 % This script tabulates the ccast NEdN fields nLW, nMW, and nSW 
 % over multiple days, to be used to generate a principal component
-% filter.  The ccast source data should not be filtered or flipped--
-% it should be generated with the calmain nedn filtering and flip
-% statements temporarily commented out.  Output is saved in a file
-% nedn_tab.mat
-%
+% filter.  The ccast source data should begenerated with the calmain
+% nedn filtering statements temporarily commented out.  Output is
+% saved to nedn_tab.mat
 
 addpath ./utils
 addpath ../source

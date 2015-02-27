@@ -31,9 +31,3 @@ end
 nbase = round((user.v2 - user.v1) / user.dv) + 1;
 ugrid = user.v1 - ng * user.dv + (0 : nbase + 2*ng -1) * user.dv;
 
-tgrid = user.v1 - ng*user.dv : user.dv : user.v2 + ng*user.dv;
-
-if ~isclose(ugrid, tgrid)
- error('frequency grid mismatch')
-end
-

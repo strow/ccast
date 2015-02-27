@@ -69,12 +69,15 @@ opts.geofile = geofile;   % geo filename for this doy
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 
 % instrument SRF files
-opts.LW_sfile = '../inst_data/SRF_v33aLR_LW.mat';  % LW SRF table
-opts.MW_sfile = '../inst_data/SRF_v33aLR_MW.mat';  % MW SRF table
-opts.SW_sfile = '../inst_data/SRF_v33aLR_SW.mat';  % SW SRF table
+opts.LW_sfile = '../inst_data/SRF_v33a_LR_Pn_LW.mat';  % LW SRF table
+opts.MW_sfile = '../inst_data/SRF_v33a_LR_Pn_MW.mat';  % MW SRF table
+opts.SW_sfile = '../inst_data/SRF_v33a_LR_Pn_SW.mat';  % SW SRF table
 
 % time-domain FIR filter 
 opts.specNF_file = '../inst_data/FIR_19_Mar_2012.txt';
+
+% NEdN principal component filter
+opts.nedn_filt = '../inst_data/nedn_filt_LR.mat';
 
 %--------------------------------
 % process matlab RDR to SDR data 
