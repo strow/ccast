@@ -3,11 +3,11 @@
 %   scipack - process science packet data
 %
 % SYNOPSIS
-%   [sci, eng] = scipack(d1, eng1)
+%   [sci, eng] = scipack(d1, engp)
 %
 % INPUTS
 %   d1   - output structure from MIT reader
-%   eng1 - previous eng packet
+%   engp - previous eng packet
 %
 % OUTPUTS
 %   sci  - calculated and saved sci packet data
@@ -18,7 +18,7 @@
 %   not include any eng data
 %
 
-function [sci, eng] = scipack(d1, eng1)
+function [sci, eng] = scipack(d1, engp)
 
 % factor to convert MIT time to IET, t_mit * mwt = t_ngas
 mwt = 8.64e7;
@@ -33,33 +33,34 @@ if d1.packet.read_four_min_packet && ~d1.packet.error
   eng = rmfield(d1.packet, ftmp);
   eng.four_min_eng.time = eng.four_min_eng.time * mwt;
 else
-  eng = eng1;
+  eng = engp;
 end
 
-% if no eng data just return, the temp functions below need this
+% initialize sci to empty
+sci = [];
+
+% quit if no eng data
 if isempty(eng)
-  sci = struct([]);
   return
 end
 
+% quit if no sci data
 nsci = ztail(d1.data.sci.Temp.time);
-sci = struct();
+if isempty(nsci) || nsci == 0
+  return
+end
+
+% return selected sci values
+sci = struct;
 sci.time = mwt * d1.data.sci.Temp.time(1:nsci);
 sci = soa2aos(sci);
 
-% hack the current MIT reader structure to guarantee it contains a
-% valid eng packet for Dave T's procedures
-d1.packet = eng;
-
 % Compute ICT temps
-ict_temps = ICT_countsToK(d1.data.sci.Temp, ...
-                          d1.packet.TempCoeffs, ...
-                          nsci);
+ict_temps = ICT_countsToK(d1.data.sci.Temp, eng.TempCoeffs, nsci);
 
 % Compute other instr temps
-instr_temps = calc_instrument_temps(d1.data.sci.Temp.Temp, ...
-                                    d1.packet.TempCoeffs, ...
-                                    nsci);
+instr_temps = ...
+    calc_instrument_temps(d1.data.sci.Temp.Temp, eng.TempCoeffs, nsci);
 
 % Create array of structures
 sci = soa2aos(ict_temps, sci);

@@ -46,12 +46,8 @@ d = a + r2 - b;         % integral angle span
 
 % find integration weights
 r1 = b : d/(narc-1) : a + r2;      % integral discrete angle steps
-if a > 0
-  x = (a^2 + r1.^2 - r2^2) / (2*a);  % x val of FOV and arc intersection
-  alpha = real(acos(x ./ r1));       % angle to FOV and arc intersection 
-else
-  alpha = [ones(1,narc-1) * pi, 0];  % limit a -> 0
-end
+x = (a^2 + r1.^2 - r2^2) / (2*a);  % x val of FOV and arc intersection
+alpha = real(acos(x ./ r1));       % angle to FOV and arc intersection 
 w = alpha .* r1;                   % integral half-arc lengths
 w = w / sum(w);                    % normalize the weights
 

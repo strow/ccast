@@ -5,7 +5,7 @@
 %
 
 % NEdN data
-load nedn_tab
+load nedn_tab_LR
 
 % parameters
 di = 1;     % sweep direction (1 or 2)
@@ -42,7 +42,7 @@ legend('LW', 'MW', 'SW')
 xlabel('index')
 ylabel('weight')
 grid on; zoom on
-saveas(gcf, 'singular_values', 'png') 
+% saveas(gcf, 'singular_values', 'png') 
 
 % LW left-singular vectors
 figure(2); clf
@@ -53,7 +53,7 @@ legend('1', '2', '3', '4', 'location', 'southeast')
 xlabel('wavenumber')
 ylabel('weight')
 grid on; zoom on
-saveas(gcf, 'LW_sing_vecs', 'png') 
+% saveas(gcf, 'LW_sing_vecs', 'png') 
 
 % MW left-singular vectors
 figure(3); clf
@@ -64,7 +64,7 @@ legend('1', '2', '3', '4', 'location', 'southwest')
 xlabel('wavenumber')
 ylabel('weight')
 grid on; zoom on
-saveas(gcf, 'MW_sing_vecs', 'png') 
+% saveas(gcf, 'MW_sing_vecs', 'png') 
 
 % SW left-singular vectors
 figure(4); clf
@@ -75,7 +75,7 @@ legend('1', '2', '3', '4', 'location', 'south')
 xlabel('wavenumber')
 ylabel('weight')
 grid on; zoom on
-saveas(gcf, 'SW_sing_vecs', 'png') 
+% saveas(gcf, 'SW_sing_vecs', 'png') 
 
 % LW pre and post filter
 figure(5); clf
@@ -86,7 +86,7 @@ legend('pre filter', 'post filter')
 xlabel('wavenumber')
 ylabel('d rad')
 grid on; zoom on
-saveas(gcf, 'LW_pre_post', 'png') 
+% saveas(gcf, 'LW_pre_post', 'png') 
 
 % MW pre and post filter
 figure(6); clf
@@ -97,7 +97,7 @@ legend('pre filter', 'post filter', 'location', 'northwest')
 xlabel('wavenumber')
 ylabel('d rad')
 grid on; zoom on
-saveas(gcf, 'MW_pre_post', 'png') 
+% saveas(gcf, 'MW_pre_post', 'png') 
 
 % SW pre and post filter
 figure(7); clf
@@ -108,4 +108,5 @@ legend('pre filter', 'post filter', 'location', 'southeast')
 xlabel('wavenumber')
 ylabel('d rad')
 grid on; zoom on
-saveas(gcf, 'SW_pre_post', 'png') 
+% saveas(gcf, 'SW_pre_post', 'png') 
+

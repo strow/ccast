@@ -3,7 +3,7 @@
 %
 % This script tabulates the ccast NEdN fields nLW, nMW, and nSW 
 % over multiple days, to be used to generate a principal component
-% filter.  The ccast source data should begenerated with the calmain
+% filter.  The ccast source data should be generated with the calmain
 % nedn filtering statements temporarily commented out.  Output is
 % saved to nedn_tab.mat
 
@@ -11,10 +11,12 @@ addpath ./utils
 addpath ../source
 
 % path to SDR year
-syear = '/asl/data/cris/ccast/sdr60_hr_pc/2015';
+% syear = '/asl/data/cris/ccast/sdr60_hr_pc/2015';
+  syear = '/asl/data/cris/ccast/sdr60_pc/2014';
 
 % SDR days of the year
-sdays = 46 : 48;
+% sdays = 46 : 48;
+  sdays = 254 : 256;
 
 nLWtab = [];
 nMWtab = [];
@@ -43,5 +45,6 @@ for di = sdays
   fprintf(1, '\n')
 end
 
-save nedn_tab vLW vMW vSW nLWtab nMWtab nSWtab
+% save nedn_tab_HR2 vLW vMW vSW nLWtab nMWtab nSWtab
+  save nedn_tab_LR vLW vMW vSW nLWtab nMWtab nSWtab
 

@@ -77,7 +77,7 @@ opts.SW_sfile = '../inst_data/SRF_v33a_LR_Pn_SW.mat';  % SW SRF table
 opts.specNF_file = '../inst_data/FIR_19_Mar_2012.txt';
 
 % NEdN principal component filter
-opts.nedn_filt = '../inst_data/nedn_filt_HR2.mat';
+opts.nedn_filt = '../inst_data/nedn_filt_LR.mat';
 
 %--------------------------------
 % process matlab RDR to SDR data 

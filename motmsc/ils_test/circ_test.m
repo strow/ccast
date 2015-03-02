@@ -9,10 +9,13 @@ ifov = 5;              % select a FOV
 a  = inst.foax(ifov);  % FOV off-axis angle
 r2 = inst.frad(ifov);  % FOV radius
 
+% a = a / 1e6
+a = 0;
+
 % a = 1;    % FOV off-axis angle (test value)
 % r2 = 2;   % FOV radius (test value)
 
-n = 100;  % FOV arc slices
+n = 1000;  % FOV arc slices
 
 b = max(0, a - r2);   % min off-axis angle  
 d = a + r2 - b;       % integral angle span
@@ -24,7 +27,11 @@ r1 = b : d/(n-1) : a + r2;
 x = (a^2 + r1.^2 - r2^2) / (2*a);
 
 % angle to FOV and arc intersection 
-alpha = real(acos(x ./ r1));
+if a > 0
+  alpha = real(acos(x ./ r1));
+else
+  alpha = [ones(1,n-1) * pi, 0];  % limit a -> 0
+end
 
 % integral half-arc lengths
 w = alpha .* r1;

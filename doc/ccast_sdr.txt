@@ -2,7 +2,7 @@
 ccast SDR format
 -----------------
 
-H. Motteler, 2 Sep 2014
+H. Motteler, 1 Mar 2015
 
 
 The ccast SDR files are saved in HDF 5 format with the Matlab
@@ -12,8 +12,8 @@ with standard tools and libs.  See the CrIS User's Guide [1] for
 background and details on the geo fields.
 
 
-Matlab variables
------------------
+Variables and structs
+----------------------
 
   rLW        nchan x 9 x 30 x nscan       LW radiance data
   rMW        nchan x 9 x 30 x nscan       MW radiance data
@@ -26,6 +26,10 @@ Matlab variables
   vLW              nchan x 1              LW frequency grid
   vMW              nchan x 1              MW frequency grid
   vSW              nchan x 1              SW frequency grid
+
+  nLW            nchan x 9 x 2            LW NEdN estimate
+  nMW            nchan x 9 x 2            MW NEdN estimate
+  nSW            nchan x 9 x 2            SW NEdN estimate
 
   geo              structure              GCRSO geo values
   scTime           34 x nscan             instrument time
@@ -54,8 +58,11 @@ the edges of each band.  nscan is typically 60 but can be less if
 there are gaps in the data.
 
 cLW, cMW, cSW - nchan x 9 x 30 x nscan arrays of complex residuals.
-The interpretation may depend on the particular calibration equation
-being used.
+The interpretation may depend on the form of the calibration equation
+
+nLW, nMW, nSW - nchan x 9 x 2 NEdN estimates.  The last dimension is
+sweep direction.  These are computed once per granule, for both sweep  
+directions, and separately for each FOV.
 
 geo - geolocation data.  See [1] and the geo subsection, below.
 
@@ -65,7 +72,8 @@ skipped and the L1a processing continues with the next file.
 
 scTime - 34 x nscan array of instrument internal time, currently
 around 35 seconds behind real time.  This is IET time but returned
-here as milliseconds since 1958.
+here as milliseconds since 1958.  For most applications users will
+want geo.FORtime.
 
 userLW, userMW, userSW - the user grid parameters, for each band.
 The sensor grid is translated to these specs.  The fields are
@@ -154,25 +162,19 @@ processing.
 Note on time fields
 --------------------
 
-geo.FORTime is the corrected obs times.  But scTime is better as a
-valid data indicator, it is authoritative for that because it is the
-sort and merge of all individual obs times that are actually found
-in the RDR file, while geo.FORTime is taken from the GCRSO files.
+geo.FORTime is IET time for each FOR, from the NOAA GCRSO files.  
+scTime is instrument time.  This is from the CCSDS packet secondary
+headers (from the RDR files) where it is saved as days, ms/day, and
+us/ms.  The CCSDS/RDR to GCRSO time offset is currently
 
-Currently the RDR to SDR time offset is
+  dtRDR  =  34817  =  34 * 1000 + 817  =  2817 + 4 * 8000 ms
 
-  dtRDR = 2817 + 4 * 8000;
-
-that is, four scans plus an arbitrary shift of less than a scan.  
-To verify this I first look at the phase of the RDR scan times.  
-The scans make a distinct pattern--30 obs, slew, space look, slew,
-ICT look, slew.  I use this to match times modulo the scan number.
-Matching GCRSO/SDR scans with RDR scans is then relatively easy.
-
-On 1 July 2012 the delay increased by 1 second and seems to have 
-been stable since then.  The procedure geo_match prints a warning 
-if the GCRSO and corrected RDR times differ by more than 1 ms, and 
-so did detect the 1 sec shift.
+That is, we can represent it as 34 leap seconds plus an 817 ms
+offset, or as four scans plus an arbitrary shift of less than a
+scan.  To verify this I look at the phase of the RDR scan times.
+These make a distinct pattern--30 obs, slew, space look, slew, 
+ICT look, slew.  I used this to match times mod the scan number.
+Matching entire GCRSO/SDR and RDR scans is then relatively easy.
 
 
 References
