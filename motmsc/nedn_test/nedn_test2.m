@@ -4,16 +4,16 @@
 
 addpath ./utils
 addpath ../source
-addpath ../../airs_decon/source
+addpath /asl/packages/airs_decon/source
 
 %-----------------
 % test parameters
 %-----------------
 band = upper(input('band > ', 's'));
-res = 'lowres';  % lowres, hires1, hires2
+res = 'hires2';  % lowres, hires1, hires2
 
 % specify a ccast SDR file
-% cpath = '/asl/data/cris/ccast/sdr60_hr_t1/2015/046';
+  cpath = '/asl/data/cris/ccast/sdr60_hr_t1/2015/046';
 % cfile = 'SDR_d20150215_t0214362.mat';
 % cfile = 'SDR_d20150215_t0446353.mat';
 % cfile = 'SDR_d20150215_t0614348.mat';
@@ -22,7 +22,7 @@ res = 'lowres';  % lowres, hires1, hires2
 % cfile = 'SDR_d20150215_t0638347.mat';  % 0.120
 % cfile = 'SDR_d20150215_t0646346.mat';  % 0.102
 % cfile = 'SDR_d20150215_t0654346.mat';  % 0.110
-% cfile = 'SDR_d20150215_t2006301.mat';  % 0.090
+  cfile = 'SDR_d20150215_t2006301.mat';  % 0.090
 
 % cpath = '/asl/data/cris/ccast/sdr60_hr_t1/2015/047';
 % cfile = 'SDR_d20150216_t0142283.mat';
@@ -36,9 +36,9 @@ res = 'lowres';  % lowres, hires1, hires2
 % cfile = 'SDR_d20150217_t0222199.mat';
 % cfile = 'SDR_d20150217_t0230199.mat';
 
-  cpath = '/asl/data/cris/ccast/sdr60/2014/300';
+% cpath = '/asl/data/cris/ccast/sdr60/2014/300';
 % cfile = 'SDR_d20141027_t1213320.mat';
-  cfile = 'SDR_d20141027_t1221319.mat';
+% cfile = 'SDR_d20141027_t1221319.mat';
 
 cboth = fullfile(cpath, cfile);
 dstr = '2015-02-15';
