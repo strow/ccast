@@ -1,0 +1,188 @@
+\documentclass[11pt]{beamer}
+\usetheme{default}
+\input{crisdefs.tex}
+
+\newcommand {\rin}   {r_{\mbox{\tiny in}}}
+\newcommand {\rsp}   {r_{\mbox{\tiny sp}}}
+\newcommand {\rout}  {r_{\mbox{\tiny out}}}
+\newcommand {\rins}  {r_{\mbox{\tiny in}}^{\mbox{\tiny s}}}
+\newcommand {\rsps}  {r_{\mbox{\tiny sp}}^{\mbox{\tiny s}}}
+\newcommand {\routs} {r_{\mbox{\tiny out}}^{\mbox{\tiny s}}}
+\newcommand {\cm}    {c_{\mbox{\tiny m}}}
+\newcommand {\cp}    {c_{\mbox{\tiny p}}}
+\newcommand {\ca}    {c_{\mbox{\tiny a}}}
+\newcommand {\vinst} {v_{\mbox{\tiny inst}}}
+\newcommand {\vdc}   {v_{\mbox{\tiny dc}}}
+\newcommand {\fn}    {f_{\mbox{\tiny N}}}
+\newcommand {\fnm}   {f_{\mbox{\tiny NM}}}
+
+\title{some notes on the \\
+  ccast nonlinearity correction}
+\author{H.~E.~Motteler}
+\institute{
+  UMBC Atmospheric Spectroscopy Lab \\
+  Joint Center for Earth Systems Technology \\
+}
+\date{\today}
+\begin{document}
+
+%----------- slide --------------------------------------------------%
+\begin{frame}[plain]
+\titlepage
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{nonlinearity correction}
+
+\begin{itemize}
+ 
+ \item let $/$ be pointwise division, and
+     \[\rins = \rin / \fn\]
+     \[\rsps = \rsp / \fn\]
+
+  \item the DC level is given by
+    \[\vdc = \vinst + 
+      \frac{2\cdot \sum_{i=1}^n|{\rins} - {\rsps}|} 
+           {\cm \cdot \ca \cdot \cp \cdot d\cdot n}\]
+
+  \item the corrected radiances (scaled by $\fn$) are
+    \[\routs = \rins \cdot (1 + 2\cdot a_2 \cdot \vdc)\]
+
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{$\fn$ scaling}
+
+\begin{itemize}
+  \item now suppose we have a scaling factor $w$ for $\fn$, so that
+     \[{\rins}' = \rin / (w \cdot \fn)\]
+     \[{\rsps}' = \rsp / (w \cdot \fn)\]
+
+  \item then the DC level is 
+    \[{\vdc}' = \vinst + 
+      \frac{2\cdot \sum_{i=1}^n|{\rins} - {\rsps}|} 
+           {w \cdot \cm \cdot \ca \cdot \cp \cdot d\cdot n}\]
+
+  \item and the corrected radiances (scaled by $\fn$) are
+    \[{\routs}' = \rins \cdot (1 + 2\cdot a_2 \cdot \vdc')\]
+
+  \item note that ${\vdc}'$ and ${\routs}'$ are both functions of $w$
+
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{parameters}
+
+\begin{itemize}
+  \item $\rin$ is scene count spectra
+  \item $\rsp$ is space-look count spectra
+  \item $n$ is the number of decimated points
+  \item $d$ is the decimation factor
+  \item $\cm$ is modulation efficiency
+  \item $\cp$ is PGA gain 
+  \item $\ca$ is A/D gain
+  \item $\vinst$ instrument contribution to DC level
+  \item $\vdc$ is estimated DC level
+  \item $\fn$ is the numeric filter at the sensor grid
+  \item $a_2$ are the correction parameters
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{discussion}
+
+\begin{itemize}
+  \item the formulas here were reverse engineered from \uw\ code
+
+  \item early versions of both \umbc\ and \uw\ \ccast\ used a
+    frequency domain representation of $\fn$ from \uw
+
+  \item after the Aug 2013 high res test \umbc\ switched to a time
+    domain representation, with weights (I think) from Joe Predina
+    and transform to the sensor grid from Dan Mooney
+    
+  \item the nonlinearity correction did not work correctly until we
+    scaled the new filters to match the norms of the 2008 \uw\ filters,
+    \begin{description}
+      \item[\small LW:]  $\fn' = 1.6047 \cdot \fn / \max(\fn)$
+      \item[\small MW:]  $\fn' = 0.9826 \cdot \fn / \max(\fn)$
+      \item[\small SW:]  $\fn' = 0.2046 \cdot \fn / \max(\fn)$
+    \end{description}
+    Here $\fn$ was the transform from the time domain, before any
+    scaling
+
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}[fragile]
+\frametitle{discussion}
+
+\begin{itemize}
+  \item the transform from time to frequency preserves any scaling
+    factor
+
+  \item so our problem was probably just that the weights we were
+    starting from did not have the correct scaling or normalization
+
+  \item the following figures show the filters before any scaling
+
+  \item the following Matlab code is Dan's filter transform demo.
+    \texttt{\small filt} is the time and \texttt{\small sfilt} the
+    frequency representation at the sensor grid
+
+\end{itemize}
+
+\begin{semiverbatim}\small
+  S = fft(filt, inst.npts * inst.df);
+  I = ifft(S);
+  S1 = fft(I(1 : inst.df : inst.npts * inst.df)) * inst.df;
+  S2 = circshift(S1, [-inst.cutpt, 0]);
+  sfilt = abs(S2);
+\end{semiverbatim}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{LW numeric filters}
+
+\begin{center}
+  \includegraphics[scale=0.6]{figures/filters_LW.pdf}
+\end{center}
+
+LW filters from UW 2008 frequency domain and MIT 2012 time domain
+representations
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{MW numeric filters}
+
+\begin{center}
+  \includegraphics[scale=0.6]{figures/filters_MW.pdf}
+\end{center}
+
+MW filters from UW 2008 frequency domain and MIT 2012 time domain
+representations
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{SW numeric filters}
+
+\begin{center}
+  \includegraphics[scale=0.6]{figures/filters_SW.pdf}
+\end{center}
+
+SW filters from UW 2008 frequency domain and MIT 2012 time domain
+representations
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\end{document}
+

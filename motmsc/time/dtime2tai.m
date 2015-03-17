@@ -12,8 +12,10 @@
 %   tai   - TAI time, seconds from 1 Jan 1958
 %
 % DISCUSSION
-%   under development.  good agreement with utc2tai * mat2utc for
-%   scalar values, no vector tests yet.  need matching tai2dtime
+%   dependds on undocumented features of datetime
+%
+% AUTHOR
+%   H. Motteler, 15 Mar 2015
 %
 
 function tai = dtime2tai(dtime);

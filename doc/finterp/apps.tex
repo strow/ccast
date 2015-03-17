@@ -1,0 +1,27 @@
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{ASL applications}
+
+\begin{itemize}
+  \item finterp.m is a general purpose interpolation routine, now
+    part of the ccast package where it is used to interpolate data
+    from the sensor to the user grid.  Although it is from 1999, it
+    implements all of the ideas above.
+  \item kc2cris.m is the latest in a long family of routines with
+    the calibration laser frequency or wavelength as a parameter,
+    which in turn fixes $dx$.  The intended application is kcarta
+    interpolation to the CrIS sensor grid.  kc2cris does not use the
+    $dv_1 / dv_2$ ratio to set transform sizes, instead it chooses a
+    power of 2 such that $dv_1 <= dvk$, the kcarta step size, and
+    interpolates from the $dvk$ to the $dv_1$ grids as a preliminary
+    step.
+  \item the old fconvkc family of routines.  These are similar to
+    kc2cris but may also have a constraint on max transform size.
+\end{itemize}
+    
+For applications such as convolving kcarta radiances to a more
+regular user grid (rather than the sensor grid) $dv_1 / dv_2$ will
+typically have a tractable rational representation, allowing for 
+an exact interpolation.
+
+\end{frame}

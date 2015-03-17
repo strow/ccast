@@ -1,22 +1,31 @@
 % 
-% test of dtm2utc
+% datetime test, try to go back from TAI 58 to datetime
 %
 
-% d1 = [2012  6 30 23 59 59];
-% d1 = [2012  7  1  0  0  0];
-% d1 = [1972  7  1 13 31 19];
-% d1 = [1971 12 31 23 59 59];
-% d1 = [1972  1  1  0  0  0];
-% d1 = [1994  3 13  7 33 13];
-  d1 = [2015  6  3 23 59  9];
+% Set a TAI time
+tai = 12784 * 86400 + 27;         % 1 jan 1993 00:00:00
+tai = 19754 * 86400 + 34 + 130;   % 1 feb 2012 00:02:10
 
-t1 = utc2tai(mat2utc(datenum(d1)));
+% regular UTC base time
+U58 = datetime('1958-01-01');
+U58.Second = tai;
+datestr(U58)
 
-t2 = dtime2tai(datetime(d1));
+% UTC base with leap seconds
+L58 = datetime('1958-01-01T00:00:00.000Z','timezone','UTCLeapSeconds');
+L58.Second = tai;
+datestr(L58)
 
-if isequal(t1, t2)
-  fprintf(1, 'residual is zero\n')
-else
-  fprintf(1, 'residual %.3g seconds\n', t2 - t1)
-end
+% try the conversions
+dt = L58;
+dt.TimeZone = '';
+dt.Year   = L58.Year;
+dt.Month  = L58.Month;
+dt.Day    = L58.Day;
+dt.Hour   = L58.Hour;
+dt.Minute = L58.Minute;
+dt.Second = L58.Second;
+
+datestr(dt)
+
 

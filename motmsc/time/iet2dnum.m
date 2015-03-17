@@ -1,9 +1,9 @@
 %
 % NAME
-%   iet2mat - take IET to Matlab date numbers
+%   iet2dnum - take IET to Matlab date numbers
 %
 % SYNOPSIS
-%   dnum = iet2mat(iet)
+%   dnum = iet2dnum(iet)
 %
 % INPUT
 %   iet   - IET time, microseconds from 1 Jan 1958
@@ -12,7 +12,7 @@
 %   dnum  - Matlab serial date numbers
 %
 
-function dnum = iet2mat(iet)
+function dnum = iet2dnum(iet)
 
 dnum = tai2mat(iet * 1e-6);
 
