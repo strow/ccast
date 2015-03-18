@@ -1,5 +1,5 @@
 % 
-% datetime test, try to go back from TAI 58 to datetime
+% datetime test, try TAI to datetime
 %
 
 % Set a TAI time
@@ -25,7 +25,5 @@ dt.Day    = L58.Day;
 dt.Hour   = L58.Hour;
 dt.Minute = L58.Minute;
 dt.Second = L58.Second;
-
 datestr(dt)
-
 

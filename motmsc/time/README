@@ -1,11 +1,11 @@
 
 time routines
 
-  iet2dnum - take IET to Matlab date numbers
-  tai2dnum - take TAI 58 to Matlab date numbers
-
   tai2utc  - take TAI to UTC by subtracting leap seconds
   utc2tai  - take UTC to TAI by adding leap seconds
+
+  iet2dnum - take IET to Matlab date numbers
+  tai2dnum - take TAI 58 to Matlab date numbers
 
   utc2dnum - take UTC 58 to Matlab date numbers
   dnum2utc - take Matlab date numbers to UTC 58
@@ -18,15 +18,16 @@ time units
   TAI 58, seconds since 1 jan 1958 including leap seconds
   IET, microseconds since 1 jan 1958 including leap seconds
   UTC 58, seconds since 1 jan 1958 assuming 86400 seconds/day
-  Matlab date numbers, days (and fractional days) from year 0
+  Matlab date numbers, days from year 0 with fractional days
+  Matlab "datetime", UTC-style time objects
 
 dependencies
 
-  iet2dnum - calls tai2dnum
-  tai2dnum - calls tai2utc
-
   tai2utc  - conversion w/ NIST leap seconds
   utc2tai  - conversion w/ NIST leap seconds
+
+  iet2dnum - calls tai2dnum
+  tai2dnum - calls tai2utc
 
   utc2dnum - direct conversion
   dnum2utc - direct conversion

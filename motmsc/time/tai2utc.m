@@ -38,7 +38,7 @@ function utc58 = tai2utc(tai58, sfile)
 
 % default leap-seconds file
 if nargin == 1
-  sfile = '../inst_data/leap-seconds.list';
+  sfile = '/asl/packages/ccast/inst_data/leap-seconds.list';
 end
 
 % read the leap seconds file

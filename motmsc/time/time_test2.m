@@ -1,9 +1,10 @@
 %
-% test utc2tai and tai2utc
+% test utc2tai and tai2utc at leap second boundaries
+%
+% note utc2tai and tai2utc return NaN for pre-1972 dates
 %
 
-addpath utils
-
+% leap second boundaries
 d{1}  = '31 dec 1971 23:59:59';
 d{2}  =  '1 jan 1972 00:00:00';
 
@@ -32,9 +33,11 @@ utc58 = (dnum - datenum('1 jan 1958')) * 24 * 60 * 60;
 
 tai58 = utc2tai(utc58);
 
+% show leap second
 tai58 - utc58
 
 utc58b = tai2utc(tai58);
 
+% snow residuals
 utc58 - utc58b
 

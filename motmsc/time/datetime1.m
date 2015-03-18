@@ -1,5 +1,5 @@
 % 
-% datetime demo, show how time differences fail
+% datetime test, show how time differences fail
 %
 
 % regular matlab UTC times
@@ -21,5 +21,5 @@ T93 - dL    % the matlab time diff is wrong by 10 seconds
 
 % try TAI as a datetime param
 Q58 = datetime(1958,1,1,0,0,0);    % identical to U58
-Q93 = datetime(1958,1,1,0,0,T93)   % 01-Jan-1993 00:00:27
+Q93 = datetime(1958,1,1,0,0,T93)   % gives 01-Jan-1993 00:00:27
 
