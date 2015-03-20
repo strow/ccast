@@ -3,16 +3,19 @@
 %
 
 % high res test file
-sfile = '/asl/data/cris/ccast/sdr60_hr/2013/240/SDR_d20130828_t0310579.mat';
+sfile = '/asl/data/cris/ccast/sdr60_hr/2015/032/SDR_d20150201_t0704280.mat';
 
 % low res test file
 % sfile = '/asl/data/cris/ccast/sdr60/2014/002/SDR_d20140102_t2053431.mat';
 
-% set the number of guard channels
-nguard = 4;
+% set the number of output guard channels
+nguard = 2;
+
+% set the number of sarta guard channels
+sguard = 4;
 
 % do the test
-[head, hattr, prof, pattr] = ccast2rtp(sfile, nguard);
+[head, hattr, prof, pattr] = ccast2rtp(sfile, nguard, sguard);
 
 % sample radiance plot
 figure(1); clf
@@ -36,24 +39,6 @@ ylabel('index')
 subplot(2,1,2)
 plot(head.vchan)
 title('vchan')
-xlabel('index')
-ylabel('wavenum')
-grid on; zoom on
-
-% ichan guard indices
-figure(3); clf
-n = head.nchan;
-ic = 1 : n;
-ix = (n - 7 * nguard) : n;
-subplot(2,1,1)
-plot(ic(ix), head.ichan(ix));
-title('ichan guard chan index')
-ylabel('index')
-grid on; zoom on
-
-subplot(2,1,2)
-plot(ic(ix), v(head.ichan(ix)));
-title('ichan guard chan freq')
 xlabel('index')
 ylabel('wavenum')
 grid on; zoom on
