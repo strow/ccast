@@ -24,7 +24,7 @@ if ~isempty(strfind(syear, 'ccast')), proc = 'ccast';
 else, proc = 'noaa'; end
 
 % plot title suffix
-tsuf = strrep(fsuf, '_', ' ');
+pstr = strrep(tstr, '_', ' ');
 
 %---------------------------------
 % plot means and means minus ifov
@@ -35,7 +35,7 @@ subplot(2,1,1)
 plot(vgrid, bavg);
 ax = axis; ax(1) = pv1; ax(2) = pv2; axis(ax);
 legend(fname, 'location', 'eastoutside')
-title(sprintf('%s %s mean, all FOVs, test %s', proc, band, tsuf))
+title(sprintf('%s %s mean, all FOVs, test %s', proc, band, pstr))
 % xlabel('wavenumber')
 ylabel('BT, K')
 grid on; zoom on
@@ -49,7 +49,7 @@ xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 
-pname = sprintf('%s_%s_avg_%s', proc, band, fsuf);
+pname = sprintf('%s_%s_avg_%s', proc, band, tstr);
 % saveas(gcf, pname, 'fig')
 % export_fig([pname,'.pdf'], '-m2', '-transparent')
 
@@ -63,7 +63,7 @@ set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(vgrid, bavg_diff(:, ix));
 axis([pv1, pv2, amin, amax])
 legend(fname{ix}, 'location', 'eastoutside')
-title(sprintf('%s %s corner FOVs minus FOV %d, test %s', proc, band, iref, tsuf))
+title(sprintf('%s %s corner FOVs minus FOV %d, test %s', proc, band, iref, pstr))
 % xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
@@ -79,7 +79,7 @@ xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 
-pname = sprintf('%s_%s_dif_%s', proc, band, fsuf);
+pname = sprintf('%s_%s_dif_%s', proc, band, tstr);
 % saveas(gcf, pname, 'fig')
 % export_fig([pname,'.pdf'], '-m2', '-transparent')
 
@@ -92,7 +92,7 @@ subplot(2,1,1)
 plot(vgrid, bstd);
 ax = axis; ax(1) = pv1; ax(2) = pv2; axis(ax);
 legend(fname, 'location', 'eastoutside')
-title(sprintf('%s %s std, all FOVs, test %s', proc, band, tsuf))
+title(sprintf('%s %s std, all FOVs, test %s', proc, band, pstr))
 % xlabel('wavenumber')
 ylabel('BT, K')
 grid on; zoom on
@@ -106,7 +106,7 @@ xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 
-pname = sprintf('%s_%s_std_%s', proc, band, fsuf);
+pname = sprintf('%s_%s_std_%s', proc, band, tstr);
 % saveas(gcf, pname, 'fig')
 % export_fig([pname,'.pdf'], '-m2', '-transparent')
 

@@ -1,47 +1,48 @@
 %
 % mean_cfovs - compare ccast FOV means over a set of files
 %
-% specify a set of days (or directories), take the mean and standard
-% deviation for selected FORs for each FOV, and compare these values
-% with the the values for a selected FOV
+% specify a list of days, take the mean and standard deviation for
+% selected FORs for each FOV, and compare these values with the the
+% values for a selected FOV
 %
 
-addpath ./utils
 addpath ../source
+addpath ../motmsc/utils
 
 %-----------------
 % test parameters
 %-----------------
 band = 'LW';
 res = 'hires2';  % lowres, hires1, hires2
-sFOR = 15:16;    % fields of regard, 1-30
+% sFOR = 15:16;  % fields of regard, 1-30
+  sFOR = 16;     % fields of regard, 1-30
 aflag = 0;       % set to 1 for ascending
 iref = 5;        % index of reference FOV
 
 % path to SDR year
-syear = '/asl/data/cris/ccast/sdr60_hr/2014';
+syear = '/asl/data/cris/ccast/sdr60_hr/2015';
 
 % SDR days of the year
 % sdays = 71;         % high res test 1
 % sdays = 239 : 240;  % high res test 2
-% sdays = 338 : 339;  % 4-5 dec 2014
-  sdays = 340 : 342;  % 6-8 dec 2014
+% sdays = 340 : 342;  % 6-8 dec 2014
+  sdays =  48 :  50;  % 17-19 Feb 2015
 
-% get user grid 
+% get user grid
 opts = struct;
 opts.resmode = res;
 [inst, user] = inst_params(band, 774, opts);
-nchan = round((user.v2 - user.v1) / user.dv) + 1;
-vgrid = user.v1 + (0:nchan-1)' * user.dv;
+vgrid = cris_ugrid(user, 2);
+nchan = length(vgrid);
 
 % loop initialization
-nFOR = numel(sFOR);
+nFOR = length(sFOR);
 bm = zeros(nchan * 9, 1);
 bw = zeros(nchan * 9, 1);
 bn = 0;
 
 %------------------------
-% loop on days and files 
+% loop on days and files
 %------------------------
 for di = sdays
 
@@ -56,45 +57,36 @@ for di = sdays
     sfile = fullfile(syear, doy, stmp);
     load(sfile)
 
-    % get data and frequency grid for this band
+    % get data for this band
     switch(band)
-      case 'LW', rtmp = rLW; vtmp = vLW(:);
-      case 'MW', rtmp = rMW; vtmp = vMW(:);
-      case 'SW', rtmp = rSW; vtmp = vSW(:);
+      case 'LW', rad1 = rLW; clear rLW
+      case 'MW', rad1 = rMW; clear rMW
+      case 'SW', rad1 = rSW; clear rSW
     end
+    [m, n, k, nscan] = size(rad1);
 
-    % keep the standard user grid
-    [m, n, k, nscan] = size(rtmp);
-    [ix, jx] = seq_match(vgrid, vtmp);
-    if ~isclose(vgrid, vtmp(jx))
-      error('frequency grid mismatch')
-    end
-
-    % get BT, reshape for moving averages
-    rtmp = rtmp(jx, :, sFOR, :);
-    btmp = real(rad2bt(vgrid, rtmp));
-    btmp = reshape(btmp, nchan * 9, nscan * nFOR);
+    % get brightness temps of rad1 subset
+    bt1 = real(rad2bt(vgrid, rad1(:, :, sFOR, :)));
+    clear rad1
 
     % get ascending flag for current scans
-    atmp = lat2aflag(squeeze(geo.Latitude(5,15,:)));
+    atmp = lat2aflag(squeeze(geo.Latitude(5, sFOR(1), :)));
 
     % loop on scans
     for j = 1 : nscan
-      if atmp(j) ~= aflag
+      if isnan(atmp(j)) || atmp(j) ~= aflag
         continue
       end
+      % loop on selected FORs
       for i = 1 : nFOR
-        k = nFOR * (j - 1) + i;
-        if L1a_err(i, j)
+        if L1a_err(sFOR(i), j)
           continue
         end
-        if ~isempty(find(isnan(btmp(:, k))))
+        bt2 = reshape(bt1(:, :, i, j), nchan * 9, 1);
+        if ~isempty(find(isnan(bt2)))
           continue
         end
-        if ~isempty(find(btmp(:, k) > 320)) && strcmp(band, 'LW')
-          continue
-        end
-        [bm, bw, bn] = rec_var(bm, bw, bn, btmp(:, k));
+        [bm, bw, bn] = rec_var(bm, bw, bn, bt2);
       end
     end
     fprintf(1, '.')
@@ -102,9 +94,11 @@ for di = sdays
   fprintf(1, '\n')
 end
 
-% reshape mean and std
+% get variance and std
 bv = bw ./ (bn - 1);
 bs = sqrt(bv);
+
+% reshape mean and std
 bstd = reshape(bs, nchan, 9);
 bavg = reshape(bm, nchan, 9);
 
@@ -116,14 +110,14 @@ bstd_diff = bstd - bstd(:, iref) * ones(1, 9);
 [t1, yr] = fileparts(syear); 
 [t1, t2] = fileparts(t1);
 t2 = t2(6:end);
-fsuf = sprintf('%s_%s%s', yr, seq2str(sdays), t2);
+tstr = sprintf('%s_%s%s', yr, seq2str(sdays), t2);
 
 % print some test stats
 fprintf(1, 'residuals by FOV\n')
 fprintf(1, '%8.4f', rmscol(bavg_diff))
-fprintf(1, '\nccast %s FOV %d, test %s, bn = %d\n', band, iref, fsuf, bn)
+fprintf(1, '\nccast %s FOV %d, test %s, bn = %d\n', band, iref, tstr, bn)
 
 % save the data
-clear btmp rtmp geo rLW rMW rSW cLW cMW cSW
-save(sprintf('ccast_%s_%s', band, fsuf))
+clear bt1 bt2 geo rLW rMW rSW cLW cMW cSW
+save(sprintf('ccast_%s_%s_%s', band, tstr, seq2str(sFOR)))
 
