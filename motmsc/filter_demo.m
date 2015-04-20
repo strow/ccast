@@ -2,7 +2,7 @@
 % compare UMBC and UW ccast filters
 %
 
-band = 'LW';
+band = 'SW';
 
 addpath ../davet/zold
 addpath ../source

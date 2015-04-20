@@ -20,7 +20,7 @@ aflag = 0;       % set to 1 for ascending
 iref = 5;        % index of reference FOV
 
 % path to SDR year
-syear = '/asl/data/cris/ccast/sdr60_hr/2015';
+syear = '/asl/data/cris/ccast/sdr60_c3/2015';
 
 % SDR days of the year
 % sdays = 71;         % high res test 1
@@ -109,8 +109,7 @@ bstd_diff = bstd - bstd(:, iref) * ones(1, 9);
 % save file suffix
 [t1, yr] = fileparts(syear); 
 [t1, t2] = fileparts(t1);
-t2 = t2(6:end);
-tstr = sprintf('%s_%s%s', yr, seq2str(sdays), t2);
+tstr = sprintf('%s_%s_%s', yr, seq2str(sdays), t2);
 
 % print some test stats
 fprintf(1, 'residuals by FOV\n')

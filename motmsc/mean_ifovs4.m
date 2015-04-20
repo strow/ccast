@@ -13,14 +13,16 @@ addpath ../motmsc/utils
 %-----------------
 % test parameters
 %-----------------
-band = 'MW';
+band = 'LW';
 res = 'hires2';  % lowres, hires1, hires2
-sFOR = 15:16;    % fields of regard, 1-30
+% sFOR = 15:16;  % fields of regard, 1-30
+  sFOR = 16;     % fields of regard, 1-30
 aflag = 0;       % set to 1 for ascending
 iref = 5;        % index of reference FOV
 
 % path to SDR year
-syear = '/asl/data/cris/sdr4/hires/2015';
+% syear = '/asl/data/cris/sdr4/hires/2015';
+  syear = '/asl/data/cris/sdr4/algo2/2015';
 
 % SDR days of the year
 sdays = 48 : 50;
@@ -95,9 +97,9 @@ for di = sdays
       end
       % loop on selected FORs
       for i = 1 : nFOR
-        if L1a_err(sFOR(i), j)
-          continue
-        end
+%       if L1a_err(sFOR(i), j)
+%         continue
+%       end
         bt2 = reshape(bt1(:, :, i, j), nchan * 9, 1);
         if ~isempty(find(isnan(bt2)))
           continue
@@ -125,8 +127,7 @@ bstd_diff = bstd - bstd(:, iref) * ones(1, 9);
 % save file suffix
 [t1, yr] = fileparts(syear); 
 [t1, t2] = fileparts(t1);
-t2 = t2(6:end);
-tstr = sprintf('%s_%s%s', yr, seq2str(sdays), t2);
+tstr = sprintf('%s_%s_%s', yr, seq2str(sdays), t2);
 
 % print some test stats
 fprintf(1, 'residuals by FOV\n')

@@ -28,10 +28,10 @@ dtRDR = 2817 + 4 * 8000;
 load(rdr_file)
 [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR(d1, rid);
 fprintf(1, 'first rdr internal time %s\n', ...
-        datestr(utc2mat(igmTime(1,1)/1000)));
+        datestr(utc2dnum(igmTime(1,1)/1000)));
 
 % load the geo data
 [geo, agatt, attr4] = read_GCRSO(geo_file);
 fprintf(1, 'first geo internal time %s\n', ...
-        datestr(iet2mat(double(geo.FORTime(1,1)))));
+        datestr(iet2dnum(double(geo.FORTime(1,1)))));
 

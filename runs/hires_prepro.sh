@@ -8,7 +8,7 @@
 #SBATCH --qos=long_contrib
 #SBATCH --account=pi_strow
 #SBATCH --ntasks=1
-#SBATCH --mem-per-cpu=10000
+#SBATCH --mem-per-cpu=12000
 
 # matlab options
 MATLAB=/usr/cluster/matlab/2014a/bin/matlab
