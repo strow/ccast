@@ -50,7 +50,7 @@ flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(59:end);
 
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/sdr60_hr';
+shome = '/asl/data/cris/ccast/newSAinv';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
@@ -69,9 +69,9 @@ opts.geofile = geofile;   % geo filename for this doy
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 
 % high-res SRF files
-opts.LW_sfile = '../inst_data/SRF_v33a_HR2_Pn_LW.mat';  % LW SRF table
-opts.MW_sfile = '../inst_data/SRF_v33a_HR2_Pn_MW.mat';  % MW SRF table
-opts.SW_sfile = '../inst_data/SRF_v33a_HR2_Pn_SW.mat';  % SW SRF table
+opts.LW_sfile = '../inst_data/SRF_inv_HR2_Pn_LW.mat';  % LW SRF table
+opts.MW_sfile = '../inst_data/SRF_inv_HR2_Pn_MW.mat';  % MW SRF table
+opts.SW_sfile = '../inst_data/SRF_inv_HR2_Pn_SW.mat';  % SW SRF table
 
 % time-domain FIR filter 
 opts.specNF_file = '../inst_data/FIR_19_Mar_2012.txt';

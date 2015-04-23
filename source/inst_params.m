@@ -134,25 +134,25 @@ user.band = band;
 switch band
   case 'LW'
     df = 24;       % decimation factor
-    npts = 864;    % decimated points
+    npts = 866;    % decimated points
     vbase = 1;     % alias offset
 
   case 'MW'
     df = 20;
     vbase = 1;
     switch resmode 
-      case 'lowres', npts = 528;
-      case 'hires1', npts = 1037;
-      case 'hires2', npts = 1050;
+      case 'lowres', npts = 530;
+      case 'hires1', npts = 1039;
+      case 'hires2', npts = 1052;
     end
 
   case 'SW'
     df = 26;
     vbase = 4;
     switch resmode
-      case 'lowres', npts = 200;
-      case 'hires1', npts = 797;
-      case 'hires2', npts = 797;
+      case 'lowres', npts = 202;
+      case 'hires1', npts = 799;
+      case 'hires2', npts = 799;
     end
 end
 

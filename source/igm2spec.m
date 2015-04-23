@@ -42,10 +42,11 @@ tind = [ceil(npts/2)+1 : npts, 1 : ceil(npts/2)]';
 spec = zeros(npts, 9, 34, nscan);
 
 % drop the guard points before the FFT
-itmp = igm(2:npts+1, :, :, :);
+% itmp = igm(2:npts+1, :, :, :);
 
 % do an FFT of shifted data.
-stmp = fft(itmp(tind, :, :, :));
+% stmp = fft(itmp(tind, :, :, :));
+stmp = fft(igm(tind, :, :, :));
 
 % permute the spectra to match the frequency scale
 spec = stmp(cind, :, :, :);

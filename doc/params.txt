@@ -1,0 +1,64 @@
+
+ccast parameters fall into two groups
+
+ - instrument parameters, set in the function inst_params.
+
+ - run parameters, set in the top-level driver file ccast_main.
+   ccast_hires is the high res version of this file.  options for
+   inst_params can also be set here.
+
+inst_params
+  resmode  - 'lowres', 'hires1', or 'hires2'
+  foax     - focal plane off axis angles
+  frad     - focal plane radii
+  a2       - a2 weights for nonlinearity correction
+
+newILS
+  narc   - number of arcs, default 1000
+  wrap  - 'sinc' (default), 'psinc n', 'psinc n*d'
+
+rdr2sdr
+  mvspan   - span for local moving averages
+  geofile  - filename for geo daily summary 
+  sfileLW, MW, SW  - ILS matrix file by band
+
+calmain
+  specNF_file
+  LW_sfile
+  MW_sfile
+  SW_sfile
+  nedn_filt
+
+finterp
+  info   - print some basic transform stats
+  tol    - tolerance for the rational approximation of dv1/dv2.  
+
+output from inst_params
+
+ user = 
+      v1: 650
+      v2: 1095
+     opd: 0.8000
+      vr: 15
+      dv: 0.6250
+    band: 'LW'
+
+ inst = 
+       band: 'LW'
+     wlaser: 774
+         df: 24
+       npts: 866
+     vlaser: 1.2920e+04
+         dx: 0.0019
+        opd: 0.8043
+         dv: 0.6216
+       cind: [866x1 double]
+       freq: [866x1 double]
+    resmode: 'hires2'
+       foax: [9x1 double]
+       frad: [9x1 double]
+         a2: [0.0194 0.0143 0.0161 0.0219 0.0134 0.0164 0.0146 0.0173 0.0305]
+     awidth: 538.3290
+      cutpt: 105
+       vdfc: 603.3355
+      vbase: 1

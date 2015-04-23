@@ -13,7 +13,7 @@ addpath ../davet
 mwt = 8.64e7;
 
 % path to allsci data
-daily_mat = '/asl/data/cris/ccast/daily/2013';
+daily_mat = '/asl/data/cris/ccast/daily/2015';
 
 % get matlab date number
 dnum = datenum(input('date > ', 's'));

@@ -121,13 +121,17 @@ if eFlag == 1        % Pull from 4-min-eng packet;
     [inst1, user1] = inst_params(band, wtmp, opt1);
 
     % see if low res grid will match eng packet emiss
-    if length(e_ICT) ~= length(inst1.freq)
+    if length(e_ICT) == length(inst1.freq)
+      ftmp = inst1.freq;
+    elseif length(e_ICT) + 2 == length(inst1.freq)
+      ftmp = inst1.freq(2:end-1);
+    else
       error('no frequency grid for eng packet emissivity')
     end
 
     % interpolate e_ICT to the input frequency grid
     % linear interp is best for steps in MW and SW emiss data
-    e_ICT = interp1(inst1.freq, e_ICT, wn, 'linear', 'extrap');
+    e_ICT = interp1(ftmp, e_ICT, wn, 'linear', 'extrap');
   end
 
 elseif eFlag == 0;   % user input

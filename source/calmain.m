@@ -76,14 +76,8 @@ switch inst.band
   case 'SW', sfile = opts.SW_sfile;
 end
 
-% get SRF matrix for the current wlaser
-Smat = getSRFwl(inst.wlaser, sfile);
-
-% take the inverse after interpolation
-Sinv = zeros(nchan, nchan, 9);
-for i = 1 : 9
-  Sinv(:,:,i) = inv(squeeze(Smat(:,:,i)));
-end
+% get the SA inverse matrix
+Sinv = getSAinv(sfile, inst);
 
 %---------------
 % loop on scans

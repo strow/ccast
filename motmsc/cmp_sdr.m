@@ -6,17 +6,17 @@ addpath ../source
 addpath utils
 
 % second 2013 high res test
-sfile = 'SDR_d20130827_t1927005.mat';
-sdir1 = '/asl/data/cris/ccast/sdr60_hr_test/2013/239';
-sdir2 = '/asl/data/cris/ccast/sdr60_hr/2013/239';
-sname1 = 'new nonlin';
-sname2 = 'old nonlin';
+% sfile = 'SDR_d20130827_t1927005.mat';
+% sdir1 = '/asl/data/cris/ccast/sdr60_hr_test/2013/239';
+% sdir2 = '/asl/data/cris/ccast/sdr60_hr/2013/239';
+% sname1 = 'new nonlin';
+% sname2 = 'old nonlin';
 
-% sfile = 'SDR_d20140402_t0041408.mat';
-% sdir1 = '/asl/data/cris/ccast/sdr60/2014/092';
-% sdir2 = '/asl/data/cris/ccast/sdr60_ng/2014/092';
-% sname1 = 'old cal';
-% sname2 = 'new cal';
+sfile = 'SDR_d20150217_t0102204.mat';
+sdir1 = '/asl/data/cris/ccast/addguard/2015/048';
+sdir2 = '/asl/data/cris/ccast/newSAinv/2015/048';
+sname1 = 'old SA inv';
+sname2 = 'new SA inv';
 
 band = 'LW';
 
@@ -48,7 +48,7 @@ i2 = interp1(v2, 1:n2, vg, 'nearest');
 %---------------------------------------
 % compare a selected FOV, FOR, and scan
 %---------------------------------------
-ifov = 9;
+ifov = 1;
 ifor = 15;
 iscan = 31;
 

@@ -19,6 +19,10 @@ MATOPT='-nojvm -nodisplay -nosplash'
 #   $MATLAB $MATOPT -r "mean_ifovs4; exit"
 
 # run the matlab wrapper
+# srun --output=one-off_%j.out \
+#   $MATLAB $MATOPT -r "ccast_hires2(50, 2015); exit"
+
+# run the matlab wrapper
 srun --output=one-off_%j.out \
-  $MATLAB $MATOPT -r "ccast_hires2(50, 2015); exit"
+  $MATLAB $MATOPT -r "mean_cfovs; exit"
 

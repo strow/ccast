@@ -5,14 +5,14 @@
 addpath utils
 addpath /asl/matlib/fileexchange/export_fig
 
-  d1 = load('noaa_test/ccast_LW_2015_48-50_sdr60_hr_15.mat');
-  d2 = load('noaa_test/ccast_LW_2015_48-50_sdr60_hr_16.mat');
-
-% d1 = load('noaa_test/ccast_LW_2015_48-50_sdr60_noSA_15.mat');
-% d2 = load('noaa_test/ccast_LW_2015_48-50_sdr60_noSA_16.mat');
+% d1 = load('noaa_test/ccast_LW_2015_48-50_sdr60_hr_15.mat');
+% d2 = load('noaa_test/ccast_LW_2015_48-50_sdr60_hr_16.mat');
 
 % d1 = load('noaa_test/noaa_LW_2015_48-50_algo1_15.mat');
 % d2 = load('noaa_test/noaa_LW_2015_48-50_algo1_16.mat');
+
+  d1 = load('ccast_LW_2015_48-50_addguard_15.mat');
+  d2 = load('ccast_LW_2015_48-50_addguard_16.mat');
 
 % shared fields
 user  = d1.user;
@@ -86,6 +86,8 @@ grid on; zoom on
 pname = sprintf('%s_%s_sfil_%s', proc, band, tstr);
 % saveas(gcf, pname, 'fig')
 % export_fig([pname,'.pdf'], '-m2', '-transparent')
+
+return
 
 %------------------------------
 % FOV mean FOR diffs, all FOVs

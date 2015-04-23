@@ -83,6 +83,8 @@ pname = sprintf('%s_%s_dif_%s', proc, band, tstr);
 % saveas(gcf, pname, 'fig')
 % export_fig([pname,'.pdf'], '-m2', '-transparent')
 
+return
+
 %-------------------------------
 % plot stds and stds minus ifov
 %-------------------------------
