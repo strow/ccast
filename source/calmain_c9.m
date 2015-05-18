@@ -49,7 +49,7 @@ function [rcal, vcal, nedn] = ...
 %-------------------
 
 % get the spectral space numeric filter
-inst.sNF = specNF(inst, opts.specNF_file);
+inst.sNF = specNF(inst, opts.NF_file);
 
 % get key dimensions
 [nchan, n, k, nscan] = size(rcnt);
@@ -69,21 +69,18 @@ it_all = rcnt(:, :, 33:34, :);
 sp_mean = nanmean(sp_all, 4);
 it_mean = nanmean(it_all, 4);
 
+% set transform tolerance
+optx = struct;
+
 % select band-specific options
 switch inst.band
-  case 'LW', sfile = opts.LW_sfile;
-  case 'MW', sfile = opts.MW_sfile;
-  case 'SW', sfile = opts.SW_sfile;
+  case 'LW', sfile = opts.LW_sfile; optx.tol = 1e-9;
+  case 'MW', sfile = opts.MW_sfile; optx.tol = 1e-7;
+  case 'SW', sfile = opts.SW_sfile; optx.tol = 1e-7;
 end
 
-% get SRF matrix for the current wlaser
-Smat = getSRFwl(inst.wlaser, sfile);
-
-% take the inverse after interpolation
-Sinv = zeros(nchan, nchan, 9);
-for i = 1 : 9
-  Sinv(:,:,i) = inv(squeeze(Smat(:,:,i)));
-end
+% get the SA inverse matrix
+Sinv = getSAinv(sfile, inst);
 
 %---------------
 % loop on scans
@@ -99,12 +96,14 @@ for si = 1 : nscan
   % get index of the closest sci record, 
   dt = abs(max(stime(:, si)) - [sci.time]);
   ix = find(dt == min(dt));
+  sci_ICT = sci(ix);
 
   % compute ICT temperature
   T_ICT = (sci(ix).T_PRT1 + sci(ix).T_PRT2) / 2;
 
   % compute predicted radiance from ICT
-  B = ICTradModel(inst.band, inst.freq, T_ICT, sci(ix), eng.ICT_Param, ...
+  ugrid = cris_ugrid(user, 4);
+  B = ICTradModel(inst.band, ugrid, T_ICT, sci_ICT, eng.ICT_Param, ...
                   1, NaN, 1, NaN);
 
   % copy rIT across 30 columns
@@ -135,28 +134,8 @@ for si = 1 : nscan
     es_nlc = nlc_vec(inst, rcnt(:, :, iES, si), ...
                           avgSP(:, :,  k,  si), eng);   
 
-    t1 = es_nlc - sp_nlc(:,:,k);
-    t1 = bandpass(inst.freq, t1, user.v1, user.v2, user.vr);
-    for i = 1 : 9
-      t1(:,i) = Sinv(:,:,i) * t1(:,i);
-    end
-
-    t2 = it_nlc(:,:,k) - sp_nlc(:,:,k);
-    t2 = bandpass(inst.freq, t2, user.v1, user.v2, user.vr);
-    for i = 1 : 9
-      t2(:,i) = Sinv(:,:,i) * t2(:,i);
-    end
-
-    t1 = t1 ./ t2;
-    t1 = bandpass(inst.freq, t1, user.v1, user.v2, user.vr);
-
-    for i = 1 : 9
-      rcal(:, i, iES, si) = rIT(:, iES) .* t1(:,i);
-    end
-
-%   % calculate (ES-SP)/(ICT-SP), accounting for sweep direction
-%   rcal(:, :, iES, si) = ...
-%      (es_nlc - sp_nlc(:,:,k)) ./ (it_nlc(:,:,k) - sp_nlc(:,:,k));
+    t1(:, :, iES) = es_nlc - sp_nlc(:,:,k);
+    t2(:, :, iES) = it_nlc(:,:,k) - sp_nlc(:,:,k);
 
   end
 
@@ -164,13 +143,24 @@ for si = 1 : nscan
   for fi = 1 : 9
 
     % apply the bandpass and SA-1 transform
-    rtmp = squeeze(rcal(:,fi,:,si));  
-    [rtmp, vcal] = finterp(rtmp, inst.freq, user.dv);
+    t3 = squeeze(t1(:, fi, :));
+    t4 = squeeze(t2(:, fi, :));
+    t3 = t3 ./ t4;
+    t3 = bandpass(inst.freq, t3, user.v1, user.v2, user.vr);
+    t3 = Sinv(:,:,fi) * t3;
+    t3 = bandpass(inst.freq, t3, user.v1, user.v2, user.vr);
+    [t3, vcal] = finterp(t3, inst.freq, user.dv, optx);
+
+%   t3 = rIT .* t3;
+
+    [ix, jx] = seq_match(ugrid, vcal);
+    t3 = rIT(ix, :) .* t3(jx, :);
+    vcal = vcal(jx);
 
     % save the current nchan x 30 chunk
-    [n, k] = size(rtmp);
+    [n, k] = size(t3);
     mchan = min(n, nchan);
-    rcal(1:mchan, fi, :, si) = rtmp(1:mchan, :);
+    rcal(1:mchan, fi, :, si) = t3(1:mchan, :);
 
   end
 
@@ -178,7 +168,14 @@ for si = 1 : nscan
   % IT calibration (for NEdN)
   %---------------------------
 
-  % calculate (IT(i) - SP) / (IT - SP) for both sweep directions
+   % compute predicted radiance from ICT
+  B = ICTradModel(inst.band, inst.freq, T_ICT, sci_ICT, eng.ICT_Param, ...
+                  1, NaN, 1, NaN);
+  
+  % copy rIT across 2 columns
+  rIT = B.total(:) * ones(1, 2);
+
+ % calculate (IT(i) - SP) / (IT - SP) for both sweep directions
   rICT(:,:,:,si) = (it_all(:,:,:,si) - sp_mean) ./ (it_mean - sp_mean);
 
   % loop on FOVs

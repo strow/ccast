@@ -1,8 +1,8 @@
 %
-% compare UMBC and UW ccast filters
+% filt_test1 -- compare ccast with old UW ATBD filters
 %
 
-band = 'SW';
+band = 'LW';
 
 addpath ../davet/zold
 addpath ../source

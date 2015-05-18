@@ -1,17 +1,18 @@
 
 ccast parameters fall into two groups
 
- - instrument parameters, set in the function inst_params.
+ - instrument parameters, set in the function inst_params
 
- - run parameters, set in the top-level driver file ccast_main.
-   ccast_hires is the high res version of this file.  options for
-   inst_params can also be set here.
+ - run parameters, set in the top-level driver files ccast_main or
+   ccast_hires.  options for inst_params can also be set here.
 
 inst_params
-  resmode  - 'lowres', 'hires1', or 'hires2'
-  foax     - focal plane off axis angles
-  frad     - focal plane radii
-  a2       - a2 weights for nonlinearity correction
+  version  - 'snpp' (default), 'jpss1', 'jpss2'
+  resmode  - 'lowres' (default), 'hires1', or 'hires2'
+  addguard - 'false' (default), 'true' to include guard points
+  foax     - focal plane FOV off-axis angles (default FM1 v33a)
+  frad     - focal plane FOV radii (default FM1 v33a)
+  a2       - a2 nonlinearity correction weights (default FM1 UW)
 
 newILS
   narc   - number of arcs, default 1000
@@ -23,11 +24,12 @@ rdr2sdr
   sfileLW, MW, SW  - ILS matrix file by band
 
 calmain
-  specNF_file
+  specNF_file -> NF_file "spec" is wrong since this is saved as a
+                 time domain file
   LW_sfile
   MW_sfile
   SW_sfile
-  nedn_filt
+  nedn_filt  -> NEdN_filt
 
 finterp
   info   - print some basic transform stats

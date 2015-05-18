@@ -1,18 +1,19 @@
 %
 % mean_diffs -- compare two runs of mean_cfovs
-%hires_prepro.sh
+%
 
 addpath utils
-addpath /asl/matlib/fileexchange/export_fig
+addpath noaa_test
+addpath /home/motteler/matlab/export_fig
 
-% d1 = load('noaa_test/ccast_LW_2015_48-50_sdr60_hr_15.mat');
-% d2 = load('noaa_test/ccast_LW_2015_48-50_sdr60_hr_16.mat');
+  d1 = load('ccast_MW_2015_48-50_c0_Pn_ag_15.mat');
+  d2 = load('ccast_MW_2015_48-50_c0_Pn_ag_16.mat');
 
-% d1 = load('noaa_test/noaa_LW_2015_48-50_algo1_15.mat');
-% d2 = load('noaa_test/noaa_LW_2015_48-50_algo1_16.mat');
+% d1 = load('ccast_LW_2015_48-50_sdr60_hr_15.mat');
+% d2 = load('ccast_LW_2015_48-50_sdr60_hr_16.mat');
 
-  d1 = load('ccast_LW_2015_48-50_addguard_15.mat');
-  d2 = load('ccast_LW_2015_48-50_addguard_16.mat');
+% d1 = load('noaa_LW_2015_48-50_algo3_15.mat');
+% d2 = load('noaa_LW_2015_48-50_algo3_16.mat');
 
 % shared fields
 user  = d1.user;

@@ -13,9 +13,7 @@
 %   spec  - nchan x 9 x 34 x nscan count spectra
 %
 % DISCUSSION
-%   the input array actually has nchan+2 points in the first
-%   dimension, but the first and last are "guard points" and 
-%   are dropped
+%   works for both inst.npts = nchan and inst.npts + 2 = nchan
 %
 %   could be updated to use matlab fftshift w/ proper dimension
 %   parameter
@@ -35,19 +33,14 @@ band = upper(inst.band);
 npts = inst.npts;
 cind = inst.cind;
 
-% tind mimics fftshift for odd-sized point sets
-tind = [ceil(npts/2)+1 : npts, 1 : ceil(npts/2)]';
-
-% initialize the output array
-spec = zeros(npts, 9, 34, nscan);
-
-% drop the guard points before the FFT
-% itmp = igm(2:npts+1, :, :, :);
+% check if we should drop guard points
+if npts + 2 == m
+ igm = igm(2:npts+1, :, :, :);
+end
 
 % do an FFT of shifted data.
-% stmp = fft(itmp(tind, :, :, :));
-stmp = fft(igm(tind, :, :, :));
+spec = fft(fftshift(igm, 1));
 
 % permute the spectra to match the frequency scale
-spec = stmp(cind, :, :, :);
+spec = spec(cind, :, :, :);
 

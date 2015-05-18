@@ -2,7 +2,8 @@
 % mean_plots -- plot results from mean_cfovs and mean_ifovs
 %
 
-addpath /asl/matlib/fileexchange/export_fig
+addpath ../motmsc/utils
+addpath /home/motteler/matlab/export_fig
 
 % names and colors
 fname = fovnames;

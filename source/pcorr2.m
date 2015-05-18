@@ -13,9 +13,6 @@
 %   t1  - corresponding angles, in radians
 %
 % DISCUSSION
-%   the calculation assumes r1 has a complex component with 
-%   meaningful phase info; if r1 is real it is returned unchanged
-%   note we don't actually need the frequency, as in pcorr1.m
 %
 % AUTHOR
 %   H. Motteler, 12 Jan 05
@@ -24,10 +21,11 @@
 function [r2, t1] = pcorr2(r1);
 
 % find the phase correction 
-warning off
 t1 = atan(imag(r1)./real(r1));
-warning on
 
 % apply the phase correction
-r2 = real(r1) .* cos(t1) + imag(r1) .* sin(t1);
+r2 = abs(real(r1) .* cos(t1) + imag(r1) .* sin(t1));
+
+% return 0 for complex 0
+r2(find(real(r1) == 0 & imag(r1) == 0)) = 0;
 

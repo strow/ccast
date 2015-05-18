@@ -11,24 +11,22 @@
 %   opts    - optional parameters
 % 
 % OPTS FIELDS
-%   resmode  - 'lowres', 'hires1', or 'hires2'
-%   foax     - focal plane off axis angles
-%   frad     - focal plane radii
-%   a2       - a2 weights for nonlinearity correction
-%   
+%   version  - 'snpp' (default), 'jpss1', 'jpss2'
+%   resmode  - 'lowres' (default), 'hires1', or 'hires2'
+%   addguard - 'false' (default), 'true' to include guard points
+%   foax     - focal plane FOV off-axis angles (default FM1 v33a)
+%   frad     - focal plane FOV radii (default FM1 v33a)
+%   a2       - a2 nonlinearity correction weights (default FM1 UW)
+%
 % OUTPUTS
 %   inst  - instrument parameters
 %   user  - user grid parameters
 %
 % DISCUSSION
-%   Defaults are low res, LLS v33a focal plane, and UW a2 weights
-%
-%   Note there are some very slightly different versions of v33a
-%   around.  The values below are from LLS, Feb or Mar 2012, and
-%   agree with the dg_v33a_lw.mat also circulated from around that
-%   time to roughly single precision accuracy, 10e-5 or better.
-%   The off-axis angles are tabulated as a list, not as the focal
-%   plane is viewed, and are returned as columns.
+%   The main steps are (1) set default values, (2) allow overrides
+%   from opts, (3) set user grid parameters, and (4) set sensor grid
+%   parameters.  Multiple instruments or options such as a choice of
+%   transform centering may require a different approach.
 %
 % AUTHOR
 %   H. Motteler, 4 Oct 2013
@@ -48,8 +46,9 @@ end
 % set defaults
 %--------------
 
-% default res mode
+version = 'snpp';
 resmode = 'lowres';
+addguard = 'false';
 
 % default off-axis angles from LLS v33a focal plane
 switch band
@@ -86,9 +85,11 @@ end
 
 % process input options
 if nargin == 3
-  if isfield(opts, 'frad'), frad = opts.frad; end
-  if isfield(opts, 'foax'), foax = opts.foax; end
+  if isfield(opts, 'version'), version = opts.version; end
   if isfield(opts, 'resmode'), resmode = opts.resmode; end
+  if isfield(opts, 'addguard'), addguard = opts.addguard; end
+  if isfield(opts, 'foax'), foax = opts.foax; end
+  if isfield(opts, 'frad'), frad = opts.frad; end
   if isfield(opts, 'a2'), a2 = opts.a2; end
 end
 
@@ -134,26 +135,31 @@ user.band = band;
 switch band
   case 'LW'
     df = 24;       % decimation factor
-    npts = 866;    % decimated points
+    npts = 864;    % decimated points
     vbase = 1;     % alias offset
 
   case 'MW'
     df = 20;
     vbase = 1;
     switch resmode 
-      case 'lowres', npts = 530;
-      case 'hires1', npts = 1039;
-      case 'hires2', npts = 1052;
+      case 'lowres', npts = 528;
+      case 'hires1', npts = 1037;
+      case 'hires2', npts = 1050;
     end
 
   case 'SW'
     df = 26;
     vbase = 4;
     switch resmode
-      case 'lowres', npts = 202;
-      case 'hires1', npts = 799;
-      case 'hires2', npts = 799;
+      case 'lowres', npts = 200;
+      case 'hires1', npts = 797;
+      case 'hires2', npts = 797;
     end
+end
+
+% option to add guard points
+switch addguard
+  case 'true', npts = npts + 2;
 end
 
 % derived parameters
@@ -181,7 +187,9 @@ inst.opd     = opd;
 inst.dv      = dv;
 inst.cind    = cind;
 inst.freq    = freq;
+inst.version = version;
 inst.resmode = resmode;
+inst.addguard = addguard;
 inst.foax    = foax(:);
 inst.frad    = frad(:);
 inst.a2      = a2;
