@@ -14,9 +14,9 @@
 %   version  - 'snpp' (default), 'jpss1', 'jpss2'
 %   resmode  - 'lowres' (default), 'hires1', or 'hires2'
 %   addguard - 'false' (default), 'true' to include guard points
-%   foax     - focal plane FOV off-axis angles (default FM1 v33a)
-%   frad     - focal plane FOV radii (default FM1 v33a)
-%   a2       - a2 nonlinearity correction weights (default FM1 UW)
+%   foax     - focal plane FOV off-axis angles (default not set)
+%   frad     - focal plane FOV radii (default not set)
+%   a2       - a2 nonlinearity weights (default UW SNPP values)
 %
 % OUTPUTS
 %   inst  - instrument parameters
@@ -25,8 +25,9 @@
 % DISCUSSION
 %   The main steps are (1) set default values, (2) allow overrides
 %   from opts, (3) set user grid parameters, and (4) set sensor grid
-%   parameters.  Multiple instruments or options such as a choice of
-%   transform centering may require a different approach.
+%   parameters.  Focal plane parameters are included in the opts
+%   struct for convenience building new SA matrices and are saved
+%   with those files
 %
 % AUTHOR
 %   H. Motteler, 4 Oct 2013
@@ -49,31 +50,14 @@ end
 version = 'snpp';
 resmode = 'lowres';
 addguard = 'false';
+foax = [];
+frad = [];
 
-% default off-axis angles from LLS v33a focal plane
+% UW SNPP a2 weights (listed in row order)
 switch band
   case 'LW'
-    foax = [0.02688708 0.01931040 0.02745719 ...
-            0.01872599 0.00039304 0.01946177 ...
-            0.02669410 0.01898521 0.02720102];
-  case 'MW'  
-    foax = [0.02692817  0.01932544  0.02744433 ...
-            0.01877022  0.00041968  0.01943880 ...
-            0.02670933  0.01897094  0.02714583];
-  case 'SW'  
-    foax = [0.02687735  0.01928389  0.02737835 ...
-            0.01875077  0.00034464  0.01935134 ...
-            0.02671876  0.01895481  0.02709675];
-end
-
-% default FOV radius from LLS v33a focal plane
-frad = 0.008403 * ones(9,1);
-
-% default UW FM1 a2 weights for nonlinearity correction
-switch band
-  case 'LW'
-    a2 = [0.01936  0.01433  0.01609  ...
-          0.02192  0.01341  0.01637  ...
+    a2 = [0.01936  0.01433  0.01609 ...
+          0.02192  0.01341  0.01637 ...
           0.01464  0.01732  0.03045];
   case 'MW'
     a2 = [0.00529  0.02156  0.02924  ...

@@ -30,5 +30,5 @@ nprocs = str2num(getenv('SLURM_NPROCS'));
 fprintf(1, 'ccast_batch: processing day %d, year %d\n', d1 + procid, year)
 
 % ccast_main(d1 + procid, year)
-ccast_c6_Pd_ag(d1 + procid, year)
+ccast_c6_Pn_ag(d1 + procid, year)
 

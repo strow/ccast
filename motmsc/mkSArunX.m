@@ -7,7 +7,7 @@ addpath ../source
 
 % inst_params options
 opts = struct;
-opts.version = 'jpss';    % current active CrIS
+opts.version = 'snpp';    % current active CrIS
 opts.resmode = 'hires2';  % mode for inst_params
 opts.addguard = 'true';   % include guard points 
 

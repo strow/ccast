@@ -61,8 +61,8 @@ rcal = ones(nchan, 9, 30, nscan) * NaN;
 es_nlc = ones(nchan, 9) * NaN;
 sp_nlc = ones(nchan, 9, 2) * NaN;
 it_nlc = ones(nchan, 9, 2) * NaN;
-es_sp = ones(nchan, 9, 30) * NaN;
-it_sp = ones(nchan, 9, 2) * NaN;
+t1 = ones(nchan, 9, 30) * NaN;
+t2 = ones(nchan, 9, 2) * NaN;
 
 % NEdN setup
 rICT = ones(nchan, 9, 2, nscan) * NaN;
@@ -73,10 +73,15 @@ it_mean = nanmean(it_all, 4);
 
 % select band-specific options
 switch inst.band
-  case 'LW', sfile = opts.LW_sfile;
-  case 'MW', sfile = opts.MW_sfile;
-  case 'SW', sfile = opts.SW_sfile;
+  case 'LW', sfile = opts.LW_sfile; bi = 1;
+  case 'MW', sfile = opts.MW_sfile; bi = 2;
+  case 'SW', sfile = opts.SW_sfile; bi = 3;
 end
+
+% NOAA processing filter
+pfilt = f_atbd(bi, 1:inst.npts, 'noaa1');
+pfilt2 = pfilt(:) * ones(1, 2);
+pfilt30 = pfilt(:) * ones(1, 30);
 
 % get the SA inverse matrix
 Sinv = getSAinv(sfile, inst);
@@ -92,15 +97,17 @@ for si = 1 : nscan
     continue
   end
 
-  % get index of the closest sci record
+  % get index of the closest sci record, 
   dt = abs(max(stime(:, si)) - [sci.time]);
   ix = find(dt == min(dt));
+  sci_ICT = sci(ix);
 
-  % get ICT temperature
+  % compute ICT temperature
   T_ICT = (sci(ix).T_PRT1 + sci(ix).T_PRT2) / 2;
 
-  % get expected ICT radiance at the sensor grid
-  B = ICTradModel(inst.band, inst.freq, T_ICT, sci(ix), eng.ICT_Param, ...
+  % compute predicted radiance from ICT
+  ugrid = cris_ugrid(user, 4);
+  B = ICTradModel(inst.band, ugrid, T_ICT, sci_ICT, eng.ICT_Param, ...
                   1, NaN, 1, NaN);
 
   % copy rIT across 30 columns
@@ -110,42 +117,62 @@ for si = 1 : nscan
   % earth scene calibration
   %-------------------------
 
-  % loop on sweep direction
+  % loop on sweep directions
   for k = 1 : 2
-    j = mod(k, 2) + 1; % SP and IT index
 
     % do the SP and IT nonlinearity corrections
-    sp_nlc(:,:,j) = nlc_vec(inst, avgSP(:,:,j,si), avgSP(:,:,j,si), eng);
-    it_nlc(:,:,j) = nlc_vec(inst, avgIT(:,:,j,si), avgSP(:,:,j,si), eng);
+    sp_nlc(:, :, k) = nlc_vec(inst, avgSP(:, :, k, si), ...
+                                    avgSP(:, :, k, si), eng);
 
-    % save the IT - SP difference
-    it_sp(:, :, k) = it_nlc(:,:,j) - sp_nlc(:,:,j);
+    it_nlc(:, :, k) = nlc_vec(inst, avgIT(:, :, k, si), ...
+                                    avgSP(:, :, k, si), eng);
+                                    
+    % denominator of calibration ratio
+    j = mod(k, 2) + 1;
+    t2(:, :, j) = it_nlc(:, :, k) - sp_nlc(:, :, k);
   end
 
   % loop on earth scenes
   for iES = 1 : 30
-    j = mod(iES, 2) + 1; % SP and IT index
+
+    % the ES and calibration indices have opposite parity
+    k = mod(iES, 2) + 1;
 
     % do the ES nonlinearity correction
-    es_nlc = nlc_vec(inst, rcnt(:, :, iES, si), avgSP(:, :, j, si), eng);   
+    es_nlc = nlc_vec(inst, rcnt(:, :, iES, si), ...
+                          avgSP(:, :,  k,  si), eng);   
 
-    % save the ES - SP difference
-    es_sp(:, :, iES) = es_nlc - sp_nlc(:, :, j);
+    % numerator of calibration ratio
+    t1(:, :, iES) = es_nlc - sp_nlc(:,:,k);
   end
 
   % loop on FOVs
   for fi = 1 : 9
 
-    % apply the bandpass and SA-1 transform
-    t3 = squeeze(es_sp(:, fi, :));
-    t4 = squeeze(it_sp(:, fi, :));
-    t4 = reshape(t4(:) * ones(1, 15), nchan, 30);
-    t3 = t3 ./ t4;
-    t3 = bandpass(inst.freq, t3, user.v1, user.v2, user.vr);
+    % process ICT - SP
+    t4 = squeeze(t2(:, fi, :));
+    [t4, a4] = pcorr2(t4);
+%   t4 = bandpass(inst.freq, t4, user.v1, user.v2, user.vr);
+    t4 = t4 .* pfilt2;
+    t4 = Sinv(:,:,fi) * t4;
+    [t4, vcal] = finterp(t4, inst.freq, user.dv);
+    t4 = reshape(t4(:) * ones(1, 15), length(vcal), 30);
+    a4 = reshape(a4(:) * ones(1, 15), nchan, 30);
+
+    % process ES  - SP
+    t3 = squeeze(t1(:, fi, :));
+    t3 = pcapp2(t3, a4);
+%   t3 = pcorr2(t3);
+%   t3 = bandpass(inst.freq, t3, user.v1, user.v2, user.vr);
+    t3 = t3 .* pfilt30;
     t3 = Sinv(:,:,fi) * t3;
-    t3 = bandpass(inst.freq, t3, user.v1, user.v2, user.vr);
-    t3 = rIT .* t3;
     [t3, vcal] = finterp(t3, inst.freq, user.dv);
+
+    t3 = t3 ./ t4;
+
+    [ix, jx] = seq_match(ugrid, vcal);
+    t3 = rIT(ix, :) .* t3(jx, :);
+    vcal = vcal(jx);
 
     % save the current nchan x 30 chunk
     [n, k] = size(t3);
@@ -157,6 +184,13 @@ for si = 1 : nscan
   %---------------------------
   % IT calibration (for NEdN)
   %---------------------------
+
+  % compute predicted radiance from ICT
+  B = ICTradModel(inst.band, inst.freq, T_ICT, sci_ICT, eng.ICT_Param, ...
+                  1, NaN, 1, NaN);
+  
+  % copy rIT across 2 columns
+  rIT = B.total(:) * ones(1, 2);
 
   % calculate (IT(i) - SP) / (IT - SP) for both sweep directions
   rICT(:,:,:,si) = (it_all(:,:,:,si) - sp_mean) ./ (it_mean - sp_mean);

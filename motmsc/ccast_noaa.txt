@@ -4,20 +4,24 @@ ccast vs noaa test summary
 
 calibration algorithms
   c0 - diff, ratio, filt, SA-1, filt, rIT, interp
+  c6 - updated faster version of c0, with finterp tol mod
+  c9 - diff, ratio, filt, SA-1, filt, interp, rIT
+  d1 - diff, ratio, rFOV, filt, SA-1, filt, interp
+
   c4 - diff, filt, SA-1, ratio, filt, rIT, interp
   c5 - diff, filt, pcorr, SA-1, ratio, filt, rIT, interp
-  c6 - updated version of c0, with finterp tol mod
-  c7 - c4 with new noaa filter
+  c7 - c4 with atbd filters and new noaa filter params
   c8 - diff, filt, SA-1, filt, interp, ratio, rIT (noaa 3)
-  c9 - diff, ratio, filt, SA-1, filt, interp, rIT
+  d0 - c8 refactored, with phase correction (close to noaa4)
+  d2 - ccast implementation of noaa 4
 
 calibration options
   ag - added guard points
   ng - no guard points (old default)
   e9 - ag with finterp tol 1e-7 SW, MW, 1e-9 LW
   SX - sinc ILS with 20 pct SA matrix extension
-  Pn - periodic sinc wrapping at inst.npts
-  Pd - periodic sinc wrapping at npts * df
+  Pn - periodic sinc wrapping at inst.npts (sensor grid)
+  Pd - periodic sinc wrapping at npts * df with SA extension
 
 2015_48-50 calibration tests, added guard points
 
@@ -29,6 +33,7 @@ calibration options
   c7_Pn_ag - even worse than c4_SX_ag in the LW
   c6_Pn_e9 - not much effect
   c9_Pn_ag - not much effect
+  c9_Pd_ag - not much effect
 
 2015_48-50 calibration tests, standard point set
 
@@ -41,17 +46,6 @@ calibration options
   sdr60_s15 - ref cal, periodic sinc, LW passband shifted up 2 chans
   sdr60_noSA - SA application commented out in calmain
   sdr60_hr_<n>X - phase correction applied to output
-
-c0_Pn_ag vs sdr60_hr
----------------------
-
-  SW FOV 5 rel:
-  MW FOV 5 rel:
-  LW FOV 5 rel:
-
-  SW sweep dif:
-  MW sweep dif:
-  LW sweep dif:
 
 c0_Pn_ag vs noaa 4
 -------------------
@@ -119,7 +113,6 @@ c0_Pn_ag vs noaa 4 and sdr60_hr
                 residual spread out, slightly worse than noaa 4
 
   LW sweep dif: FOV 5 improved, all FOVs now very close to noaa 4
-
 
 2015-04-12 notes
 -----------------

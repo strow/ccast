@@ -5,11 +5,17 @@
 addpath ../source
 addpath utils
 
-sfile = 'SDR_d20150301_t0436420.mat';
-sdir1 = '/asl/data/cris/ccast/sdr60_hr/2015/060';
-sdir2 = '/asl/data/cris/ccast/c6_Pn_ng/2015/060';
-sname1 = 'c6 Pn ng old';
-sname2 = 'c6 Pn ng new';
+% sfile = 'SDR_d20150218_t0318115.mat';
+% sdir1 = '/asl/data/cris/ccast/d0_Pn_ag/2015/049';
+% sdir2 = '/asl/data/cris/ccast/d2_Pn_ag/2015/049';
+% sname1 = 'd0 Pn ag old';
+% sname2 = 'd2 Pn ag new';
+
+sfile = 'SDR_d20150218_t0230118.mat';
+sdir1 = '/asl/data/cris/ccast/c0_Pn_ag/2015/049';
+sdir2 = '/asl/data/cris/ccast/c6_Pn_ag/2015/049';
+sname1 = 'c0 Pn ag old';
+sname2 = 'c6 Pn ag new';
 
 band = 'LW';
 
@@ -59,7 +65,7 @@ grid on; zoom on
 subplot(2,1,2)
 plot(vg, x1 - x2)
 xlabel('wavenumber')
-ylabel('BT, K')
+ylabel('dBT, K')
 legend([sname1, ' - ', sname2], 'location', 'southeast')
 grid on; zoom on
 
@@ -76,6 +82,6 @@ plot(vg, w1 - w2)
 legend(fovnames, 'location', 'southeast')
 title(sprintf('%s FOR %d Scan %d', rtmp, ifor, iscan))
 xlabel('wavenumber')
-ylabel('BT, K')
+ylabel('dBT, K')
 grid on; zoom on
 
