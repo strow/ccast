@@ -64,7 +64,7 @@ geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 
 opts = struct;            % initialize opts
 opts.cal_fun = 'd2';      % calibration function
-opts.version = 'jpss';    % current active CrIS
+opts.version = 'snpp';    % current active CrIS
 opts.resmode = 'hires2';  % mode for inst_params
 opts.addguard = 'true';   % include guard points 
 opts.geofile = geofile;   % geo filename for this doy

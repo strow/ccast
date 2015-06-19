@@ -43,10 +43,9 @@ switch band
     error(['bad band value ', band])
 end
 
-%--------------
-% set defaults
-%--------------
-
+%----------
+% defaults
+%----------
 version = 'snpp';
 resmode = 'lowres';
 addguard = 'false';
@@ -83,9 +82,9 @@ switch resmode
     error(['bad resmode value ', resmode])
 end
 
-%------------
-%  user grid
-%------------
+%-----------
+% user grid
+%-----------
 switch band
   case 'LW'
     user.v1 = 650;    % first channel
@@ -113,9 +112,9 @@ end
 user.dv = 1 / (2*user.opd);
 user.band = band;
 
-% ---------------
-% instrument grid
-% ---------------
+%-------------
+% sensor grid
+%-------------
 switch band
   case 'LW'
     df = 24;       % decimation factor
@@ -176,7 +175,7 @@ inst.resmode = resmode;
 inst.addguard = addguard;
 inst.foax    = foax(:);
 inst.frad    = frad(:);
-inst.a2      = a2;
+inst.a2      = a2(:);
 
 % mainly for tests
 inst.awidth = awidth;
