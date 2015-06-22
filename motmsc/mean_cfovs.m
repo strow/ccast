@@ -12,15 +12,15 @@ addpath ../motmsc/utils
 %-----------------
 % test parameters
 %-----------------
-band = 'SW';
+band = 'LW';
 res = 'hires2';  % lowres, hires1, hires2
-  sFOR = 15:16;  % fields of regard, 1-30
-% sFOR = 15;     % fields of regard, 1-30
+% sFOR = 15:16;  % fields of regard, 1-30
+  sFOR = 16;     % fields of regard, 1-30
 aflag = 0;       % set to 1 for ascending
 iref = 5;        % index of reference FOV
 
 % path to SDR year
-syear = '/asl/data/cris/ccast/sdr60_hr/2015';
+syear = '/asl/data/cris/ccast/e4_Pn_ag/2015';
 
 % SDR days of the year
 % sdays = 71;         % high res test 1

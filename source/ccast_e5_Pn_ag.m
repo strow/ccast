@@ -47,10 +47,10 @@ addpath ../source
 rhome = '/asl/data/cris/ccast/rdr60_hr';
 rdir = fullfile(rhome, ystr, dstr);
 flist = dir(fullfile(rdir, 'RDR*.mat'));
-flist = flist(150:end);
+% flist = flist(91:96);
 
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/c6_Pn_e9';
+shome = '/asl/data/cris/ccast/e5_Pn_ag';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
@@ -64,8 +64,8 @@ geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 %----------------------------
 
 opts = struct;            % initialize opts
-opts.cal_fun = 'c6';      % calibration function
-opts.version = 'jpss';    % current active CrIS
+opts.cal_fun = 'e5';      % calibration function
+opts.version = 'snpp';    % current active CrIS
 opts.resmode = 'hires2';  % mode for inst_params
 opts.addguard = 'true';   % include guard points 
 opts.geofile = geofile;   % geo filename for this doy

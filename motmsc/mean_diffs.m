@@ -6,14 +6,14 @@ addpath utils
 addpath noaa_test
 addpath /home/motteler/matlab/export_fig
 
-% d1 = load('ccast_LW_2015_48-50_d0_Pn_ag_15.mat');
-% d2 = load('ccast_LW_2015_48-50_d0_Pn_ag_16.mat');
+  d1 = load('ccast_LW_2015_48-50_e3_Pn_ag_15.mat');
+  d2 = load('ccast_LW_2015_48-50_e3_Pn_ag_16.mat');
 
 % d1 = load('ccast_LW_2015_48-50_sdr60_hr_15.mat');
 % d2 = load('ccast_LW_2015_48-50_sdr60_hr_16.mat');
 
-  d1 = load('noaa_LW_2015_48-50_algo4_15.mat');
-  d2 = load('noaa_LW_2015_48-50_algo4_16.mat');
+% d1 = load('noaa_LW_2015_48-50_algo4_15.mat');
+% d2 = load('noaa_LW_2015_48-50_algo4_16.mat');
 
 % shared fields
 user  = d1.user;

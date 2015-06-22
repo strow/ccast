@@ -20,12 +20,9 @@ switch opts.cal_fun
   case 'd2'
     [rcal, vcal, nedn] = ...
        calmain_d2(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
-  case 'e0'
+  case 'e5'
     [rcal, vcal, nedn] = ...
-       calmain_e0(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
-  case 'e1'
-    [rcal, vcal, nedn] = ...
-       calmain_e1(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
+       calmain_e5(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
   otherwise
     error(sprintf('unknow calibration function %s', opts.cal_fun))
 end

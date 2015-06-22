@@ -43,12 +43,12 @@ cc_old = bandpass(resp_freq, resp_ones, user.v1, user.v2, user.vr);
 
 % ccast new bandpass
 switch upper(band)
-  case 'LW', pL =  650; pH = 1100; vr = 20; bi = 1;
-  case 'MW', pL = 1200; pH = 1760; vr = 30; bi = 2;
-  case 'SW', pL = 2145; pH = 2560; vr = 30; bi = 3;
+  case 'LW', pL =  650; pH = 1100; rL = 15; rH = 20; bi = 1;
+  case 'MW', pL = 1200; pH = 1760; rL = 30; rH = 30; bi = 2;
+  case 'SW', pL = 2145; pH = 2560; rL = 30; rH = 30; bi = 3;
 end
 [user.v1 - pL, pH - user.v2]
-cc_new = bandpass(resp_freq, resp_ones, pL, pH, vr);
+cc_new = bandpass(resp_freq, resp_ones, pL, pH, rL, rH);
 
 % NOAS/ATBD processing filter
 noaa1 = f_atbd(bi, 1 : inst.npts, 'noaa1');
@@ -89,6 +89,6 @@ legend('responsivity', 'numeric filter', ...
 xlabel('wavenumber'); ylabel('normalized weight')
 grid on; zoom on
 
-  saveas(gcf, sprintf('show_filts_%s', band), 'png')
+% saveas(gcf, sprintf('show_filts_%s', band), 'png')
 % export_fig( sprintf('show_filts_%s.pdf', band), '-m2', '-transparent')
 
