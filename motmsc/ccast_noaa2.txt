@@ -3,12 +3,9 @@ ccast test summary
 -------------------
 
 calibration algorithms
-  c6 - new implementation of ccast reference algo
-  e0 - c6 with per-FOV adjustment for first filter app
-  e1 - c6 with modified filter passbands and rolloff #1
-  e2 - c6 with modified filter passbands and rolloff #2
-  e3 - c6 with modified filter passbands and rolloff #2
-  d2 - ccast implementation of noaa 4
+  c6     - updates of ccast reference algo
+  e0-e5  - c6 with modified filter parameters
+  d2     - ccast implementation of noaa 4
 
 calibration options
   ag - added guard points
