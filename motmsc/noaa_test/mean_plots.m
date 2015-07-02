@@ -1,38 +1,17 @@
 %
-% mean_plots -- plot results from mean_cfovs
+% mean_plots -- plot results from mean_cfovs and mean_ifovs
 %
 
 addpath ../motmsc/utils
 addpath /home/motteler/matlab/export_fig
-
-file = input('file > ', 's');
-band = input('band > ', 's');
-
-load(file);
-
-switch band
-  case 'LW', bavg = bmLW; bstd = bsLW; bn = bnLW; vgrid = vLW;
-  case 'MW', bavg = bmMW; bstd = bsMW; bn = bnMW; vgrid = vMW;
-  case 'SW', bavg = bmSW; bstd = bsSW; bn = bnSW; vgrid = vSW;
-end
-
-% get relative differences
-iref = 5;
-bavg_diff = bavg - bavg(:, iref) * ones(1, 9);
-bstd_diff = bstd - bstd(:, iref) * ones(1, 9);
-
-% print some stats
-fprintf(1, 'residuals by FOV\n')
-fprintf(1, '%8.4f', rmscol(bavg_diff))
-fprintf(1, '\nccast %s FOV %d, test %s, bn = %d\n', band, iref, tstr, bn)
 
 % names and colors
 fname = fovnames;
 fcolor = fovcolors;
 
 % plot frequency grid
-pv1 = 10 * floor(vgrid(1) / 10);
-pv2 = 10 *  ceil(vgrid(end) / 10);
+pv1 = 10 * floor(user.v1 / 10);
+pv2 = 10 *  ceil(user.v2 / 10);
 
 % residual plot range
 switch band
@@ -42,7 +21,8 @@ switch band
 end
 
 % processing string
-proc = 'ccast'; 
+if ~isempty(strfind(syear, 'ccast')), proc = 'ccast'; 
+else, proc = 'noaa'; end
 
 % plot title suffix
 pstr = strrep(tstr, '_', ' ');
