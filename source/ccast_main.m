@@ -64,10 +64,10 @@ geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 %----------------------------
 
 opts = struct;            % initialize opts
-opts.cal_fun = 'c6';      % calibration function
+opts.cal_fun = 'e5';      % calibration function
 opts.version = 'snpp';    % current active CrIS
 opts.resmode = 'lowres';  % mode for inst_params
-opts.addguard = 'true';  % include guard points 
+opts.addguard = 'true';   % include guard points 
 opts.geofile = geofile;   % geo filename for this doy
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 
