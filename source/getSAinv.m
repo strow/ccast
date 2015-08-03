@@ -24,8 +24,8 @@ inst2 = inst;
 if nargin == 2
   if ~strcmp(upper(inst1.band), upper(inst2.band))
     error('bands do not match')
-  elseif ~strcmp(inst1.resmode, inst2.resmode)
-    error('res modes do not match')
+% elseif ~strcmp(inst1.resmode, inst2.resmode)
+%   error('res modes do not match')
   elseif ~isequal(inst1.npts, inst2.npts)
     error('sensor grid sizes not match')
   end

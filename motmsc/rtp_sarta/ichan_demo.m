@@ -13,7 +13,7 @@ wlaser = 773.1307;
 [instMW, userMW] = inst_params('MW', wlaser, opt1);
 [instSW, userSW] = inst_params('SW', wlaser, opt1);
 
-ng = 4;   % number of guard channels you are using  
+ng = 2;   % number of guard channels you are using  
 sg = 4;   % number of guard channels sarta was built with
 
 vchan = cris_vchan(ng, userLW, userMW, userSW);

@@ -5,7 +5,7 @@
 addpath utils
 
 d1 = load('nedn_e5_Pn_ag.mat');
-d2 = load('ccast_e5_Pn_ag_15-16.mat');
+% d2 = load('ccast_e5_Pn_ag_15-16.mat');
 
 nednLW = gauss_filt(mean(d1.nmLW, 3));
 nednMW = gauss_filt(mean(d1.nmMW, 3));
@@ -60,7 +60,7 @@ title('ccast SW NEdN')
 xlabel('wavenumber')
 ylabel('NEdN')
 grid on; zoom on
-saveas(gcf, 'ccast_NEdN', 'png')
+% saveas(gcf, 'ccast_NEdN', 'png')
 
 figure(2); clf
 set(gcf, 'Units','centimeters', 'Position', [3, 3, 24, 16])
@@ -88,9 +88,7 @@ title('ccast SW NEdN at 280K')
 xlabel('wavenumber')
 ylabel('NEdT')
 grid on; zoom on
-saveas(gcf, 'ccast_NEdT', 'png')
-
-
+% saveas(gcf, 'ccast_NEdT', 'png')
 
 
 

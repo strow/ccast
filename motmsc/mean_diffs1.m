@@ -1,5 +1,5 @@
 %
-% mean_diffs -- compare two runs of mean_cfovs
+% mean_diffs1 -- compare FOR 15 and FOR 16 runs of mean_cfovs
 %
 
 addpath ../motmsc/utils
@@ -11,20 +11,18 @@ f2 = input('file 2 > ', 's');
 d1 = load(f1);
 d2 = load(f2);
 
-band = input('band > ', 's');
+% concatenate bands
+vgrid = [d1.vLW(3:end-2); d1.vMW(3:end-2); d1.vSW(3:end-2)];
+d1_bm = [d1.bmLW(3:end-2, :); d1.bmMW(3:end-2, :); d1.bmSW(3:end-2, :)];
+d2_bm = [d2.bmLW(3:end-2, :); d2.bmMW(3:end-2, :); d2.bmSW(3:end-2, :)];
+d1_am = [d1.amLW(3:end-2, :); d1.amMW(3:end-2, :); d1.amSW(3:end-2, :)];
+d2_am = [d2.amLW(3:end-2, :); d2.amMW(3:end-2, :); d2.amSW(3:end-2, :)];
 
-switch band
-  case 'LW'
-    mdif = d1.bmLW - d2.bmLW; vgrid = d1.vLW; 
-    adif = d1.amLW - d2.amLW; user  = d1.userLW;
-  case 'MW'
-    mdif = d1.bmMW - d2.bmMW; vgrid = d1.vMW; 
-    adif = d1.amMW - d2.amMW; user  = d1.userMW;
-  case 'SW'
-    mdif = d1.bmSW - d2.bmSW; vgrid = d1.vSW; 
-    adif = d1.amSW - d2.amSW; user  = d1.userSW;
-end
+% take differences
+mdif = d1_bm - d2_bm;
+adif = d1_am - d2_am;
 
+% plot setup
 tstr = d1.tstr;
 for1 = d1.sFOR;
 for2 = d2.sFOR;
@@ -32,29 +30,19 @@ for2 = d2.sFOR;
 % names and colors
 fname = fovnames;
 fcolor = fovcolors;
-
-% plot frequency grid
-pv1 = 10 * floor(user.v1 / 10);
-pv2 = 10 *  ceil(user.v2 / 10);
-
-% plot title suffix
 pstr = strrep(tstr, '_', '-');
 
 %------------------------
 % FOR double differences
 %------------------------
-switch band
-  case 'LW', ymin = -0.1; ymax =  0.1;
-  case 'MW', ymin = -0.2; ymax =  0.2;
-  case 'SW', ymin = -0.3; ymax =  0.3;
-end
 figure(1); clf
+set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 subplot(3,1,1)
 ix = [1,3,7,9];
 set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(vgrid, mdif(:, ix) - adif(:, ix));
-axis([pv1, pv2, ymin, ymax])
-title(sprintf('%s FOR %d - %d double diff, %s', band, for1, for2, pstr))
+axis([600, 2600, -0.2, 0.2])
+title(sprintf('FOR %d - %d double diff, %s', for1, for2, pstr))
 legend(fname{ix}, 'location', 'eastoutside')
 ylabel('dBT, K')
 grid on; zoom on
@@ -63,7 +51,7 @@ subplot(3,1,2)
 ix = [2,4,6,8];
 set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(vgrid, mdif(:, ix) - adif(:, ix));
-axis([pv1, pv2, ymin, ymax])
+axis([600, 2600, -0.2, 0.2])
 legend(fname{ix}, 'location', 'eastoutside')
 ylabel('dBT, K')
 grid on; zoom on
@@ -72,29 +60,27 @@ subplot(3,1,3)
 ix = [5];
 set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(vgrid, mdif(:, ix) - adif(:, ix));
-axis([pv1, pv2, ymin, ymax])
+axis([600, 2600, -0.2, 0.2])
 legend(fname{ix}, 'location', 'eastoutside')
 xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 
-% pname = sprintf('ccast_%s_sfil_%s', band, tstr);
+  pname = sprintf('rel_ddif_%s', tstr);
 % saveas(gcf, pname, 'fig')
-% export_fig([pname,'.pdf'], '-m2', '-transparent')
+  export_fig([pname,'.pdf'], '-m2', '-transparent')
+
+return
 
 %------------------------
 % FOR single differences
 %------------------------
-switch band
-  case 'LW', ymin = -0.3; ymax =  0.3;
-  case 'MW', ymin = -0.2; ymax =  0.2;
-  case 'SW', ymin = -0.4; ymax =  0.6;
-end
 figure(2); clf
+set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 set(gcf, 'DefaultAxesColorOrder', fcolor);
 plot(vgrid, mdif);
-axis([pv1, pv2, ymin, ymax])
-title(sprintf('%s FOR %d - %d, test %s', band, for1, for2, pstr))
+% axis([pv1, pv2, ymin, ymax])
+title(sprintf('FOR %d - %d, test %s', for1, for2, pstr))
 legend(fname, 'location', 'eastoutside')
 xlabel('wavenumber')
 ylabel('dBT, K')
@@ -108,14 +94,14 @@ grid on; zoom on
 % breakouts by scan geometery
 %-----------------------------
 figure(3); clf
+set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 subplot(2,1,1)
 ix = [9, 3, 6, 5, 2];
 set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(vgrid, mdif(:, ix));
-axis([pv1, pv2, ymin, ymax])
-title(sprintf('%s FOR %d - %d, scan breakouts', band, for1, for2))
+% axis([pv1, pv2, ymin, ymax])
+title(sprintf('FOR %d - %d, scan breakouts', for1, for2))
 legend(fname{ix}, 'location', 'eastoutside')
-xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 
@@ -123,8 +109,9 @@ subplot(2,1,2)
 ix = [8, 7, 4, 1];
 set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(vgrid, mdif(:, ix));
-axis([pv1, pv2, ymin, ymax])
+% axis([pv1, pv2, ymin, ymax])
 legend(fname{ix}, 'location', 'eastoutside')
+xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 

@@ -120,6 +120,7 @@ grid on; zoom on
 % corner and side FOV breakouts
 %-------------------------------
 figure(3); clf
+set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 subplot(2,1,1)
 ix = [1,3,7,9];
 set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));

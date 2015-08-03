@@ -1,5 +1,5 @@
 %
-% mean_diffss -- compare  results from mean_cfovs
+% mean_diffs2 -- compare two FOR 15-16 runs of mean_cfovs
 %
 
 addpath ../motmsc/utils

@@ -12,7 +12,7 @@
 % 
 % OPTS FIELDS
 %   version  - 'snpp' (default), 'jpss1', 'jpss2'
-%   resmode  - 'lowres' (default), 'hires1', or 'hires2'
+%   resmode  - 'lowres' (default), 'hires1', 'hires2', 'hi2low'
 %   addguard - 'false' (default), 'true' to include guard points
 %   foax     - focal plane FOV off-axis angles (default not set)
 %   frad     - focal plane FOV radii (default not set)
@@ -77,7 +77,7 @@ if nargin == 3
 end
 
 switch resmode
-  case {'lowres', 'hires1', 'hires2'}
+  case {'lowres', 'hires1', 'hires2', 'hi2low'}
   otherwise
     error(['bad resmode value ', resmode])
 end
@@ -127,7 +127,7 @@ switch band
     switch resmode 
       case 'lowres', npts = 528;
       case 'hires1', npts = 1037;
-      case 'hires2', npts = 1050;
+      case {'hires2', 'hi2low'}, npts = 1050;
     end
 
   case 'SW'
@@ -135,8 +135,7 @@ switch band
     vbase = 4;
     switch resmode
       case 'lowres', npts = 200;
-      case 'hires1', npts = 797;
-      case 'hires2', npts = 797;
+      case {'hires1', 'hires2', 'hi2low'}, npts = 797;
     end
 end
 
