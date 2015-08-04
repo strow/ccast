@@ -35,7 +35,7 @@ SAinv = zeros(inst.npts, inst.npts, 9);
 for j = 1 : 9
 
   % loop on channels
-  for i = 1 : inst.npts
+  parfor i = 1 : inst.npts
   
     % call newILS
     SAinv(:, i, j) = newILS(j, inst, inst.freq(i), inst.freq, opts);
