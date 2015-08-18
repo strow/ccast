@@ -23,7 +23,9 @@
 %   will match.  The function loops on elements of utc58 and so is
 %   relatively slow.
 %
-%   Output for times before UTC 1 Jan 1972 are returned as NaNs.
+%   UTC time was defined as starting 1 Jan 1972 with a ten second
+%   offset from TAI.  UTC time before then is not well-defined, as
+%   there is no standard way of assigning the leap seconds.
 %
 % REFERENCES
 %   [1] http://tycho.usno.navy.mil/leapsec.html
@@ -52,7 +54,7 @@ else
 end
 
 % zero row for pre 1972 dates
-leap_tab = [[0, NaN]; leap_tab];
+leap_tab = [[0, 0]; leap_tab];
 
 % seconds from 1900 to 1958
 tai_base = 1830297600;

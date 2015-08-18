@@ -89,6 +89,6 @@ legend('responsivity', 'numeric filter', ...
 xlabel('wavenumber'); ylabel('normalized weight')
 grid on; zoom on
 
-% saveas(gcf, sprintf('show_filts_%s', band), 'png')
-% export_fig( sprintf('show_filts_%s.pdf', band), '-m2', '-transparent')
+  saveas(gcf, sprintf('show_filts_%s', band), 'fig')
+  export_fig( sprintf('show_filts_%s.pdf', band), '-m2', '-transparent')
 

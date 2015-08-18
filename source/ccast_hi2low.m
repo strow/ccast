@@ -50,7 +50,7 @@ flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(91:96);
 
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/e5_Pn_ag';
+shome = '/asl/data/cris/ccast/sdr60';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
@@ -66,7 +66,7 @@ geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 opts = struct;            % initialize opts
 opts.cal_fun = 'e5';      % calibration function
 opts.version = 'snpp';    % current active CrIS
-opts.resmode = 'hires2';  % mode for inst_params
+opts.resmode = 'hi2low';  % mode for inst_params
 opts.addguard = 'true';   % include guard points 
 opts.geofile = geofile;   % geo filename for this doy
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
@@ -80,7 +80,7 @@ opts.SW_sfile = '../inst_data/SAinv_HR2_Pn_ag_SW.mat';
 opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';
 
 % NEdN principal component filter
-opts.nedn_filt = '../inst_data/nedn_filt_HR2.mat';
+opts.nedn_filt = '../inst_data/nedn_filt_LR.mat';
 
 %--------------------------------
 % process matlab RDR to SDR data 
