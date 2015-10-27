@@ -7,9 +7,9 @@ addpath utils
 
 sfile = 'SDR_d20150217_t0054204.mat';
 sdir1 = '/asl/data/cris/ccast/sdr60_hr/2015/048';
-sdir2 = '/asl/data/cris/ccast/e0_Pn_ag/2015/048';
-sname1 = 'old filter';
-sname2 = 'new filter';
+sdir2 = '/asl/data/cris/ccast/e6_Pn_ag/2015/048';
+sname1 = 'rIT post';
+sname2 = 'rIT pre';
 
 band = 'LW';
 
@@ -41,7 +41,7 @@ i2 = interp1(v2, 1:n2, vg, 'nearest');
 %---------------------------------------
 % compare a selected FOV, FOR, and scan
 %---------------------------------------
-ifov = 1;
+ifov = 3;
 ifor = 15;
 iscan = 31;
 

@@ -31,6 +31,7 @@ flat_bt = [flat_btLW; flat_btMW; flat_btSW];
 flat_ap = [flat_apLW; flat_apMW; flat_apSW];
 
 figure(1); clf
+set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 subplot(3,1,1)
 plot(vobs, resp_bt - flat_bt);
 axis([600, 2600, -0.3, 0.3])
@@ -41,7 +42,7 @@ grid on; zoom on
 subplot(3,1,2)
 plot(vobs, resp_ap - flat_ap);
 axis([600, 2600, -.02, 0.02])
-title('ap resp minus ap flat, 49 fitting profiles')
+title('hamm resp minus hamm flat, 49 fitting profiles')
 ylabel('dBT')
 grid on; zoom on
 

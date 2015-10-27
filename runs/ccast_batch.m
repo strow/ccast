@@ -26,10 +26,12 @@ addpath ../source
 
 procid = str2num(getenv('SLURM_PROCID'));
 nprocs = str2num(getenv('SLURM_NPROCS'));
+nodeid = sscanf(getenv('SLURMD_NODENAME'), 'n%d');
 
-fprintf(1, 'ccast_batch: processing day %d, year %d\n', d1 + procid, year)
+fprintf(1, 'ccast_batch: processing day %d, year %d, node %d\n', ...
+            d1 + procid, year, nodeid);
 
-  ccast_main(d1 + procid, year)
-% ccast_hires2(d1 + procid, year)
+% ccast_main(d1 + procid, year)
+  ccast_hires2(d1 + procid, year)
 % ccast_hi2low(d1 + procid, year)
 

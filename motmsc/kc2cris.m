@@ -31,8 +31,8 @@
 % DISCUSSION
 %   kc2cris and kc2iasi are similar internally--see finterp.pdf 
 %   from the airs_decon or ccast documentation for the relevant
-%   derivations.  Since we start with kcarta radiances, large n
-%   (number of observations) can quickly reach memory limits.
+%   derivations.  rad1 is an m x n array of kcarta radiances and
+%   can quickly reach memory limits for large n.
 %
 % HM, 22 Oct 2014
 %
