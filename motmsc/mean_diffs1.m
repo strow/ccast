@@ -66,9 +66,9 @@ xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 
-  pname = sprintf('rel_ddif_%s', tstr);
+% pname = sprintf('rel_ddif_%s', tstr);
 % saveas(gcf, pname, 'fig')
-  export_fig([pname,'.pdf'], '-m2', '-transparent')
+% export_fig([pname,'.pdf'], '-m2', '-transparent')
 
 return
 

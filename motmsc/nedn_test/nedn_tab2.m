@@ -6,7 +6,7 @@
 %
 
 % NEdN data
-% load nedn_tab_HR2
+% load nedn_tab_HR
   load nedn_tab_LR
 
 % number of basis vectors
@@ -41,4 +41,5 @@ for di = 1 : 2     % loop on sweep direction
 end
 
   save nedn_filt_LR vLW vMW vSW uLW uMW uSW
-% save nedn_filt_HR2 vLW vMW vSW uLW uMW uSW
+% save nedn_filt_HR vLW vMW vSW uLW uMW uSW
+

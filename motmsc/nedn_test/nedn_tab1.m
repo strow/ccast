@@ -45,6 +45,6 @@ for di = sdays
   fprintf(1, '\n')
 end
 
-% save nedn_tab_HR2 vLW vMW vSW nLWtab nMWtab nSWtab
+% save nedn_tab_HR vLW vMW vSW nLWtab nMWtab nSWtab
   save nedn_tab_LR vLW vMW vSW nLWtab nMWtab nSWtab
 

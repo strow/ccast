@@ -10,11 +10,13 @@ addpath ../motmsc/utils
 %-----------------
 
 % path to SDR year
-tstr = 'e5_Pn_ag';
+% tstr = 'e5_Pn_ag';
+  tstr = 'nedn_hr3-2';
 syear = fullfile('/asl/data/cris/ccast', tstr, '2015');
 
 % SDR days of the year
-sdays =  48 :  50;  % 17-19 Feb 2015
+% sdays =  48 :  50;   % 17-19 Feb 2015
+  sdays =  312 : 314;  %
 
 % loop initialization
 mLW = 717; mMW = 869; mSW = 637;

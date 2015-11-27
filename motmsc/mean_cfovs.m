@@ -17,12 +17,13 @@ addpath /asl/packages/airs_decon/source
 aflag = 0;       % set to 1 for ascending
 
 % path to SDR year
-  tstr = 'd2_Pn_ag';
+  tstr = 'e5_hr3_ap';
 % tstr = 'e5_Pn_ag';
 syear = fullfile('/asl/data/cris/ccast', tstr, '2015');
 
 % SDR days of the year
-sdays =  48 :  50;  % 17-19 Feb 2015
+% sdays =  48 :  50;   % 17-19 Feb 2015
+  sdays =  312 : 314;  % 
 
 % loop initialization
 nLW = 717; nMW = 869; nSW = 637; % high res sizes

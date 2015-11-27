@@ -1,6 +1,6 @@
 %
 % NAME
-%   inst_params - set instrument and user-grid parameters
+%   inst_params - set sensor and user-grid parameters
 %
 % SYNOPSIS
 %   [inst, user] = inst_params(band, wlaser, opts)
@@ -12,11 +12,13 @@
 % 
 % OPTS FIELDS
 %   version  - 'snpp' (default), 'jpss1', 'jpss2'
-%   resmode  - 'lowres' (default), 'hires1', 'hires2', 'hi2low'
-%   addguard - 'false' (default), 'true' to include guard points
+%   inst_res - 'lowres' (default), 'hires1-3', 'hi3to2'
+%   user_res - 'lowres' (default), 'hires'
 %   foax     - focal plane FOV off-axis angles (default not set)
 %   frad     - focal plane FOV radii (default not set)
 %   a2       - a2 nonlinearity weights (default UW SNPP values)
+%   pL, pH   - processing filter passband start and end freqs
+%   rL, rH   - processing filter out-of-band LHS and RHS rolloff
 %
 % OUTPUTS
 %   inst  - instrument parameters
@@ -25,9 +27,25 @@
 % DISCUSSION
 %   The main steps are (1) set default values, (2) allow overrides
 %   from opts, (3) set user grid parameters, and (4) set sensor grid
-%   parameters.  Focal plane parameters are included in the opts
-%   struct for convenience building new SA matrices and are saved
-%   with those files
+%   parameters.  Focal plane parameters can be set in the opts struct 
+%   for convenience building new SA matrices, and are saved in those
+%   files
+%
+%   sensor grid resolution modes (inst_res values)
+%               LW    MW   SW
+%     lowres  - 866,  530, 202
+%     hires1  - 866, 1039, 799
+%     hires2  - 866, 1052, 799
+%     hi3to2  - 866, 1052, 800
+%     hires3  - 874, 1052, 808
+%
+%   user grid resolution modes (user_res values)
+%     lowres  - opd 0.8 LW, 0.4 MW, 0.2 SW
+%     hires   - opd 0.8 all bands
+%
+%  DEPRECATED OPTIONS AND FIELDS
+%    resmode 'lowres', 'hires2', and 'hi2low' work as before
+%    usr.vr is used for bandpass filtering by some non-ccast app's
 %
 % AUTHOR
 %   H. Motteler, 4 Oct 2013
@@ -35,51 +53,58 @@
 
 function [inst, user] = inst_params(band, wlaser, opts)
 
+% keep "band" upper-case locally
 band = upper(band);
-
-switch band
-  case {'LW', 'MW', 'SW'}
-  otherwise
-    error(['bad band value ', band])
-end
 
 %----------
 % defaults
 %----------
 version = 'snpp';
-resmode = 'lowres';
-addguard = 'false';
+inst_res = 'lowres';
+user_res = 'lowres';
 foax = [];
 frad = [];
 
-% UW SNPP a2 weights (listed in row order)
+% UW SNPP a2 weights
 switch band
   case 'LW'
-    a2 = [0.01936  0.01433  0.01609 ...
-          0.02192  0.01341  0.01637 ...
-          0.01464  0.01732  0.03045];
+    a2 = [0.0194 0.0143 0.0161 0.0219 0.0134 0.0164 0.0146 0.0173 0.0305];
   case 'MW'
-    a2 = [0.00529  0.02156  0.02924  ...
-          0.01215  0.01435  0.00372  ...
-          0.10702  0.04564  0.00256];
+    a2 = [0.0053 0.0216 0.0292 0.0121 0.0143 0.0037 0.1070 0.0456 0.0026];
   case 'SW'
     a2 = zeros(1, 9);
+  otherwise
+    error(['bad band value ', band])
 end
 
-% process input options
+% e5-e6 cal algo filters
+switch band
+  case 'LW', pL =  650; pH = 1100; rL = 15; rH = 20; vr = 15;
+  case 'MW', pL = 1200; pH = 1760; rL = 30; rH = 30; vr = 20;
+  case 'SW', pL = 2145; pH = 2560; rL = 30; rH = 30; vr = 22;
+end
+
+% allow some old "resmode" style options
+if nargin == 3 && isfield(opts, 'resmode') 
+  switch opts.resmode
+    case 'hires2', inst_res = 'hires2'; user_res = 'hires';
+    case 'hi2low', inst_res = 'hires2'; user_res = 'lowres';
+    case 'lowres', inst_res = 'lowres'; user_res = 'lowres';
+  end
+end
+
+% apply any "opts" input options
 if nargin == 3
   if isfield(opts, 'version'), version = opts.version; end
-  if isfield(opts, 'resmode'), resmode = opts.resmode; end
-  if isfield(opts, 'addguard'), addguard = opts.addguard; end
+  if isfield(opts, 'inst_res'), inst_res = opts.inst_res; end
+  if isfield(opts, 'user_res'), user_res = opts.user_res; end
   if isfield(opts, 'foax'), foax = opts.foax; end
   if isfield(opts, 'frad'), frad = opts.frad; end
   if isfield(opts, 'a2'), a2 = opts.a2; end
-end
-
-switch resmode
-  case {'lowres', 'hires1', 'hires2', 'hi2low'}
-  otherwise
-    error(['bad resmode value ', resmode])
+  if isfield(opts, 'pL'), pL = opts.pL; end
+  if isfield(opts, 'pH'), pH = opts.pH; end
+  if isfield(opts, 'rL'), pL = opts.rL; end
+  if isfield(opts, 'rH'), pH = opts.rH; end
 end
 
 %-----------
@@ -90,58 +115,60 @@ switch band
     user.v1 = 650;    % first channel
     user.v2 = 1095;   % last channel
     user.opd = 0.8;   % user grid OPD
-    user.vr = 15;     % bandpass wings
+
   case 'MW'  
     user.v1 = 1210;
     user.v2 = 1750;
     user.opd = 0.4;
-    user.vr = 20;
+
   case 'SW'  
     user.v1 = 2155;
     user.v2 = 2550;
     user.opd = 0.2;
-    user.vr = 22;
 end
 
 % user OPD is 0.8 for high res
-switch resmode
-  case {'hires1', 'hires2'}, user.opd = 0.8;
+switch user_res
+  case 'lowres'
+  case 'hires', user.opd = 0.8;
+  otherwise, error(['bad user res value ', user_res])
 end
 
 % derived parameters
 user.dv = 1 / (2*user.opd);
 user.band = band;
+user.vr = vr;
 
 %-------------
 % sensor grid
 %-------------
 switch band
   case 'LW'
-    df = 24;       % decimation factor
-    npts = 864;    % decimated points
-    vbase = 1;     % alias offset
+    df = 24;          % decimation factor
+    vbase = 1;        % alias offset
+    switch inst_res   % interferogram size
+      case {'lowres', 'hires1', 'hires2', 'hi3to2'}, npts = 866;
+      case 'hires3', npts = 874;
+    end
 
   case 'MW'
     df = 20;
     vbase = 1;
-    switch resmode 
-      case 'lowres', npts = 528;
-      case 'hires1', npts = 1037;
-      case {'hires2', 'hi2low'}, npts = 1050;
+    switch inst_res
+      case 'lowres', npts = 530;
+      case 'hires1', npts = 1039;
+      case {'hires2', 'hires3', 'hi3to2'}, npts = 1052;
     end
 
   case 'SW'
     df = 26;
     vbase = 4;
-    switch resmode
-      case 'lowres', npts = 200;
-      case {'hires1', 'hires2', 'hi2low'}, npts = 797;
+    switch inst_res
+      case 'lowres', npts = 202;
+      case {'hires1', 'hires2'}, npts = 799;
+      case 'hi3to2', npts = 800;
+      case 'hires3', npts = 808;
     end
-end
-
-% option to add guard points
-switch addguard
-  case 'true', npts = npts + 2;
 end
 
 % derived parameters
@@ -170,11 +197,15 @@ inst.dv      = dv;
 inst.cind    = cind;
 inst.freq    = freq;
 inst.version = version;
-inst.resmode = resmode;
-inst.addguard = addguard;
+inst.inst_res = inst_res;
+inst.user_res = user_res;
 inst.foax    = foax(:);
 inst.frad    = frad(:);
 inst.a2      = a2(:);
+inst.pL      = pL;
+inst.pH      = pH;
+inst.rL      = rL;
+inst.rH      = rH;
 
 % mainly for tests
 inst.awidth = awidth;

@@ -4,7 +4,8 @@
 
 addpath utils
 
-d1 = load('nedn_e5_Pn_ag.mat');
+  d1 = load('nedn_nedn_hr3.mat');
+% d1 = load('nedn_e5_Pn_ag.mat');
 % d2 = load('ccast_e5_Pn_ag_15-16.mat');
 
 nednLW = gauss_filt(mean(d1.nmLW, 3));

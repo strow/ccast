@@ -33,10 +33,25 @@ band = upper(inst.band);
 npts = inst.npts;
 cind = inst.cind;
 
-% check if we should drop guard points
-if npts + 2 == m
- igm = igm(2:npts+1, :, :, :);
+% truncate and shift for hi3to2 LW and SW
+if strcmp(inst.inst_res, 'hi3to2') && ~strcmp(band, 'MW')
+  igm = igm((1:npts)+4, :, :, :);
 end
+
+% apodize all the extended res IGMs
+if strcmp(inst.inst_res, 'hires3')
+  igm = igm_apod(igm, 7);
+end
+
+% apodize the extended res LW and SW IGMs
+% if strcmp(inst.inst_res, 'hires3') && ~strcmp(band, 'MW')
+%   igm = igm_apod(igm);
+% end
+
+% % check if we should drop guard points
+% if npts + 2 == m
+%  igm = igm(2:npts+1, :, :, :);
+% end
 
 % do an FFT of shifted data.
 spec = fft(fftshift(igm, 1));

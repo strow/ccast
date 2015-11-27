@@ -19,15 +19,6 @@
 %   matlab RDR files and geo daily summary data from scripts such 
 %   as rdr2mat.m and geo_daily.m
 %
-%   The paths to data are set up as ../yyyy/doy/ but that's just a
-%   convention, doy can be any subset of the day's data.  The only
-%   restriction is that the current setup uses doy to match the geo
-%   daily summary, so doy can't be subset that spans days.
-%
-%   To switch to one of the high res modes, set opt.resmode to
-%   'hires1' or 'hires2' and opts.LW_sfile, MW_sfile, and SW_sfile
-%   to the high res SRF files.
-%
 
 function ccast_main(doy, year)
 
@@ -50,12 +41,13 @@ flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(91:96);
 
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/sdr60_hr';
+% shome = '/asl/data/cris/ccast/sdr60_hr';
+  shome = '/asl/data/cris/ccast/tmp60_hr';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
 % path to geo data, allgeo<yyyymmdd>.mat
-ghome = '/asl/data/cris/ccast/daily/';
+ghome = '/asl/data/cris/ccast/daily';
 tmp = datestr(datenum(year,1,1) + doy - 1, 30);
 geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 
@@ -66,8 +58,8 @@ geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 opts = struct;            % initialize opts
 opts.cal_fun = 'e5';      % calibration function
 opts.version = 'snpp';    % current active CrIS
-opts.resmode = 'hires2';  % mode for inst_params
-opts.addguard = 'true';   % include guard points 
+opts.inst_res = 'hires2'; % high res #2 sensor grid
+opts.user_res = 'hires';  % high resolution user grid
 opts.geofile = geofile;   % geo filename for this doy
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 
