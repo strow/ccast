@@ -38,10 +38,16 @@ if strcmp(inst.inst_res, 'hi3to2') && ~strcmp(band, 'MW')
   igm = igm((1:npts)+4, :, :, :);
 end
 
-% apodize all the extended res IGMs
-if strcmp(inst.inst_res, 'hires3')
+% truncate and apodize for hi3odd res mode
+if strcmp(inst.inst_res, 'hi3odd')
+  igm = igm(2:npts+1, :, :, :);
   igm = igm_apod(igm, 7);
 end
+
+% apodize all the extended res IGMs
+% if strcmp(inst.inst_res, 'hires3')
+%   igm = igm_apod(igm, 7);
+% end
 
 % apodize the extended res LW and SW IGMs
 % if strcmp(inst.inst_res, 'hires3') && ~strcmp(band, 'MW')

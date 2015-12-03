@@ -2,6 +2,7 @@
 % mean_diffs1 -- compare FOR 15 and FOR 16 runs of mean_cfovs
 %
 
+addpath mean_cfovs
 addpath ../motmsc/utils
 addpath /home/motteler/matlab/export_fig
 

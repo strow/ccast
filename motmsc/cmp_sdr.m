@@ -5,11 +5,11 @@
 addpath ../source
 addpath utils
 
-sfile = 'SDR_d20151108_t0210404.mat';
-sdir1 = '/asl/data/cris/ccast/e5_hr3_ap/2015/312';
-sdir2 = '/asl/data/cris/ccast/e5_hr3_ap1/2015/312';
-sname1 = 'apod 0';
-sname2 = 'apod 1';
+sfile = 'SDR_d20151108_t0226403.mat';
+sdir1 = '/asl/data/cris/ccast/nedn_hr3-2/2015/312';
+sdir2 = '/asl/data/cris/ccast/e5_hr3-2/2015/312';
+sname1 = 'hr3-ap1';
+sname2 = 'hi3odd';
 
 band = 'LW';
 
@@ -41,7 +41,7 @@ i2 = interp1(v2, 1:n2, vg, 'nearest');
 %---------------------------------------
 % compare a selected FOV, FOR, and scan
 %---------------------------------------
-ifov = 1;
+ifov = 5;
 ifor = 15;
 iscan = 32;
 

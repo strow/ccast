@@ -3,6 +3,7 @@
 %
 
 addpath ../source
+addpath /home/motteler/matlab/export_fig
 
 rpath = '/asl/data/cris/ccast/rdr60_hr/2015/306/';
 gran1 = 'RDR_d20151102_t1539244.mat';
@@ -88,20 +89,8 @@ grid on; zoom on
 % saveas(gcf, 'igm_even_points', 'png')
 
 figure(3); clf
-n = 799;
-x1 = n/2; x2 = x1 + 1; y1 = 2000;
-plot(1:n, SW1d0, 1:n, SW1d1, x1, y1, 'r+',  x2, y1, 'r+')
-ax(1)=396; ax(2)=405; ax(3)=0; ax(4)=2100; axis(ax)
-title('120 SW old high res ITC interferograms, both sweeps')
-xlabel('index'); ylabel('sensor count')
-text(x1, y1, '  n/2'); 
-text(x2, y1, '  n/2 + 1'); 
-grid on; zoom on 
-% saveas(gcf, 'igm_odd_points', 'png')
-
-return
-
-figure(4); clf
+set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+subplot(1,2,1)
 n = 808;
 x1 = n / 2; x2 = x1 + 1; y1 = 2300;
 plot(1:n, SW2d0, 1:n, SW2d1, x1, y1, 'r+', x2, y1, 'r+')
@@ -111,6 +100,23 @@ xlabel('index'); ylabel('sensor count')
 text(x1, y1, '  n/2'); 
 text(x2, y1, '  n/2 + 1'); 
 grid on; zoom on 
+% export_fig('igms_SW_new.pdf', '-m2', '-transparent')
+
+% figure(4); clf
+subplot(1,2,2)
+n = 799;
+x1 = n / 2; x2 = x1 + 1; y1 = 2000;
+plot(1:n, SW1d0, 1:n, SW1d1, x1, y1, 'r+',  x2, y1, 'r+')
+ax(1)=396; ax(2)=405; ax(3)=0; ax(4)=2100; axis(ax)
+title('120 SW old high res ITC interferograms, both sweeps')
+xlabel('index'); ylabel('sensor count')
+text(x1, y1, '  n/2'); 
+text(x2, y1, '  n/2 + 1'); 
+grid on; zoom on 
+% export_fig('igms_SW_old.pdf', '-m2', '-transparent')
+  export_fig('igm_SW_centers.pdf', '-m2', '-transparent')
+
+return
 
 figure(5); clf
 n = 1052;

@@ -12,12 +12,12 @@ addpath /asl/packages/airs_decon/source
 %-----------------
 % test parameters
 %-----------------
-% sFOR = 16;     % fields of regard, 1-30
-  sFOR = 15:16;  % fields of regard, 1-30
+  sFOR = 15;     % fields of regard, 1-30
+% sFOR = 15:16;  % fields of regard, 1-30
 aflag = 0;       % set to 1 for ascending
 
 % path to SDR year
-  tstr = 'e5_hr3_ap';
+  tstr = 'e5_hr3-2';
 % tstr = 'e5_Pn_ag';
 syear = fullfile('/asl/data/cris/ccast', tstr, '2015');
 

@@ -41,8 +41,8 @@ flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(91:96);
 
 % path to matlab SDR output files
-% shome = '/asl/data/cris/ccast/e5_hr3';
-  shome = '/asl/data/cris/ccast/e5_hr3_ap1';
+  shome = '/asl/data/cris/ccast/e5_hr3';
+% shome = '/asl/data/cris/ccast/e5_hr3_ap1';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
@@ -72,7 +72,7 @@ opts.SW_sfile = '../inst_data/SAinv_HR3_Pn_SW.mat';
 opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';
 
 % NEdN principal component filter
-opts.nedn_filt = '../inst_data/nedn_filt_HR2.mat';
+opts.nedn_filt = '../inst_data/nedn_filt_HR.mat';
 
 %--------------------------------
 % process matlab RDR to SDR data 

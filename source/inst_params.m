@@ -37,6 +37,7 @@
 %     hires1  - 866, 1039, 799
 %     hires2  - 866, 1052, 799
 %     hi3to2  - 866, 1052, 800
+%     hi3odd  - 873, 1051, 807
 %     hires3  - 874, 1052, 808
 %
 %   user grid resolution modes (user_res values)
@@ -148,6 +149,7 @@ switch band
     vbase = 1;        % alias offset
     switch inst_res   % interferogram size
       case {'lowres', 'hires1', 'hires2', 'hi3to2'}, npts = 866;
+      case 'hi3odd', npts = 873;
       case 'hires3', npts = 874;
     end
 
@@ -157,6 +159,7 @@ switch band
     switch inst_res
       case 'lowres', npts = 530;
       case 'hires1', npts = 1039;
+      case 'hi3odd', npts = 1051;
       case {'hires2', 'hires3', 'hi3to2'}, npts = 1052;
     end
 
@@ -167,6 +170,7 @@ switch band
       case 'lowres', npts = 202;
       case {'hires1', 'hires2'}, npts = 799;
       case 'hi3to2', npts = 800;
+      case 'hi3odd', npts = 807;
       case 'hires3', npts = 808;
     end
 end
