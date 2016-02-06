@@ -41,8 +41,7 @@ flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(91:96);
 
 % path to matlab SDR output files
-% shome = '/asl/data/cris/ccast/sdr60_hr';
-  shome = '/asl/data/cris/ccast/tmp60_hr';
+shome = '/asl/data/cris/ccast/sdr60_hr';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 

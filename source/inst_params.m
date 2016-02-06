@@ -67,16 +67,9 @@ foax = [];
 frad = [];
 
 % UW SNPP a2 weights
-switch band
-  case 'LW'
-    a2 = [0.0194 0.0143 0.0161 0.0219 0.0134 0.0164 0.0146 0.0173 0.0305];
-  case 'MW'
-    a2 = [0.0053 0.0216 0.0292 0.0121 0.0143 0.0037 0.1070 0.0456 0.0026];
-  case 'SW'
-    a2 = zeros(1, 9);
-  otherwise
-    error(['bad band value ', band])
-end
+a2LW = [0.0194 0.0143 0.0161 0.0219 0.0134 0.0164 0.0146 0.0173 0.0305];
+a2MW = [0.0053 0.0216 0.0292 0.0121 0.0143 0.0037 0.1070 0.0456 0.0026];
+a2SW = zeros(1, 9);
 
 % e5-e6 cal algo filters
 switch band
@@ -94,14 +87,16 @@ if nargin == 3 && isfield(opts, 'resmode')
   end
 end
 
-% apply any "opts" input options
+% apply recognized input options
 if nargin == 3
   if isfield(opts, 'version'), version = opts.version; end
   if isfield(opts, 'inst_res'), inst_res = opts.inst_res; end
   if isfield(opts, 'user_res'), user_res = opts.user_res; end
   if isfield(opts, 'foax'), foax = opts.foax; end
   if isfield(opts, 'frad'), frad = opts.frad; end
-  if isfield(opts, 'a2'), a2 = opts.a2; end
+  if isfield(opts, 'a2LW'), a2LW = opts.a2LW; end
+  if isfield(opts, 'a2MW'), a2MW = opts.a2MW; end
+  if isfield(opts, 'a2SW'), a2SW = opts.a2SW; end
   if isfield(opts, 'pL'), pL = opts.pL; end
   if isfield(opts, 'pH'), pH = opts.pH; end
   if isfield(opts, 'rL'), pL = opts.rL; end
@@ -188,6 +183,13 @@ cutpt = mod(round(vdfc/dv), npts);  % cut point (d9)
 % get the channel index permutation
 cind = [(cutpt+1:npts)' ; (1:cutpt)'];
 freq = dv * (cutpt:cutpt+npts-1)' + awidth * vbase;
+
+% set the a2 weights
+switch band
+  case 'LW', a2 = a2LW;
+  case 'MW', a2 = a2MW;
+  case 'SW', a2 = a2SW;
+end
 
 % instrument params
 inst.band    = band;

@@ -83,10 +83,10 @@ for ix = 1 : length(hlist)
   rtmp = ['RDR_', rid, '.mat'];
   rfile = fullfile(mout, rtmp);
 
-  % check if the matlab RDR file already exists
-  if exist(rfile) == 2
-    continue
-  end
+% % check if the matlab RDR file already exists
+% if exist(rfile) == 2
+%   continue
+% end
 
   % call the MIT RDR reader
   fprintf(1, 'rdr2mat: processing %s...\n', rid)

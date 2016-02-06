@@ -44,20 +44,10 @@ if strcmp(inst.inst_res, 'hi3odd')
   igm = igm_apod(igm, 7);
 end
 
-% apodize all the extended res IGMs
-% if strcmp(inst.inst_res, 'hires3')
-%   igm = igm_apod(igm, 7);
-% end
-
-% apodize the extended res LW and SW IGMs
-% if strcmp(inst.inst_res, 'hires3') && ~strcmp(band, 'MW')
-%   igm = igm_apod(igm);
-% end
-
-% % check if we should drop guard points
-% if npts + 2 == m
-%  igm = igm(2:npts+1, :, :, :);
-% end
+% apodize all IGMs for hires3 res mode
+if strcmp(inst.inst_res, 'hires3')
+  igm = igm_apod(igm, 7);
+end
 
 % do an FFT of shifted data.
 spec = fft(fftshift(igm, 1));

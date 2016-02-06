@@ -5,13 +5,13 @@
 addpath ../source
 addpath utils
 
-sfile = 'SDR_d20151108_t0226403.mat';
-sdir1 = '/asl/data/cris/ccast/nedn_hr3-2/2015/312';
-sdir2 = '/asl/data/cris/ccast/e5_hr3-2/2015/312';
-sname1 = 'hr3-ap1';
-sname2 = 'hi3odd';
+sfile = 'SDR_d20151205_t0407010.mat';
+sdir1 = '/asl/data/cris/ccast/sdr60_hr/2015/339';
+sdir2 = '/asl/data/cris/ccast/h3a2095/2015/339';
+sname1 = 'sdr60hr';
+sname2 = 'h3a2095';
 
-band = 'LW';
+band = 'MW';
 
 sfile1 = fullfile(sdir1, sfile);
 sfile2 = fullfile(sdir2, sfile);

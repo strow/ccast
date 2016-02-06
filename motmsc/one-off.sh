@@ -16,5 +16,5 @@ MATOPT='-nojvm -nodisplay -nosplash'
 
 # run the matlab wrapper
 srun --output=one-off_%j.out \
-  $MATLAB $MATOPT -r "mean_nedn; exit"
+  $MATLAB $MATOPT -r "mean_cfovs; exit"
 
