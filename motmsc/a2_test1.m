@@ -1,5 +1,5 @@
 %
-% a2_test3 -- FOV differences as a function of a2 values
+% a2_test -- FOV differences as a function of a2 values
 %
 % main internal vars
 %   na2   -  number of a2 vals
@@ -30,8 +30,8 @@ vH = 1750;    % MW fitting interval end, 1/cm
 %--------------------------------------------
 
 % a2 scaling factors as strings
-alist = {'050', '055', '060', '065', '070', '075', '080', '085', ...
-         '090', '095', '100', '105', '110'};
+alist = {'040', '045', '050', '055', '060', '065', '070', '075', ...
+         '080', '085', '090', '095', '100', '105', '110'};
 
 % loop initialization
 na2 = length(alist);

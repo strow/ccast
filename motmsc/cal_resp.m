@@ -5,10 +5,11 @@
 addpath ../source
 addpath utils
 
-kcdir = '/asl/s1/motteler/kctest2/kcdata';
+kcdir = '/asl/s1/motteler/kctest4/kcdata';
 
 opts = struct;
-opts.resmode = 'hires2';
+opts.inst_res = 'hires3';
+opts.user_res = 'hires';
 wlaser = 773.1307;
 [instLW, userLW] = inst_params('LW', wlaser, opts);
 [instMW, userMW] = inst_params('MW', wlaser, opts);
@@ -17,7 +18,7 @@ wlaser = 773.1307;
 ngc = 0;
 radLW = []; radMW = []; radSW = [];
 
-for i = 1 : 2223
+for i = 1 : 1854
 
   kcmat = fullfile(kcdir, sprintf('kc%04d.mat', i));
   d1 = load(kcmat);

@@ -5,11 +5,14 @@
 addpath ../source
 addpath utils
 
-sfile = 'SDR_d20151205_t0407010.mat';
-sdir1 = '/asl/data/cris/ccast/sdr60_hr/2015/339';
-sdir2 = '/asl/data/cris/ccast/h3a2095/2015/339';
-sname1 = 'sdr60hr';
-sname2 = 'h3a2095';
+sfile = 'SDR_d20160118_t0033058.mat';
+sdir1 = '/asl/data/cris/ccast/h3a2new/2016/018';
+sdir1 = '/asl/data/cris/ccast/d2_hr3-2/2016/018';
+sdir2 = '/asl/data/cris/ccast/sdr60_hr/2016/018';
+
+sname1 = 'h3a2new';
+sname1 = 'd2-hr3-2';
+sname2 = 'sdr60-hr';
 
 band = 'MW';
 

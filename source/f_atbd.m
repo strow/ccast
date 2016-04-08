@@ -52,6 +52,16 @@ switch(t)
     a3 = [ 30    59    41];
     a4 = [0.5   0.5   0.5];
 
+  case 'noaa3' 
+    % noaa new for extended res
+    np = [874  1052   808];
+    k0 = [ 79    95    85];
+    k1 = [797   959   724];
+    a1 = [ 30    59    41];
+    a2 = [0.5   0.58  0.5];
+    a3 = [ 30    59    41];
+    a4 = [0.5   0.5   0.5];
+
   otherwise
     error(sprintf('unexpected filter type %s', t))
 end

@@ -3,10 +3,12 @@
 %
 
 % load tests
-cf = load('cal_e5_Pn_ag_flat');
-cr = load('cal_e5_Pn_ag_resp');
-nf = load('cal_d2_Pn_ag_flat');
-nr = load('cal_d2_Pn_ag_resp');
+% cf = load('cal_h3a2new_flat');
+% cr = load('cal_h3a2new_resp');
+  cf = load('cal_sdr60_hr_flat');
+  cr = load('cal_sdr60_hr_resp');
+  nf = load('cal_h3noaa4_flat');
+  nr = load('cal_h3noaa4_resp');
 
 % plot setup
 addpath utils
@@ -97,7 +99,7 @@ subplot(3,1,1)
 iFOV = 1;
 plot(cf.vobs, cf.bobs(:, iFOV) - cf.bcal(:, iFOV), cc, ...
      nr.vobs, nr.bobs(:, iFOV) - nr.bcal(:, iFOV), nc)
-axis([1720, 1750, -0.5, 0.5])
+axis([1720, 1750, -0.5, 1.5])
 legend('ccast flat', 'noaa resp')
 title(sprintf('obs minus calc FOV %d', iFOV))
 ylabel('dBT')
@@ -107,7 +109,7 @@ subplot(3,1,2)
 iFOV = 2;
 plot(cf.vobs, cf.bobs(:, iFOV) - cf.bcal(:, iFOV), cc, ...
      nr.vobs, nr.bobs(:, iFOV) - nr.bcal(:, iFOV), nc);
-axis([1720, 1750, -0.5, 0.5])
+axis([1720, 1750, -0.5, 1.5])
 legend('ccast flat', 'noaa resp')
 title(sprintf('obs minus calc FOV %d', iFOV))
 ylabel('dBT')
@@ -117,7 +119,7 @@ subplot(3,1,3)
 iFOV = 5;
 plot(cf.vobs, cf.bobs(:, iFOV) - cf.bcal(:, iFOV), cc, ...
      nr.vobs, nr.bobs(:, iFOV) - nr.bcal(:, iFOV), nc);
-axis([1720, 1750, -0.5, 0.5])
+axis([1720, 1750, -0.5, 1.5])
 legend('ccast flat', 'noaa resp')
 title(sprintf('obs minus calc FOV %d', iFOV))
 ylabel('dBT')
@@ -185,7 +187,8 @@ set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(nr.vobs, nr.bobs(:, ix) - nr.bcal(:, ix))
 % axis([600, 2600, -3, 3])
 % axis([650, 680, -1, 2])
-  axis([1720, 1750, -0.5, 0.5])
+% axis([1720, 1750, -0.5, 0.5])
+  axis([1720, 1750, -1.0, 1.5])
 legend(fname{ix}, 'location', 'eastoutside')
 title('noaa obs minus resp calc corner FOVs')
 ylabel('dBT')
@@ -197,7 +200,8 @@ set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(nr.vobs, nr.bobs(:, ix) - nr.bcal(:, ix))
 % axis([600, 2600, -3, 3])
 % axis([650, 680, -1, 2])
-  axis([1720, 1750, -0.5, 0.5])
+% axis([1720, 1750, -0.5, 0.5])
+  axis([1720, 1750, -1.0, 1.5])
 legend(fname{ix}, 'location', 'eastoutside')
 title('noaa obs minus resp calc side FOVs')
 ylabel('dBT')
@@ -209,14 +213,15 @@ set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(nr.vobs, nr.bobs(:, ix) - nr.bcal(:, ix))
 % axis([600, 2600, -3, 3])
 % axis([650, 680, -1, 2])
-  axis([1720, 1750, -0.5, 0.5])
+% axis([1720, 1750, -0.5, 0.5])
+  axis([1720, 1750, -1.0, 1.5])
 legend(fname{ix}, 'location', 'eastoutside')
 title('noaa obs minus resp calc center FOV')
 ylabel('dBT')
 grid on; zoom on
 
 % saveas(gcf, 'cal_noaa_MW', 'png')
-  export_fig('cal_noaa_MW.pdf', '-m2', '-transparent')
+% export_fig('cal_noaa_MW.pdf', '-m2', '-transparent')
 
 %------------------------
 % ccast breakouts by FOV
@@ -229,7 +234,8 @@ set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(cf.vobs, cf.bobs(:, ix) - cf.bcal(:, ix))
 % axis([600, 2600, -3, 3])
 % axis([650, 680, -1, 2])
-  axis([1720, 1750, -0.5, 0.5])
+% axis([1720, 1750, -0.5, 0.5])
+  axis([1720, 1750, -1.0, 1.5])
 legend(fname{ix}, 'location', 'eastoutside')
 title('ccast obs minus flat calc corner FOVs')
 ylabel('dBT')
@@ -241,7 +247,8 @@ set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(cf.vobs, cf.bobs(:, ix) - cf.bcal(:, ix))
 % axis([600, 2600, -3, 3])
 % axis([650, 680, -1, 2])
-  axis([1720, 1750, -0.5, 0.5])
+% axis([1720, 1750, -0.5, 0.5])
+  axis([1720, 1750, -1.0, 1.5])
 legend(fname{ix}, 'location', 'eastoutside')
 title('ccast obs minus flat calc side FOVs')
 ylabel('dBT')
@@ -253,15 +260,13 @@ set(gcf, 'DefaultAxesColorOrder', fcolor(ix, :));
 plot(cf.vobs, cf.bobs(:, ix) - cf.bcal(:, ix))
 % axis([600, 2600, -3, 3])
 % axis([650, 680, -1, 2])
-  axis([1720, 1750, -0.5, 0.5])
+% axis([1720, 1750, -0.5, 0.5])
+  axis([1720, 1750, -1.0, 1.5])
 legend(fname{ix}, 'location', 'eastoutside')
 title('ccast obs minus flat calc center FOV')
 ylabel('dBT')
 grid on; zoom on
 
 % saveas(gcf, 'cal_ccast_MW', 'png')
-  export_fig('cal_ccast_MW.pdf', '-m2', '-transparent')
-
-
-
+% export_fig('cal_ccast_MW.pdf', '-m2', '-transparent')
 
