@@ -1,46 +1,44 @@
 %
-% ILS test 1 - compare newILS, oaffov, and UW ILS
+% ils_demo - demo ILS plots
 %
 
-addpath ../source
-addpath ../motmsc/utils
+addpath ../../source
+addpath ../utils
 
 band = 'SW';
 wlaser = 773.13;
 opts = struct;
-opts.resmode = 'hires2';
+opts.inst_res = 'hires3';
+opts.user_res = 'hires';
 
+[foax, frad] = fp_v33a(band);
 [inst, user] = inst_params(band, wlaser, opts);
-dv   = inst.dv;
-freq = inst.freq;
-ichan = floor(0.6*inst.npts);
-ichan = 3;
-fchan = freq(ichan); 
+inst.foax = foax; 
+inst.frad = frad;
 
-% new UMBC ILS
-narc = 2001;
-opts = struct;
-opts.narc = narc;
-opts.wrap = 'sinc';
-srf1 = newILS(1, inst, fchan, freq, opts);
-srf2 = newILS(2, inst, fchan, freq, opts);
-srf5 = newILS(5, inst, fchan, freq, opts);
+k = 6;
+v1 = user.v1;
+v2 = user.v2;
+vref = floor((v1 + v2) / 2);
+vgrid = (vref - k : 0.02 : vref+k)';
 
-% interpolate to a finer frequency grid
-[srf1, frq1] = finterp2(srf1(:), freq, 10);
-[srf2, frq2] = finterp2(srf2(:), freq, 10);
-[srf5, frq5] = finterp2(srf5(:), freq, 10);
+opts.narc = 2000;
+opts.wrap = 'psinc n';
+
+srf1 = newILS(1, inst, vref, vgrid, opts);
+srf2 = newILS(2, inst, vref, vgrid, opts);
+srf5 = newILS(5, inst, vref, vgrid, opts);
 
 figure(1); clf
-plot(frq1, srf1, frq2, srf2, frq5, srf5)
-% axis([floor(fchan-6), ceil(fchan+6), -0.3, 1.1])
-k = 6;
-v1 = floor(max(fchan-k, freq(1)));
-v2 = floor(min(fchan+k, freq(end)));
-axis([v1, v2, -0.3, 1.1])
-title(sprintf('CrIS SW ILS comparison, channel %d', ichan))
-legend('fov 1', 'fov 2', 'fov 5')
+set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+plot(vgrid, srf1, vgrid, srf2, vgrid, srf5)
+axis([vgrid(1), vgrid(end), -0.3, 1.1])
+title(sprintf('CrIS ILS at %g cm-1', vref))
+legend('FOV 1', 'FOV 2', 'FOV 5')
+xlabel('wavenumber');
+ylabel('weight')
 zoom on; grid on
 
-saveas(gcf, sprintf('ILS_SW_chan_%d', ichan), 'fig')
+% saveas(gcf, sprintf('ILS_%s_demo', band), 'png')
+  export_fig(sprintf('ILS_%s_demo.pdf', band), '-m2', '-transparent')
 

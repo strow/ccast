@@ -4,7 +4,7 @@
 
 addpath ../source
 
-kcdir = '/asl/s1/motteler/kctest4/kcdata';
+kcdir = '/asl/s1/motteler/kctest5/kcdata';
 
 opt1 = struct;
 opt1.inst_res = 'hires3';
@@ -25,7 +25,7 @@ optSW.pL = 2145; optSW.pH = 2560; optSW.rL = 30; optSW.rH = 30;
 
 radLW = []; radMW = []; radSW = [];
 
-for i = 1 : 1854
+for i = 1 : 3782
 
   kcmat = fullfile(kcdir, sprintf('kc%04d.mat', i));
   d1 = load(kcmat);

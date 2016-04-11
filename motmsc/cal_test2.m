@@ -13,17 +13,17 @@ addpath ../motmsc/utils
 % tstr = 'h3noaa4';
 % tstr = 'h3a2new';
 % tstr = input('test > ', 's');
-gran = 'SDR_d20160118_t0529041';
-fstr = fullfile('/asl/data/cris/ccast', tstr, '2016/018', gran);
+gran = 'SDR_d20160120_t0304487';
+fstr = fullfile('/asl/data/cris/ccast', tstr, '2016/020', gran);
 d1 = load(fstr);
 
 % load the RTP clear matchups
-rtpfile = '/asl/s1/motteler/kctest4/clear_testY.rtp';
+rtpfile = '/asl/s1/motteler/kctest5/clear_testY.rtp';
 [h, ha, p, pa] = rtpread(rtpfile);
 
 % load convolved kcarta data
-% filt = 'resp';
-  filt = 'flat';
+  filt = 'resp';
+% filt = 'flat';
 % filt = input('filt > ', 's');
 d2 = load(['cal_', filt]);
 
