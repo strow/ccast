@@ -3,6 +3,8 @@
 %
 
 addpath /asl/packages/airs_decon/source
+addpath /asl/packages/ccast/source
+addpath /home/motteler/matlab/export_fig
 
 % load convolved kcarta data
 flat = load('cal_flat');
