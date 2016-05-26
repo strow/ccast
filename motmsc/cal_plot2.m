@@ -338,7 +338,7 @@ ylabel('dBT')
 grid on; zoom on
 
 % saveas(gcf, 'ddif_LW_zoom', 'fig')
-  export_fig('ddif_LW_zoom.pdf', '-m2', '-transparent')
+% export_fig('ddif_LW_zoom.pdf', '-m2', '-transparent')
 
 %------------------------------
 % double diff all FOVs MW zoom
@@ -366,5 +366,5 @@ ylabel('dBT')
 grid on; zoom on
 
 % saveas(gcf, 'ddif_MW_zoom', 'fig')
-  export_fig('ddif_MW_zoom.pdf', '-m2', '-transparent')
+% export_fig('ddif_MW_zoom.pdf', '-m2', '-transparent')
 
