@@ -23,18 +23,23 @@
 
 The Nyquist equations for Fourier transform interferometry are
 
-\[ V = N \/dv = 1/ 2\/dx \]
-\[ L = N \/dx = 1/ 2\/dv \]
+\[ \Vmax = n \: dv = 1/ (2\/dx) \]
+\[ \Lmax = n \: dx = 1/ (2\/dv) \]
 
 where
 
 \begin{itemize}
-  \item $L$ is maximum OPD
-  \item $V$ is maximum frequency
+  \item $\Lmax$ is maximum OPD
+  \item $\Vmax$ is maximum frequency
   \item $dx$ is the distance step
   \item $dv$ is the frequency step
-  \item the transform size is $2N$
+  \item $n$ is the number of steps
+% \item the transform size is $2N$
 \end{itemize}
+
+\vspace{2mm}
+We consider the application to interferometric or ``double Fourier''
+interpolation
 
 \end{frame}
 %----------- slide --------------------------------------------------%
@@ -51,20 +56,50 @@ where
 \frametitle{discussion}
 
 \begin{itemize}
-  \item the previous slide shows the special case of a symmetrical
-    real-valued interferogram being transformed to symmetrical
-    real-valued spectra.  Note that the transform is invertible.
-  \item the $2n$ point real-valued FFT is equivalent to an $n+1$
-    point cosine transform.
-  \item applications of the $n+1$ point representation include
-    \begin{itemize}
-       \item calculating expected observed radiances
-       \item applying apodization and response functions
-       \item interpolation between instrument grids
-    \end{itemize}
-  \item for a typical interpolation application we start with two
-    frequency steps, $dv_1$ and $dv_2$, and want to move between
-    them
+
+  \item $\Vmax = n\: dv = 1/(2\/dx)$ and $\Lmax = n\: dx =
+    1/(2\/dv)$
+
+  \item $\Lmax$ and $\Vmax$ fall on index $n+1$ when we start
+    counting from $1$
+
+  \item index $1$ is optical displacement 0 and index $n+1$ is
+    optical displacement $\Lmax$.  We need $n+1$ points to represent
+    a full single-sided sweep
+
+  \item starting from spectra we generate the interferogram by
+    embedding the spectral interval from $j$ to $k$ in the larger
+    zero-filled span from $0$ to $\Vmax$, reflecting this from $n$
+    down to $2$ as shown, and doing a $2n$-point inverse FFT
+
+  \item starting from spectra at resolution $dv$, note that choosing
+    one of $dx$, $\Vmax$, or $n$ fixes the other values
+
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
+\frametitle{discussion}
+
+\begin{itemize}
+
+  \item if our original $n+1$ point spectra is real-valued then the
+    interferogram will be as well
+
+  \item the transforms are invertible.  If we start with an $n+1$
+    point sweep from $0$ to $\Lmax$, reflect it as shown, and do a
+    $2n$ point FFT, we get the spectra and reflection
+
+  \item in practice we might take a $2n$ point sweep from $-\Lmax$
+    to $\Lmax$, get an interferogram centered near point $n$, swap
+    halves to get something like the interferogram shown, and do a
+    $2n$ point FFT to get the spectra and reflection
+
+  \item in that case the resulting spectrum will typically be
+    complex, with the imperfect centering appearing as a phase
+    shift
+    
 \end{itemize}
 
 \end{frame}
@@ -83,13 +118,13 @@ where
 
 The Nyquist equations for (1) and (2) are
 
-\[ V_1 = N_1 \/dv_1 = 1/ 2\/dx \]
-\[ L_1 = N_1 \/dx   = 1/ 2\/dv_1 \]
+\[ V_1 = N_1 \/dv_1 = 1/(2\/ dx) \]
+\[ L_1 = N_1 \/dx   = 1/(2\/ dv_1) \]
 
 and for (2) and (3) are
 
-\[ V_2 = N_2 \/dv_2 = 1/ 2\/dx \]
-\[ L_2 = N_2 \/dx   = 1/ 2\/dv_2 \]
+\[ V_2 = N_2 \/dv_2 = 1/ (2\/ dx) \]
+\[ L_2 = N_2 \/dx   = 1/ (2\/ dv_2) \]
 
 If we are given $dv_1$ and $dv_2$ then we need $dx$, $N_1$, or $N_2$
 to fill out the values above.  $N_1$ and $N_2$ must be integers.

@@ -275,6 +275,30 @@ the \ccast\ \ils\ for $\fov_i$ can be represented as
 \end{frame}
 %----------- slide --------------------------------------------------%
 \begin{frame}
+\frametitle{\ccast\ \SA\ matrix}
+
+the \ccast\ \SA\ matrix for $\fov_k$ is
+
+\[\SA(i,j) = \int_{\mbox{\tiny FOV}_k} \!\!\!\! w_k(\theta)\, \psinc(2 \pi
+                 \delta(v_i - v_j \cos \theta ))\, d\theta \]
+
+\begin{itemize}
+  \item $1 \le i,j \le n$, for $n$ the number of points in the
+    sensor grid
+  \item $v_i$ is frequency for channel $i$, and $\delta$ is max \opd
+  \item $\psinc(x) = sin(x)/(n \sin(x/n))$ for $x \ne 0$,  $1$ for
+    $x = 0$
+   \item $\psinc(2 \pi \delta(v - v_0 \cos \theta ))$ gives the ILS
+     for a single ray at off-axis angle $\theta$ and reference or
+     channel frequency $v_0$
+  \item integration is over the intersection of on-axis arcs with
+    $\fov_k$, with $w_k(\theta)$ the length of an intersecting arc
+    at off-axis angle $\theta$
+\end{itemize}
+
+\end{frame}
+%----------- slide --------------------------------------------------%
+\begin{frame}
 \frametitle{sample \ccast\ \ils}
 \begin{center}
   \includegraphics[scale=0.5]{figures/ILS_SW_demo.pdf}
