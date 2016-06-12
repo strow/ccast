@@ -55,12 +55,13 @@ geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 %----------------------------
 
 opts = struct;            % initialize opts
-opts.cal_fun = 'e5';      % calibration function
+opts.cal_fun = 'e7';      % calibration function
 opts.version = 'snpp';    % current active CrIS
 opts.inst_res = 'hires3'; % high res #3 sensor grid
 opts.user_res = 'hires';  % high resolution user grid
 opts.geofile = geofile;   % geo filename for this doy
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
+opts.resamp = 4;          % resampling algorithm
 
 % high-res SA inverse files
 opts.LW_sfile = '../inst_data/SAinv_HR3_Pn_LW.mat';

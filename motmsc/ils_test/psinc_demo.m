@@ -2,52 +2,56 @@
 % psinc_demo - sinc and psinc integrated and single-ray ILS
 %
 
-addpath ../source
-addpath ../motmsc/utils
+addpath ../../source
+addpath ../utils
 
-% get sensor grid
+% inst parameters
 band = 'SW';
-opts = struct;
-opts.resmode = 'lowres';
-% opts.resmode = 'hires2';
 wlaser = 773.1301;
+opts = struct;
+opts.user_res = 'hires';
+opts.inst_res = 'hires3';
+[foax, frad] = fp_v33a(band);
+opts.foax = foax;
+opts.frad = frad;
 [inst, user] = inst_params(band, wlaser, opts);
 
 % demo parameters
 ifov = 1;
-% fchan = 949.71;
-fchan = user.v1 + .2 * (user.v2 - user.v1);
-
-% oaffov parameters
-fgrid = inst.freq;
+vref = user.v1 + 0.4 * (user.v2 - user.v1);
+vgrid = inst.freq;
+theta = inst.foax(ifov);
 opd = inst.opd;
-thetac = inst.foax(ifov);
-hfov = inst.frad(ifov);
-nslice = 2001;
 N = inst.npts;
+pv1 = 10 * round(vgrid(1)/10);
+pv2 = 10 * round(vgrid(end)/10);
 
 % regular sinc integrated ILS
-[frq1, srf1] = oaffov2(fgrid, fchan, opd, thetac, hfov, nslice);
+opts.narc = 1000;
+opts.wrap = 'sinc';
+srf1 = newILS(ifov, inst, vref, vgrid, opts);
 
 % periodic sinc integrated ILS
-[frq2, srf2] = oaffov_p(fgrid, fchan, opd, thetac, hfov, nslice, N);
+opts.wrap = 'psinc n';
+srf2 = newILS(ifov, inst, vref, vgrid, opts);
 
 % regular sinc single-ray ILS
-srf3 = rsinc(2*(fgrid - fchan*cos(thetac))*opd);
+srf3 = rsinc(2*(vgrid - vref*cos(theta))*opd);
 srf3 = srf3 / sum(srf3);
 
 % periodic sinc single-ray ILS
-srf4 = psinc(2*(fgrid - fchan*cos(thetac))*opd, N);
+srf4 = psinc(2*(vgrid - vref*cos(theta))*opd, N);
 srf4 = srf4 / sum(srf4);
 
 % periodic sinc extended
 frq5 = 0 : inst.dv : 4000;
-srf5 = psinc(2*(frq5 - fchan*cos(thetac))*opd, N);
+srf5 = psinc(2*(frq5 - vref*cos(theta))*opd, N);
 
 % sinc and psinc ILS plots
 figure(1); clf
 subplot(2,1,1)
-plot(frq1, srf1, frq2, srf2)
+plot(vgrid, srf1, vgrid, srf2)
+axis([pv1, pv2, -0.2, 0.8])
 legend('sinc ILS', 'psinc ILS')
 title(sprintf('FOV %d sinc and periodic sinc ILS', ifov))
 xlabel('wavenumber')
@@ -55,7 +59,8 @@ ylabel('normalized weight')
 grid on; zoom on
 
 subplot(2,1,2)
-plot(frq1, srf2 - srf1)
+plot(vgrid, srf2 - srf1)
+ax = axis; ax(1) = pv1; ax(2) = pv2; axis(ax);
 title('periodic minus regular sinc ILS')
 xlabel('wavenumber')
 ylabel('difference')
@@ -63,7 +68,8 @@ grid on; zoom on
 
 % single-ray and ILS plots
 figure(2); clf
-plot(frq1, srf1, frq2, srf2, fgrid, srf3, fgrid, srf4)
+plot(vgrid, srf1, vgrid, srf2, vgrid, srf3, vgrid, srf4)
+axis([pv1, pv2, -0.2, 0.8])
 title(sprintf('FOV %d single-ray and ILS comparison', ifov))
 legend('sinc ILS', 'psinc ILS', 'sinc ray', 'psinc ray')
 xlabel('wavenumber')

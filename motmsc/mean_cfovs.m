@@ -18,10 +18,7 @@ aflag = 0;       % set to 1 for ascending
 
 % path to SDR year
 % tstr = 'sdr60_hr';
-% tstr = 'h3a2new';
-  tstr = 'd2_hr3-2';
-% tstr = 'd2_a2new';
-% tstr = 'h3noaa4';
+  tstr = 'e7r4hr3';
 syear = fullfile('/asl/data/cris/ccast', tstr, '2016');
 
 % SDR days of the year
