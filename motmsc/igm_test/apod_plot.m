@@ -1,3 +1,6 @@
+%
+% apod_plot -- plot extended res cosine apodization
+%
 
 addpath ../source
 addpath /home/motteler/matlab/export_fig
