@@ -91,7 +91,7 @@ if exist(btrimFile) == 2
   fprintf(1, '%s: starting with cached bit trim mask\n', fname)
 else
   % use a default 
-  [BitTrimBitsRetained, BitTrimIndex, BitTrimNpts] = btrim_lores;
+  [BitTrimBitsRetained, BitTrimIndex, BitTrimNpts] = btrim_lowres;
   packet.BitTrimBitsRetained = BitTrimBitsRetained;
   packet.BitTrimIndex = BitTrimIndex;
   packet.BitTrimNpts = BitTrimNpts;

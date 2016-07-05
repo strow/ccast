@@ -2,6 +2,7 @@
 # ccast/motmsc git ignore file
 #
 
-figures
 noaa_test
-
+cal_test1
+cal_test2
+mean_cfovs

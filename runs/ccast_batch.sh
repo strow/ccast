@@ -9,10 +9,10 @@
 # sbatch options
 #SBATCH --job-name=ccast
 #SBATCH --partition=batch
-#SBATCH --qos=long_contrib
+#SBATCH --qos=medium
 #SBATCH --account=pi_strow
 #SBATCH --mem-per-cpu=12000
-#SBATCH --ntasks=60
+#SBATCH --ntasks=31
 
 # matlab options
 MATLAB=/usr/cluster/matlab/2014a/bin/matlab
@@ -23,12 +23,12 @@ srun --output=ccast_%j_0_%t.out \
     $MATLAB $MATOPT -r "ccast_batch($1, $2); exit"
 
 # job step 2
-srun --output=ccast_%j_1_%t.out \
-   $MATLAB $MATOPT -r "ccast_batch($1+60, $2); exit"
+# srun --output=ccast_%j_1_%t.out \
+#   $MATLAB $MATOPT -r "ccast_batch($1+30, $2); exit"
 
 # job step 3
-srun --output=ccast_%j_2_%t.out \
-   $MATLAB $MATOPT -r "ccast_batch($1+120, $2); exit"
+# srun --output=ccast_%j_2_%t.out \
+#   $MATLAB $MATOPT -r "ccast_batch($1+60, $2); exit"
 
 # job step 4
 # srun --output=ccast_%j_3_%t.out \

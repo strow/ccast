@@ -1,7 +1,7 @@
 %
 % mean_cfovs - mean and std for each ccast FOV over selected FORs
 %
-% loop on days and ccast SDR filesand take the mean and standard
+% loop on days and ccast SDR files and take the mean and standard
 % deviation for each FOV for a subset of FORs
 %
 
@@ -12,17 +12,19 @@ addpath /asl/packages/airs_decon/source
 %-----------------
 % test parameters
 %-----------------
-% sFOR = 16;     % fields of regard, 1-30
-  sFOR = 15:16;  % fields of regard, 1-30
+  sFOR = 16;     % fields of regard, 1-30
+% sFOR = 15:16;  % fields of regard, 1-30
 aflag = 0;       % set to 1 for ascending
 
 % path to SDR year
-  tstr = 'd2_Pn_ag';
-% tstr = 'e5_Pn_ag';
-syear = fullfile('/asl/data/cris/ccast', tstr, '2015');
+% tstr = 'sdr60_hr';
+  tstr = 'e7r4hr3';
+syear = fullfile('/asl/data/cris/ccast', tstr, '2016');
 
 % SDR days of the year
-sdays =  48 :  50;  % 17-19 Feb 2015
+% sdays =  48 :  50;   % 17-19 Feb 2015
+% sdays =  338 : 340;  % recent non-lin test
+  sdays =  18 : 20;    % new NOAA test
 
 % loop initialization
 nLW = 717; nMW = 869; nSW = 637; % high res sizes

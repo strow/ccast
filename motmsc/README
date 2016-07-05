@@ -1,89 +1,199 @@
 
-recent tests
--------------
-cmp_sdr      - compare spectra from two ccast SDR files
-cmp_idps     - compare spectra from ccast and ipds files
-cmp_fovs     - find a FOR with similar FOVs and compare them
-cmp_loop1    - loop on ccast SDR files, compare with IDPS 
-cmp_ecmwf1   - loop on ECMWF RTP, match with IDPS, compare
-cmp_ecmwf2   - compare ecmwf, idps, and ccast radiances
-plot_allsci  - sample plots of sci and eng data
+top level 
+--------
+rad_svd - SVD on some sample radiance sets
+resamp[YXZ] - assorted resampling tests
 
-mean_cfovs   - compare ccast FOV means over a set of files
-mean_ifovs   - compare idps FOV means over a set of files
+mkSArun - call mkSAinv with typical values
 
-nf_test      - numeric filter tests
-interp_test  - finterp validation 
+mean_cfovs  - mean and std for each ccast FOV over selected FORs
+mean_plots  - plot results from mean_cfovs
+mean_diffs1 - compare FOR 15 and FOR 16 runs of mean_cfovs
+mean_diffs2 - compare two FOR 15-16 runs of mean_cfovs
+
+cal_flat  - convolve kcarta radiances with kc2cris
+cal_resp  - convolve kcarta radiances with kc2resp
+cal_test1 - plot responsivity differences
+cal_test2 - match kcarta, rtp, and cris SDR obs
+cal_plot2 - plots from cal_test2
+
+resp_test1 - compare kc2resp with kc2cris
+resp_test2 - try flattened responsivity
+resp_test3 - compare kc2resp with kc2resp3
+resp_test4 - calibration equation tests
+resp_test5 - show R fHR rHR vs fLR R rHR
+resp_test6 - sample flat, flat + 20, and resp ref truth
+ 
+resp_obs - compare ccast minus noaa with flat minus resp ref truth
+resp_cmp - compare recent ccast with UW reference responsivity
+
+kc2cris  - convolve kcarta to CrIS channel radiances
+kc2resp  - convolve kcarta to CrIS responsivity
+kc2resp3 - used for 2-stage responsivity test
+
+filt_test1 - compare ccast with old UW ATBD filters
+filt_test2 - compare ccast and new noaa processing filters
+filt_test3 - compare noaa high and extended res filters
+filt_test4 - compare compare old and new bandpass filters
+show_filts - plot responsivity, FIR, and processing filters
+
+cmp_sdr   - compare two ccast SDR files
+cmp_res   - compare ccast hi2low with user-grid finterp
+cmp_idps  - compare b/ccast and IDPS spectra
+cmp_loop1 - loop on ccast SDR files, compare with IDPS
+cmp_fovs1 - find a FOR with similar FOVs and compare them
+cmp_fovs2 - find obs with similar FOVs and compare them
+
+sa_test1 - plot difference of SA row and column sums from 1
+sa_test2 - plot difference of SA inv row and col sums from 1
+sa_test3 - plot stats for extended SA matrix
+sa_shift - plot SA time impulse
+
+inst_demo   - demo calls to inst_params
+plot_allsci - sample plots of sci and eng data
+sweep_diffs - compare space and IT looks by sweep direction
+rad_stats1  - long span CrIS radiance stats
+
+utils
+------
+header      - man-page style function boilerplate 
+finterp2    - fourier interpolation, wrapper for interpft
+gauss_filt  - 7-point Gaussian FIR filter
+hires_bmask - high res bit trim mask with max and min bounds
+isclose     - test for rms relative difference less than eps
+ntail       - find the non-NaN end a vector or array
+rec_mean    - recursive mean
+rec_var     - one-pass recursive variance
+round2n     - round to n significant digits
+fovnames    - FOV names for plot legends
+fovcolors   - colors for 9 FOV plots
+scalefig    - scale figures for printing
+lat2aflag   - flag ascending latitudes
+latcheck    - test lat2aflag
+test_mean   - test of recursive mean
+test_var    - test of recursive variance
+
+rtp_sarta
+----------
+ccast2rtp  - take ccast SDR data to RTP structs
+cris_ichan - sarta ichan indices in frequency order
+cris_vchan - full CrIS grid with guard channels
+guard_ind  - indices for copying data with guard bands
+guard_test - test guard_ind
+ichan_demo - get sarta ichan and vchan values for CrIS
+rtp_test   - basic high level tests of ccast2rtp
+
+nedn_test
+----------
+nedn_tab1  - tabulate unfiltered nedn estimates
+nedn_tab2  - save left singular vectors from tabulated NEdN data
+nedn_test1 - quick look at NOAA NEdN
+nedn_test2 - quick look at ccast NEdN
+nedn_test3 - compare two ccast NEdN runs
+nedn_test4 - NEdN svd and filter demo plots
+mean_nedn  - get ccast NEdN average over several days
+nedn_plot  - show NEdN and NEdT from mean_nedn data
+
+nonlinear
+----------
+a2_test*  - FOV differences as a function of a2 values
+nlc_ng    - nonlineary correction
+nlc_uw    - UW nonlinearity function
+nlc_test1 - compare old and new non-linearity correction codes
+nlc_test2 - plot old and new numeric filters
 
 msc_test
 ---------
 joepcut      - compare Joe P spreadsheet vs inst_params
+cut_test1    - show plot channel freq vs met laser
 echeck1      - compare eng packet vs older saved emissivity 
 echeck2      - quick look at changes in eng packet emissivity
 dw2dv_test   - compare wlaser and frequency residuals
-rtp_test2    - compare readsdr_rtp with prototype readbc_rtp
-conv_demo1   - demo of kcarta to CrIS convolution with finterp
-test_std     - test of recursive std
-test_mean    - test of recursive mean
-cos_demo     - generic cosine transform demo
-rdr_times    - compare RDR internal, filename, and attribute time
-matbench     - simple matlab vectorization benchmarks
-bcast_rdr4   - call rdr2sdr4 on regular or high-res data
-rdr2mat4     - process 4-scan RDR h5 files to mat files
-rdr2sdr4     - rdr2sdr to check for out-of-order 4-scan data
 idps_check   - quick look a day's worth of SDR data
+idps_wlaser  - plot IPDS SDR wlaser values for multiple days
 read_test1   - misc MIT reader tests
+nf_test1     - interpolate old filter to sensor grid
+nf_test2     - compare old and new numeric filters
+interp_test1 - test finterp as used in CrIS processing
+interp_test2 - test complex vs regular versions of finterp
+cold_cfovs   - scan ccast SDR files for cold obs
+check_days   - quick check for bad SDR data
 
-hires
-------
+time
+-----
+new time functions, see time/README
+
+ils_test
+---------
+mostly tests to develop a new ccast ILS function
+ils_demo - demo ILS plots
+circ_test - plot integration setup for CrIS FOVs
+ils_test1 - compare newILS, oaffov, and UW ILS
+ils_test2 - newILS and oaffov as functions of arc steps
+ils_test3 - show ILS change at cutpoints
+ils_test4 - benchmark new ILS, oaffov, and UW ILS
+ils_test5 - get condition number of f * SA-1 *f
+ils_test6 - test fix for limit a -> 0
+ils_test7 - check newILS normalization
+ils_test8 - check newILS grid shifts
+imp_test1 - show finterp impulse response is a sinc function
+psinc - normalized periodic sinc
+rsinc - normalized regular sinc
+oaffov2 - old UMBC ILS function
+computeIls - old UW ILS function
+
+noaa_test
+----------
+compare NOAA and CCAST SDRs with radiances calculated from clear
+matchups for the 17-19 Feb 2015 NOAA test
+
+geo_test
+---------
+geo_plot1  - demo plot of allgeo data
+geo_run1   - geo_daily-only wrapper
+geo_test   - simple geo tests and benchmarks
+map_demo1  - plot xtrack by atrack for a selected channel
+map_demo2  - map demo from a list of matlab SDR files
+
+movavg
+-------
+atest       - moving average w/ NaN tests
+movavg_aux  - get moving average from a 3-file window
+movavg_pre  - preprocess moving averages
+
+igm_test
+---------
+apod_plot   - plot extended res cosine apodization
+igm_shift1  - check interferograms before and after extension
+igm_shift2  - shift extended igms to pre-extended grid
+igm_mean    - find mean of a day of interferogram data
+igm_std     - find std of a day of interferogram data
+igm_plots   - plot mean and std of interferogram data
+igm_scan1   - find max and min IGM values from bcast dump files
+phase_look  - print summary phase stats from bcast dump files
+phase_diffs - plot even minus odd phase diffs
+mask_test1  - plot IGM obs along with high res bit-trim mask
+
+zold
+-----
+cmp_ecmwf1  - loop on ECMWF RTP, match with IDPS, compare
+cmp_ecmwf2  - compare ecmwf, idps, and ccast radiances
+
+zold/msc_test
+--------------
+rtp_test2   - compare readsdr_rtp with prototype readbc_rtp
+conv_demo1  - demo of kcarta to CrIS convolution with finterp
+cos_demo    - generic cosine transform demo
+rdr_times   - compare RDR internal, filename, and attribute time
+matbench    - simple matlab vectorization benchmarks
+bcast_rdr4  - call rdr2sdr4 on regular or high-res data
+rdr2mat4    - process 4-scan RDR h5 files to mat files
+rdr2sdr4    - rdr2sdr to check for out-of-order 4-scan data
+
+zold/hires
+-----------
 srf_lowres  - compare low res SRFs by FOV at mid-band
 srf_hires1  - compare high res SRFs by FOV at mid-band
 srf_hires2  - compare high res SRFs by FOV at low end of band
 srf_hires3  - check high res SA residuals
 mkemissHR   - tabulated emissivity for highres ICT model
-
-geo_test
----------
-geo_plot1   - demo plot of allgeo data
-geo_run1    - geo_daily-only wrapper
-geo_test    - simple geo tests and benchmarks
-map_demo1   - plot xtrack by atrack for a selected channel
-map_demo2   - map demo from a list of matlab SDR files
-
-movavg
--------
-atest        - moving average w/ NaN tests
-movavg_aux   - get moving average from a 3-file window
-movavg_pre   - preprocess moving averages
-
-igm_test
----------
-igm_mean     - find mean of a day of interferogram data
-igm_std      - find std of a day of interferogram data
-igm_plots    - plot mean and std of interferogram data
-igm_scan1    - find max and min IGM values from bcast dump files
-phase_look   - print summary phase stats from bcast dump files
-phase_diffs  - plot even minus odd phase diffs
-mask_test1   - plot IGM obs along with high res bit-trim mask
-
-utils
-------
-header       - man-page style function boilerplate 
-finterp2     - fourier interpolation, wrapper for interpft
-hires_bmask  - high res bit trim mask with max and min bounds
-isclose      - test for rms relative difference less than eps
-ntail        - find the non-NaN end a vector or array
-oaffov2      - compute the off axis SRF
-readbc_rtp   - translate bcast SDR data to RTP profiles
-rec_std      - recursive standard deviation
-rec_mean     - recursive (mean
-rmscol       - return rms value for each column
-iet2mat      - take IET time to matlab serial date number
-tai2mat      - take AIRS TAI to matlab serial date number
-iet2tai      - take IET to AIRS TAI
-tai2iet      - take AIRS TAI to IET
-seq_match    - return closest matching pairs from two sequences
-mkhamm       - build a sparse matrix for fast hamming convolutions
-fovnames     - FOV names for plot legends
-fovcolors    - colors for 9 FOV plots
-

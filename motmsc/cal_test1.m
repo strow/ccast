@@ -1,10 +1,14 @@
 %
-% cal_test1 -- plot responsivity double difference
+% cal_test1 -- plot responsivity differences
 %
 
+addpath /asl/packages/airs_decon/source
+addpath /asl/packages/ccast/source
+addpath /home/motteler/matlab/export_fig
+
 % load convolved kcarta data
-flat = load('cal_flatX');
-resp = load('cal_respX');
+flat = load('cal_flat');
+resp = load('cal_resp');
 
 % get mean brightness temps
 resp_btLW = mean(real(rad2bt(resp.frqLW, resp.radLW)), 2);
@@ -30,29 +34,35 @@ resp_ap = [resp_apLW; resp_apMW; resp_apSW];
 flat_bt = [flat_btLW; flat_btMW; flat_btSW];
 flat_ap = [flat_apLW; flat_apMW; flat_apSW];
 
+% load responsivity 
+d1 = load('resp_filt');
+resp_freq = [d1.freq_lw; d1.freq_mw; d1.freq_sw];
+resp_filt = [d1.filt_lw; d1.filt_mw; d1.filt_sw];
+
 figure(1); clf
+set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 subplot(3,1,1)
-plot(vobs, resp_bt - flat_bt);
-axis([600, 2600, -0.3, 0.3])
-title('resp minus flat, 49 fitting profiles')
-ylabel('dBT')
+plot(resp_freq, resp_filt)
+axis([600, 2600, 0, 1.5])
+title('responsivity')
+ylabel('weight')
 grid on; zoom on
 
 subplot(3,1,2)
-plot(vobs, resp_ap - flat_ap);
-axis([600, 2600, -.02, 0.02])
-title('ap resp minus ap flat, 49 fitting profiles')
+plot(vobs, resp_bt - flat_bt);
+axis([600, 2600, -0.4, 0.4])
+title('resp calc minus flat calc')
 ylabel('dBT')
 grid on; zoom on
 
 subplot(3,1,3)
-plot(vobs, (resp_bt - flat_bt) - (resp_ap - flat_ap))
-axis([600, 2600, -0.3, 0.3])
-title('double difference')
+plot(vobs, resp_ap - flat_ap);
+axis([600, 2600, -.04, 0.04])
+title('hamming resp calc minus hamming flat calc')
 xlabel('wavenumber')
 ylabel('dBT')
 grid on; zoom on
 
-saveas(gcf, 'fit_prof_resp', 'png')
-saveas(gcf, 'fit_prof_resp', 'fig')
+% saveas(gcf, 'resp_flat_diff', 'png')
+% export_fig('resp_flat_diff.pdf', '-m2', '-transparent')
 

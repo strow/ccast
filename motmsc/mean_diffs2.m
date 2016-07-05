@@ -2,14 +2,15 @@
 % mean_diffs2 -- compare two FOR 15-16 runs of mean_cfovs
 %
 
+addpath mean_cfovs
 addpath ../motmsc/utils
 addpath /home/motteler/matlab/export_fig
 
-% f1 = input('file 1 > ', 's');
-% f2 = input('file 2 > ', 's');
+f1 = input('file 1 > ', 's');
+f2 = input('file 2 > ', 's');
 
-f1 = 'ccast_d2_Pn_ag_15-16.mat';
-f2 = 'ccast_e5_Pn_ag_15-16.mat';
+% f1 = 'ccast_d2_Pn_ag_15-16.mat';
+% f2 = 'ccast_e5_Pn_ag_15-16.mat';
 
 d1 = load(f1);
 d2 = load(f2);
@@ -36,8 +37,8 @@ fname = fovnames;
 fcolor = fovcolors;
 
 % plot title suffix
-% tstr1 = d1.tstr; tstr2 = d2.tstr;
-tstr1 = 'noaa'; tstr2 = 'ccast';
+tstr1 = d1.tstr; tstr2 = d2.tstr;
+% tstr1 = 'noaa'; tstr2 = 'ccast';
 pstr1 = strrep(tstr1, '_', '-');
 pstr2 = strrep(tstr2, '_', '-');
 
@@ -73,5 +74,5 @@ ylabel('dBT, K')
 grid on; zoom on
 
 % saveas(gcf, 'rel_summary', 'png')
-export_fig('rel_summary.pdf', '-m2', '-transparent')
+% export_fig('rel_summary.pdf', '-m2', '-transparent')
 

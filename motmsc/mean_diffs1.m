@@ -2,6 +2,7 @@
 % mean_diffs1 -- compare FOR 15 and FOR 16 runs of mean_cfovs
 %
 
+addpath mean_cfovs
 addpath ../motmsc/utils
 addpath /home/motteler/matlab/export_fig
 
@@ -66,9 +67,9 @@ xlabel('wavenumber')
 ylabel('dBT, K')
 grid on; zoom on
 
-  pname = sprintf('rel_ddif_%s', tstr);
+% pname = sprintf('rel_ddif_%s', tstr);
 % saveas(gcf, pname, 'fig')
-  export_fig([pname,'.pdf'], '-m2', '-transparent')
+% export_fig([pname,'.pdf'], '-m2', '-transparent')
 
 return
 

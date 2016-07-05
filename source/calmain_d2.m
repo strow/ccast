@@ -79,7 +79,7 @@ switch inst.band
 end
 
 % NOAA processing filters
-pfilt = f_atbd(bi, 1:inst.npts, 'noaa2');
+pfilt = f_atbd(bi, 1:inst.npts, 'noaa3');
 pfilt2 = pfilt(:) * ones(1, 2);
 pfilt30 = pfilt(:) * ones(1, 30);
 

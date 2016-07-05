@@ -81,12 +81,8 @@ end
 % get the SA inverse matrix
 Sinv = getSAinv(sfile, inst);
 
-% ccast new bandpass
-switch inst.band
-  case 'LW', pL =  650; pH = 1100; rL = 15; rH = 20;
-  case 'MW', pL = 1200; pH = 1760; rL = 30; rH = 30;
-  case 'SW', pL = 2145; pH = 2560; rL = 30; rH = 30;
-end
+% get processing filter specs
+pL = inst.pL; pH = inst.pH; rL = inst.rL; rH = inst.rH;
 
 %---------------
 % loop on scans

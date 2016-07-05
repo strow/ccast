@@ -1,73 +1,74 @@
 %
-% filt_test3 -- show ATBD regular res filters by index 
+% filt_test3 -- compare noaa high and extended res filters
 %
 
 addpath ../source
 
-opts = struct;
-opts.resmode = 'lowres';
-
-% all in one plot
-figure(1); clf
-
 %-----------
 % LW filter 
 %-----------
-[inst, user] = inst_params('LW', 773.13, opts);
-ix = 1 : inst.npts;
-ff = f_atbd(1, ix);
 
-subplot(3,2,1)
-plot(ix, ff)
-axis([40, 80, -0.1, 1.1])
+opts = struct;
+opts.inst_res = 'hires2';
+[inst2, user] = inst_params('LW', 773.13, opts);
+x2 = inst2.freq;
+n2 = inst2.npts;
+i2 = 1 : n2;
+f2 = f_atbd(1, i2, 'noaa2');
+
+opts.inst_res = 'hires3';
+[inst3, user] = inst_params('LW', 773.13, opts);
+x3 = inst3.freq;
+n3 = inst3.npts;
+i3 = 1 : n3;
+f3 = f_atbd(1, i3, 'noaa3');
+
+figure(1); clf
+subplot(1,2,1)
+plot(x2, f2, x3, f3)
+axis([620, 645, -0.1, 1.1])
 title('LW left')
+legend('hires2', 'hires3', 'location', 'northwest')
 grid on; zoom on;
 
-subplot(3,2,2)
-plot(ix, ff)
-axis([785, 825, -0.1, 1.1])
+subplot(1,2,2)
+plot(x2, f2, x3, f3)
+axis([1100, 1125, -0.1, 1.1])
 title('LW right')
-grid on; zoom on;
-
-%-----------
-% MW filter 
-%-----------
-[inst, user] = inst_params('MW', 773.13, opts);
-n = inst.npts;
-k = 50;
-
-subplot(3,2,3)
-ix = 1 : k;
-plot(ix, f_atbd(2, ix))
-axis([10, 40, -0.1, 1.1])
-title('MW left')
-grid on; zoom on;
-
-subplot(3,2,4)
-ix = n-k+1 : n;
-plot(ix, f_atbd(2, ix))
-axis([490, 520, -0.1, 1.1])
-title('MW right')
+legend('hires2', 'hires3', 'location', 'northeast')
 grid on; zoom on;
 
 %-----------
 % SW filter 
 %-----------
-[inst, user] = inst_params('SW', 773.13, opts);
-n = inst.npts;
-k = 25;
 
-subplot(3,2,5)
-ix = 1 : k;
-plot(ix, f_atbd(3, ix))
-axis([5, 20, -0.1, 1.1])
+opts = struct;
+opts.inst_res = 'hires2';
+[inst2, user] = inst_params('SW', 773.13, opts);
+x2 = inst2.freq;
+n2 = inst2.npts;
+i2 = 1 : n2;
+f2 = f_atbd(3, i2, 'noaa2');
+
+opts.inst_res = 'hires3';
+[inst3, user] = inst_params('SW', 773.13, opts);
+x3 = inst3.freq;
+n3 = inst3.npts;
+i3 = 1 : n3;
+f3 = f_atbd(3, i3, 'noaa3');
+
+figure(2); clf
+subplot(1,2,1)
+plot(x2, f2, x3, f3)
+axis([2120, 2140, -0.1, 1.1])
 title('SW left')
+legend('hires2', 'hires3', 'location', 'northwest')
 grid on; zoom on;
 
-subplot(3,2,6)
-ix = n-k+1 : n;
-plot(ix, f_atbd(3, ix))
-axis([180, 195, -0.1, 1.1])
+subplot(1,2,2)
+plot(x2, f2, x3, f3)
+axis([2560, 2590, -0.1, 1.1])
 title('SW right')
+legend('hires2', 'hires3', 'location', 'northeast')
 grid on; zoom on;
 

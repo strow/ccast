@@ -124,7 +124,12 @@ for fi = 1 : nfile
   % RDR validation and ordering.  checkRDR returns data in column
   % order as nchan x 9 x nobs arrays, with nobs being the time steps
 
-  [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR(d1, rid);
+  try
+    [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSDR] = checkRDR(d1, rid);
+  catch
+     fprintf(1, 'rdr2sdr: checkRDR failed, skipping file %s\n', rid)
+     continue
+  end
 
   % this frees up a lot of of memory
   clear d1

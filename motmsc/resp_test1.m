@@ -19,7 +19,8 @@ vkc = d1.w(:); rkc = d1.r(:);
 % get CrIS user struct
 band = 'LW';
 opt1 = struct;
-opt1.resmode = 'hires2';
+opt1.user_res = 'hires';
+opt1.inst_res = 'hires3';
 wlaser = 773.13;
 [inst, user] = inst_params(band, wlaser, opt1);
 
@@ -27,7 +28,9 @@ wlaser = 773.13;
 ngc = 0;
 
 % basic convolution
-[rad1, frq1] = kc2cris(user, rkc, vkc, ngc);
+opt2 = struct;
+opt2.ngc = ngc;
+[rad1, frq1] = kc2cris(user, rkc, vkc, opt2);
 
 % convolution with responsivity
 [rad2, frq2] = kc2resp(user, rkc, vkc, ngc);
