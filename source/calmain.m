@@ -17,6 +17,9 @@ switch opts.cal_fun
   case 'd2'
     [rcal, vcal, nedn] = ...
        calmain_d2(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
+  case 'e5_noise'
+    [rcal, vcal, nedn] = ...
+       calmain_e5_noise(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
   case 'e5'
     [rcal, vcal, nedn] = ...
        calmain_e5(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
