@@ -41,7 +41,7 @@
 %   H. Motteler, 26 Apr 2012
 %
 
-function [rICT, vcal, nedn] = ...
+function [rcal, vcal, nedn] = ...
      calmain_e5_noise(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts)
 
 %-------------------
@@ -61,7 +61,7 @@ rcal = ones(nchan, 9, 30, nscan) * NaN;
 es_nlc = ones(nchan, 9) * NaN;
 sp_nlc = ones(nchan, 9, 2) * NaN;
 it_nlc = ones(nchan, 9, 2) * NaN;
-es_sp = ones(nchan, 9, 30) * NaN;
+es_sp = ones(nchan, 9, 2) * NaN;
 it_sp = ones(nchan, 9, 2) * NaN;
 
 % NEdN setup
@@ -125,11 +125,14 @@ for si = 1 : nscan
     it_sp(:, :, k) = it_nlc(:,:,j) - sp_nlc(:,:,j);
   end
 
-  % loop on earth scenes
+% loop on earth scenes
+% Move SP and ES into rcnt, had to switch sweep dirs for this to work below
+  rcnt(:,:,[28 27 30 29],:) = rcnt(:,:,31:34,:);
   for iES = 1 : 30
-    j = mod(iES, 2) + 1; % SP and IT index
+     j = mod(iES, 2) + 1; % SP and IT index
 
-    % do the ES nonlinearity correction
+% do the ES nonlinearity correction
+   % LLS below iES --> iES+4  
     es_nlc = nlc_vec(inst, rcnt(:, :, iES, si), avgSP(:, :, j, si), eng);   
 
     % save the ES - SP difference
@@ -171,6 +174,8 @@ for si = 1 : nscan
     rtmp = squeeze(rICT(:, fi, :, si));
     rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
     rtmp = rIT(:, 1:2) .* (Sinv(:,:,fi) * rtmp);
+%   Below we avoid Sinv
+%    rtmp = rIT(:, 1:2) .* rtmp;
     rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
     [rtmp, it_vcal] = finterp(rtmp, inst.freq, user.dv);
 

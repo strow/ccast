@@ -205,10 +205,41 @@ for fi = 1 : nfile
   % radiometric and spectral calibration
   % -------------------------------------
   
-  % get moving averages of SP and IT count spectra
-  [avgLWSP, avgLWIT] = movavg_app(rcLW(:, :, 31:34, :), mvspan);
-  [avgMWSP, avgMWIT] = movavg_app(rcMW(:, :, 31:34, :), mvspan);
-  [avgSWSP, avgSWIT] = movavg_app(rcSW(:, :, 31:34, :), mvspan);
+% % Run this once per day?  
+% % get moving averages of SP and IT count spectra
+% % Save cal counts for fancier smoothing
+%   allLWSP = rcLW(:,:, 31:32,:);
+%   allLWIT = rcLW(:,:, 33:34,:);
+%   allMWSP = rcMW(:,:, 31:32,:);
+%   allMWIT = rcMW(:,:, 33:34,:);
+%   allSWSP = rcSW(:,:, 31:32,:);
+%   allSWIT = rcSW(:,:, 33:34,:);
+% 
+%   ctmp = ['CAL_', rid, '.mat'];
+%   cfile = fullfile(sdir, ctmp);
+% 
+%   FORTime = geo.FORTime(30,:);
+%   
+%   save(cfile,'allLWSP','allLWIT','allMWSP','allMWIT','allSWSP','allSWIT','FORTime');
+% 
+%   continue
+
+% Load in pre-smoothed cal data, should be one-to-one...
+  
+   ctmp = ['SCAL_', rid, '.mat'];
+   cfile = fullfile(sdir, ctmp);
+   load(cfile);
+
+   avgLWSP = out_LWSP;
+   avgLWIT = out_LWIT;
+   avgMWSP = out_MWSP;
+   avgMWIT = out_MWIT;
+   avgSWSP = out_SWSP;
+   avgSWIT = out_SWIT;
+  
+%   [avgLWSP, avgLWIT] = movavg_app(rcLW(:, :, 31:34, :), mvspan);
+%   [avgMWSP, avgMWIT] = movavg_app(rcMW(:, :, 31:34, :), mvspan);
+%   [avgSWSP, avgSWIT] = movavg_app(rcSW(:, :, 31:34, :), mvspan);
 
   [rLW, vLW, nLW] = calmain(instLW, userLW, rcLW, scTime, ...
                             avgLWIT, avgLWSP, sci, eng, geo, opts);
