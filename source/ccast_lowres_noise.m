@@ -58,15 +58,21 @@ geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 opts = struct;            % initialize opts
 opts.cal_fun = 'e5_noise';      % calibration function
 opts.version = 'snpp';    % current active CrIS
-opts.inst_res = 'lowres'; % low resolution sensor grid
+% opts.inst_res = 'lowres'; % low resolution sensor grid
+opts.inst_res = 'hires3'; % low resolution sensor grid
 opts.user_res = 'lowres'; % low resolution user grid
 opts.geofile = geofile;   % geo filename for this doy
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 
 % low-res SA inverse files
-opts.LW_sfile = '../inst_data/SAinv_LR_Pn_ag_LW.mat';
-opts.MW_sfile = '../inst_data/SAinv_LR_Pn_ag_MW.mat';
-opts.SW_sfile = '../inst_data/SAinv_LR_Pn_ag_SW.mat';
+opts.LW_sfile = '../inst_data/SAinv_HR3_Pn_LW.mat';
+opts.MW_sfile = '../inst_data/SAinv_HR3_Pn_MW.mat';
+opts.SW_sfile = '../inst_data/SAinv_HR3_Pn_SW.mat';
+
+
+% opts.LW_sfile = '../inst_data/SAinv_LR_Pn_ag_LW.mat';
+% opts.MW_sfile = '../inst_data/SAinv_LR_Pn_ag_MW.mat';
+% opts.SW_sfile = '../inst_data/SAinv_LR_Pn_ag_SW.mat';
 
 % time-domain FIR filter 
 opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';
