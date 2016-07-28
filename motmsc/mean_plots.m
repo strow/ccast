@@ -75,7 +75,7 @@ bstd_diff = bstd - bstd(:, iref) * ones(1, 9);
 
 % print some stats
 fprintf(1, 'residuals by FOV\n')
-fprintf(1, '%8.4f', rmscol(bavg_diff))
+fprintf(1, '%8.4f', rms(bavg_diff))
 fprintf(1, '\nccast %s FOV %d, test %s, bn = %d\n', band, iref, tstr, bn)
 
 % plot frequency grid
