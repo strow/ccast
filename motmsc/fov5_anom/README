@@ -1,0 +1,15 @@
+
+find_anom2  - read hacked ccast data, tabulate relevant info
+fovdiff     - return max RMS FOV difference
+
+ccast_h3tolow  - modified to tabulate nlc_hack values
+rdr2sdr     - modified to tabulate nlc_hack values
+calmain_e5  - modified to tabulate nlc_hack values
+nlc_hack    - nlc_vec modified to return Vlev and Vdc
+
+find_anom1  - find the original homogeneous warm/cold test set
+nlc_cmp     - original homogeneous warm/cold test set stats
+nlc_vecX    - nlc_vec modified save internal values to a file
+
+hist2d      - demo 2d histogram
+

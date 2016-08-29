@@ -64,6 +64,10 @@ it_nlc = ones(nchan, 9, 2) * NaN;
 es_sp = ones(nchan, 9, 30) * NaN;
 it_sp = ones(nchan, 9, 2) * NaN;
 
+% tabulate NLC values
+VlevTab = zeros(9, 30, nscan);
+VdcTab = zeros(9, 30, nscan);
+
 % NEdN setup
 rICT = ones(nchan, 9, 2, nscan) * NaN;
 sp_all = rcnt(:, :, 31:32, :);
@@ -134,9 +138,20 @@ for si = 1 : nscan
 
     % save the ES - SP difference
     es_sp(:, :, iES) = es_nlc - sp_nlc(:, :, j);
-  end
 
-% if si == 10 && strcmp(inst.band, 'SW'), keyboard, end
+    % tabulate nlc internals
+   [Vlev, Vdc] = nlc_hack(inst, rcnt(:, :, iES, si), avgSP(:, :, j, si), eng);   
+   VlevTab(:, iES, si) = Vlev;
+   VdcTab(:, iES, si) = Vdc;
+
+    % stop on selected scan and FOR
+%   if si ==  7 && iES == 15, keyboard, end
+%   if si == 10 && iES == 15, keyboard, end
+%   if si == 11 && iES == 15, keyboard, end
+%   if si == 18 && iES == 16, keyboard, end
+%   if si ==  8 && iES == 16, keyboard, end
+%   if si == 33 && iES == 16, keyboard, end
+  end
 
   % loop on FOVs
   for fi = 1 : 9
@@ -163,23 +178,24 @@ for si = 1 : nscan
   % IT calibration (for NEdN)
   %---------------------------
 
-  % calculate (IT(i) - SP) / (IT - SP) for both sweep directions
-  rICT(:,:,:,si) = (it_all(:,:,:,si) - sp_mean) ./ (it_mean - sp_mean);
+% % calculate (IT(i) - SP) / (IT - SP) for both sweep directions
+% rICT(:,:,:,si) = (it_all(:,:,:,si) - sp_mean) ./ (it_mean - sp_mean);
+%
+% % loop on FOVs
+% for fi = 1 : 9
+%
+%   % apply the bandpass and SA-1 transforms
+%   rtmp = squeeze(rICT(:, fi, :, si));
+%   rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
+%   rtmp = rIT(:, 1:2) .* (Sinv(:,:,fi) * rtmp);
+%   rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
+%   [rtmp, it_vcal] = finterp(rtmp, inst.freq, user.dv);
+%
+%   % save the current nchan x 2 chunk
+%   rICT(1:mchan, fi, :, si) = rtmp(1:mchan, :);
+%
+% end
 
-  % loop on FOVs
-  for fi = 1 : 9
-
-    % apply the bandpass and SA-1 transforms
-    rtmp = squeeze(rICT(:, fi, :, si));
-    rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
-    rtmp = rIT(:, 1:2) .* (Sinv(:,:,fi) * rtmp);
-    rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
-    [rtmp, it_vcal] = finterp(rtmp, inst.freq, user.dv);
-
-    % save the current nchan x 2 chunk
-    rICT(1:mchan, fi, :, si) = rtmp(1:mchan, :);
-
-  end
 end
 
 %-----------
@@ -192,8 +208,11 @@ rcal = rcal(1:mchan, :, :, :);
 rICT = rICT(1:mchan, :, :, :);
 
 % NEdN is the standard deviation of rICT
-nedn = nanstd(real(rICT), 0, 4);
+% nedn = nanstd(real(rICT), 0, 4);
 
 % apply principal component filter to NEdN 
-nedn = nedn_filt(user, opts.nedn_filt, vcal, nedn);
+% nedn = nedn_filt(user, opts.nedn_filt, vcal, nedn);
+
+% HACK: save NLC values in nedn
+nedn = VlevTab;
 
