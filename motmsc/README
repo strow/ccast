@@ -17,25 +17,8 @@ cal_test1 - plot responsivity differences
 cal_test2 - match kcarta, rtp, and cris SDR obs
 cal_plot2 - plots from cal_test2
 
-resp_test1 - compare kc2resp with kc2cris
-resp_test2 - try flattened responsivity
-resp_test3 - compare kc2resp with kc2resp3
-resp_test4 - calibration equation tests
-resp_test5 - show R fHR rHR vs fLR R rHR
-resp_test6 - sample flat, flat + 20, and resp ref truth
- 
-resp_obs - compare ccast minus noaa with flat minus resp ref truth
-resp_cmp - compare recent ccast with UW reference responsivity
-
 kc2cris  - convolve kcarta to CrIS channel radiances
 kc2resp  - convolve kcarta to CrIS responsivity
-kc2resp3 - used for 2-stage responsivity test
-
-filt_test1 - compare ccast with old UW ATBD filters
-filt_test2 - compare ccast and new noaa processing filters
-filt_test3 - compare noaa high and extended res filters
-filt_test4 - compare compare old and new bandpass filters
-show_filts - plot responsivity, FIR, and processing filters
 
 cmp_sdr   - compare two ccast SDR files
 cmp_res   - compare ccast hi2low with user-grid finterp
@@ -50,9 +33,43 @@ sa_test3 - plot stats for extended SA matrix
 sa_shift - plot SA time impulse
 
 inst_demo   - demo calls to inst_params
-plot_allsci - sample plots of sci and eng data
 sweep_diffs - compare space and IT looks by sweep direction
 rad_stats1  - long span CrIS radiance stats
+
+resp_test (24 May 2016)
+------------------------
+resp_test1 - compare kc2resp with kc2cris
+resp_test2 - try flattened responsivity
+resp_test3 - compare kc2resp with kc2resp3
+resp_test4 - calibration equation tests
+resp_test5 - show R fHR rHR vs fLR R rHR
+resp_test6 - sample flat, flat + 20, and resp ref truth
+resp_obs - compare ccast minus noaa with flat minus resp ref truth
+resp_cmp - compare recent ccast with UW reference responsivity
+kc2resp3 - used for 2-stage responsivity test
+
+fov5_anom (30 Aug 2016)
+-----------------------
+see the README there for more info
+
+error_corr (29 Jul 2016)
+-------------------------
+nedn_stats1 - tabulate ICT radiance from a modified ccast run
+edn_stats2  - ICT noise correlation matrix, SVD, and plots
+cal_test3   - CrIS kcarta clear matchups for correlation tests
+
+filt_test
+----------
+filt_test1 - compare ccast with old UW ATBD filters
+filt_test2 - compare ccast and new noaa processing filters
+filt_test3 - compare noaa high and extended res filters
+filt_test4 - compare compare old and new bandpass filters
+show_filts - plot responsivity, FIR, and processing filters
+
+allsci
+-------
+allsci_tab  - summary ICT and met laser data from daily files
+allsci_plot - quick look at ICT and met laser values
 
 utils
 ------

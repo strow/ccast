@@ -39,7 +39,7 @@ rhome = '/asl/data/cris/ccast/rdr60_hr3';
 rdir = fullfile(rhome, ystr, dstr);
 flist = dir(fullfile(rdir, 'RDR*.mat'));
 
-% flist = flist(144);  % for RDR_d20160101_t1907172 (cold)
+flist = flist(144);  % for RDR_d20160101_t1907172 (cold)
 % flist = flist(1);    % for RDR_d20160101_t0003237 (warm)
 % flist = flist(100);  % for RDR_d20160103_t1315030 (cold)
 % flist = flist(99);   % for RDR_d20160103_t1307031 (warm)
@@ -47,7 +47,7 @@ flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(51);   % for RDR_d20160103_t0643052 (warm)
 
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/sdr60_nlc';
+shome = '/asl/data/cris/ccast/sdr60X';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 

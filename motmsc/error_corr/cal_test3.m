@@ -12,6 +12,7 @@ addpath ../motmsc/utils
 
 % load the CrIS SDR granule
 % tstr = 'h3noaa4';
+% tstr = 'sdr60_hr_t-20';
   tstr = 'sdr60_hr';
 gran = 'SDR_d20160120_t0304487';
 fstr = fullfile('/asl/data/cris/ccast', tstr, '2016/020', gran);

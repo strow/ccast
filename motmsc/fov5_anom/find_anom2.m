@@ -114,7 +114,7 @@ end
 
 save find_anom2 aTab sFOR syear sdays
 
-return
+return  % select figures below as needed
 
 figure(1); clf
 plot(aTab(:, 1), aTab(:, 2) - aTab(:, 3), '.')
@@ -164,4 +164,29 @@ xlabel('mean 900 cm-1 temp')
 ylabel('integral ratio')
 grid on; zoom on
 % saveas(gcf, 'FOV_5_dc_lev_int_orig', 'png')
+
+% DC level integral vs window chan temp
+figure(6); clf
+% mean of all fovs:
+x1 = aTab(:, 1);
+y1 = aTab(:, 8);
+y2 = aTab(:, 9); 
+y3 = ((1/9)*y1 + (8/9)*y2);
+
+subplot(2,1,1)
+plot(x1, y3, '.')
+axis([180, 320, 0, 0.6])
+title('DC level integral vs 900 cm-1 temp')
+legend('mean all FOVs', 'location', 'northwest')
+ylabel('Volts')
+grid on; zoom on
+
+subplot(2,1,2)
+plot(x1, y1, '.r', x1, y2, '.g')
+axis([180, 320, 0, 0.6])
+legend('FOV 5 only', 'mean other FOVs', 'location', 'northwest')
+xlabel('mean 900 cm-1 BT')
+ylabel('Volts')
+grid on; zoom on
+% saveas(gcf, 'dc_lev_vs_window', 'png')
 
