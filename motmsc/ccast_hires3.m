@@ -38,10 +38,10 @@ addpath ../source
 rhome = '/asl/data/cris/ccast/rdr60_hr3';
 rdir = fullfile(rhome, ystr, dstr);
 flist = dir(fullfile(rdir, 'RDR*.mat'));
-% flist = flist(91:96);
+% flist = flist(175);
 
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/h3a2newX';
+shome = '/asl/data/cris/ccast/sdr60_hrX';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
@@ -55,7 +55,7 @@ geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 %----------------------------
 
 opts = struct;            % initialize opts
-opts.cal_fun = 'e8';      % calibration function
+opts.cal_fun = 'a4';      % calibration function
 opts.version = 'snpp';    % current active CrIS
 opts.inst_res = 'hires3'; % high res #3 sensor grid
 opts.user_res = 'hires';  % high resolution user grid
@@ -73,10 +73,6 @@ opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';
 
 % NEdN principal component filter
 opts.nedn_filt = '../inst_data/nedn_filt_HR.mat';
-
-% new a2 weights
-% opts.a2LW = [0.0438 0.0236 0.0428 0.0256 0.0078 0.0156 0.0060 0.0265 0.0610];
-% opts.a2MW = [0.0106 0.0314 0.0545 0.0100 0.0074 0.0013 0.1208 0.0403 0.0124];
 
 %--------------------------------
 % process matlab RDR to SDR data 

@@ -6,12 +6,12 @@ addpath ../source
 addpath utils
 
 % SDR files
-sfile = 'SDR_d20160120_t0024496.mat';
-sdir1 = '/asl/data/cris/ccast/sdr60_hr_t-20/2016/020';
+sfile = 'SDR_d20160120_t0056495.mat';
+sdir1 = '/asl/data/cris/ccast/h3a2newX/2016/020';
 sdir2 = '/asl/data/cris/ccast/sdr60_hr/2016/020';
 
 % plot labels
-sname1 = 'sdr60 hr t-20';
+sname1 = 'h3a2newX';
 sname2 = 'sdr60 hr';
 
 band = 'LW';
@@ -52,7 +52,7 @@ x1 = real(rad2bt(vg, r1(i1, ifov, ifor, iscan)));
 x2 = real(rad2bt(vg, r2(i2, ifov, ifor, iscan)));
 
 figure(1); clf
-set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 subplot(2,1,1)
 plot(vg, x1, vg, x2)
 title(sprintf('%s FOV %d FOR %d Scan %d', rtmp, ifov, ifor, iscan))

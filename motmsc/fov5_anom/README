@@ -9,7 +9,7 @@ nlc_hack    - nlc_vec modified to return Vlev and Vdc
 
 find_anom1  - find the original homogeneous warm/cold test set
 nlc_cmp     - original homogeneous warm/cold test set stats
-nlc_vecX    - nlc_vec modified save internal values to a file
+nlc_save    - nlc_vec modified save internal values to a file
 
 hist2d      - demo 2d histogram
 

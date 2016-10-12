@@ -26,6 +26,12 @@ switch opts.cal_fun
   case 'e7'
     [rcal, vcal, nedn] = ...
        calmain_e7(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
+  case 'e8'
+    [rcal, vcal, nedn] = ...
+       calmain_e8(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
+  case 'a4'
+    [rcal, vcal, nedn] = ...
+       calmain_a4(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
   otherwise
     error(sprintf('unknow calibration function %s', opts.cal_fun))
 end

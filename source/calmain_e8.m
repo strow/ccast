@@ -1,6 +1,6 @@
 %
 % NAME
-%   calmain_e7 - ccast ref algo 1 with resampling
+%   calmain_e8 - ccast ref algo 1 with resampling and new nlc 
 %
 % SYNOPSIS
 %   [rcal, vcal, nedn] = ...
@@ -121,8 +121,8 @@ for si = 1 : nscan
     j = mod(k, 2) + 1; % SP and IT index
 
     % do the SP and IT nonlinearity corrections
-    sp_nlc(:,:,j) = nlc_vec(inst, avgSP(:,:,j,si), avgSP(:,:,j,si), eng);
-    it_nlc(:,:,j) = nlc_vec(inst, avgIT(:,:,j,si), avgSP(:,:,j,si), eng);
+    sp_nlc(:,:,j) = nlc_new(inst, avgSP(:,:,j,si), avgSP(:,:,j,si), eng);
+    it_nlc(:,:,j) = nlc_new(inst, avgIT(:,:,j,si), avgSP(:,:,j,si), eng);
 
     % save the IT - SP difference
     it_sp(:, :, k) = it_nlc(:,:,j) - sp_nlc(:,:,j);
@@ -133,7 +133,7 @@ for si = 1 : nscan
     j = mod(iES, 2) + 1; % SP and IT index
 
     % do the ES nonlinearity correction
-    es_nlc = nlc_vec(inst, rcnt(:, :, iES, si), avgSP(:, :, j, si), eng);   
+    es_nlc = nlc_new(inst, rcnt(:, :, iES, si), avgSP(:, :, j, si), eng);   
 
     % save the ES - SP difference
     es_sp(:, :, iES) = es_nlc - sp_nlc(:, :, j);
