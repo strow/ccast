@@ -1,6 +1,6 @@
 %
 % NAME
-%   calmain_a2 - calmain stub to derive a2 values from ICT and space looks
+%   calmain_a4 - calmain stub for nonlinearity and related tests
 %
 % SYNOPSIS
 %   [rcal, vcal, nedn] = ...
@@ -93,6 +93,7 @@ ca = 8192/2.5;
 
 % combined gain factor 
 cg = cm .* cp .* ca;
+% cg = mean(cg) * ones(9,1);
 
 % load normalized responsivity
 load resp_filt
@@ -112,15 +113,10 @@ resp_filt = resp_filt * 1/max(resp_filt);
 % loop on scans with full IT and SP moving averages
 %---------------------------------------------------
 
-for si = 5 : nscan - 4
+for si = 1 : nscan
  
   % check that this row has some ES's
   if isnan(max(stime(1:30, si)))
-    continue
-  end
-
-  % just spin until we get to desired scan
-  if ~(strcmp(inst.band, 'LW') && si == 41)
     continue
   end
 
@@ -158,16 +154,127 @@ for si = 5 : nscan - 4
   vIT9f = rIT9f / rsf;
   vIT9r = rIT9r / rsf;
 
+  % select an earth-scene
+  iES = 16; 
+% iES = 15; 
+  j = mod(iES, 2) + 1;
+
   % divide by the numeric filter
-  specIT = avgIT(:,:,1,si) ./ (inst.sNF(:) * ones(1, 9));
-  specSP = avgSP(:,:,1,si) ./ (inst.sNF(:) * ones(1, 9));
+  specIT = avgIT(:,:,j,si) ./ (inst.sNF(:) * ones(1, 9));
+  specSP = avgSP(:,:,j,si) ./ (inst.sNF(:) * ones(1, 9));
+  specES = rcnt(:,:,iES,si) ./ (inst.sNF(:) * ones(1, 9));
 
   % divide by gain factors
   specIT = specIT ./ (ones(inst.npts, 1) * cg');
   specSP = specSP ./ (ones(inst.npts, 1) * cg');
+  specES = specES ./ (ones(inst.npts, 1) * cg');
 
-  % IT - SP diff and phase corr
-  specXX = abs(specIT - specSP);
+  % spectra minus SP
+  absIT_SP = abs(specIT - specSP);
+  absES_SP = abs(specES - specSP);
+
+  % level integrals
+  levIT = mean(abs(specIT))';
+  levSP = mean(abs(specSP))';
+  levES = mean(abs(specES))';
+  levIT_SP = mean(abs(specIT - specSP))';
+  levES_SP = mean(abs(specES - specSP))';
+% [Vinst levSP levIT levES levIT_SP levES_SP]
+
+  % basic calibration ratio
+  cal_ratio = (specES - specSP) ./ (specIT - specSP);
+
+ %---------------------
+ % set pause condition
+ %---------------------
+
+% if strcmp(inst.band, 'LW') && si == 21, keyboard, end
+  if strcmp(inst.band, 'LW') && si == 59, keyboard, end
+% if mean(ES_SP) > 2, keyboard, end
+  continue
+
+  figure(1); clf
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+  subplot(3,1,1)
+  plot(inst.freq, abs(specES));
+% axis([660, 680, 0, 0.5])
+  title('ES magnitude')
+  legend(fovnames, 'location', 'eastoutside')
+  ylabel('volts')
+  grid on;
+
+  subplot(3,1,2)
+  plot(inst.freq, real(specES))
+% axis([660, 680, -0.3,  0.2])
+  title('ES real')
+  legend(fovnames, 'location', 'eastoutside')
+  ylabel('volts')
+  grid on;
+
+  subplot(3,1,3)
+  plot(inst.freq, imag(specES))
+% axis([660, 680, -0.2,  0.3])
+  title('ES imag')
+  legend(fovnames, 'location', 'eastoutside')
+  xlabel('wavenumber')
+  ylabel('volts')
+  grid on;
+
+  figure(2); clf
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+  subplot(3,1,1)
+  plot(inst.freq, abs(specSP));
+% axis([660, 680, 0, 2])
+  title('SP magnitude')
+  legend(fovnames, 'location', 'eastoutside')
+  ylabel('volts')
+  grid on;
+
+  subplot(3,1,2)
+  plot(inst.freq, real(specSP))
+% axis([660, 680, -1.5,  0])
+  title('SP real')
+  legend(fovnames, 'location', 'eastoutside')
+  ylabel('volts')
+  grid on;
+
+  subplot(3,1,3)
+  plot(inst.freq, imag(specSP))
+% axis([660, 680, 0,  1.5])
+  title('SP imag')
+  legend(fovnames, 'location', 'eastoutside')
+  xlabel('wavenumber')
+  ylabel('volts')
+  grid on;
+
+  figure(3); clf
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+  subplot(3,1,1)
+  plot(inst.freq, abs(specES - specSP))
+% axis([660, 680, 0.4, 0.6])
+  title('ES - SP, magnitude')
+  legend(fovnames, 'location', 'eastoutside')
+  ylabel('volts')
+  grid on;
+
+  subplot(3,1,2)
+  plot(inst.freq, real(specES - specSP))
+% axis([660, 680, 0.4, 0.6])
+  title('ES - SP, real')
+  legend(fovnames, 'location', 'eastoutside')
+  ylabel('volts')
+  grid on;
+
+  subplot(3, 1, 3)
+  plot(inst.freq, imag(specES - specSP))
+% axis([660, 680, -0.01, 0.01])
+  title('ES - SP, imag')
+  legend(fovnames, 'location', 'eastoutside')
+  grid on;
+
+  %------------------------------
+  % solve for UW-style a2 values
+  %------------------------------
 
   % UW scaling factor
   UW_fudge = (max(inst.sNF)/UW_NF_scale) * 2/inst.df;
@@ -176,12 +283,12 @@ for si = 5 : nscan - 4
   Vdc = Vinst + UW_fudge * mean(abs(specIT - specSP))';
 
   % solve for a2 values
-  a2v = (vIT9r - specXX) ./ (2 * specXX .* (ones(inst.npts, 1) * Vdc'));
+  a2v = (vIT9r - absIT_SP) ./ (2 * absIT_SP .* (ones(inst.npts, 1) * Vdc'));
 
   % user grid index
   ix = find(user.v1 <= inst.freq & inst.freq <= user.v2);
 
-  figure(1)
+  figure(1); clf
   plot(inst.freq(ix), a2v(ix, :))
   title([inst.band, ' a2 values from ICT obs and calc'])
   legend(fovnames, 'location', 'southeast')
@@ -197,11 +304,13 @@ for si = 5 : nscan - 4
   ylabel('weight')
   grid on
 
-  keyboard
+  %----------------
+  % obs minus calc
+  %----------------
 
   % basic residuals
-% y1 = specXX - vIT9r;
-  y1 = (specXX - vIT9r) ./ vIT9r;
+% y1 = absIT_SP - vIT9r;
+  y1 = (absIT_SP - vIT9r) ./ vIT9r;
   figure(2); clf
   plot(inst.freq(ix), y1(ix, :));
 % title([inst.band, ' (IT - SP) - calc'])
@@ -212,8 +321,25 @@ for si = 5 : nscan - 4
 % ylabel('volts')
   grid on
 
+  % direct calc of correction factor
+  r1 = absIT_SP ./ vIT9r;
+  r2 = mean(r1(ix, :));
+  specYY = absIT_SP ./ (ones(inst.npts, 1) * r2);
+  y2 = (specYY - vIT9r) ./ vIT9r;
+  figure(3); clf
+  plot(inst.freq(ix), y2(ix, :));
+  title([inst.band, ' scaling NLC ((IT - SP) - calc) / calc'])
+  legend(fovnames, 'location', 'southeast')
+  xlabel('frequency')
+  ylabel('relative difference')
+  grid on
+
+  %--------------
+  % responsivity
+  %--------------
+
   % plot responsivity, (IT - SP) / vIT9f
-  resp_obs = specXX ./ vIT9f;
+  resp_obs = absIT_SP ./ vIT9f;
   figure(3); clf
   plot(inst.freq, resp_obs)
   ax = axis; ax(3) = 0; axis(ax);
@@ -231,19 +357,6 @@ for si = 5 : nscan - 4
   legend(fovnames, 'location', 'south')
   xlabel('frequency')
 % ylabel('relative difference')
-  grid on
-
-  % direct calc of correction factor
-  r1 = specXX ./ vIT9r;
-  r2 = mean(r1(ix, :));
-  specYY = specXX ./ (ones(inst.npts, 1) * r2);
-  y2 = (specYY - vIT9r) ./ vIT9r;
-  figure(3); clf
-  plot(inst.freq(ix), y2(ix, :));
-  title([inst.band, ' scaling NLC ((IT - SP) - calc) / calc'])
-  legend(fovnames, 'location', 'southeast')
-  xlabel('frequency')
-  ylabel('relative difference')
   grid on
 
 end

@@ -40,8 +40,13 @@ rdir = fullfile(rhome, ystr, dstr);
 flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(175);
 
+% select RID hack
+%  flist = dir(fullfile(rdir, 'RDR_d20160120_t0040495.mat'));
+   flist = dir(fullfile(rdir, 'RDR_d20160120_t1808436.mat'));
+
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/sdr60_hrX';
+% shome = '/asl/data/cris/ccast/ES_scaled';
+  shome = '/asl/data/cris/ccast/sdr60_hrX';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 

@@ -1,17 +1,6 @@
 %
-% demo gain plots, run from inside calmain_a2
+% spec2igm demos, run from inside calmain_a4
 %
-
-% combined gain factor 
-cg = cm .* cp .* ca;;
-
-% divide by gain factors
-specIT = avgIT(:,:,1,si) ./ (ones(inst.npts, 1) * cg');
-specSP = avgSP(:,:,1,si) ./ (ones(inst.npts, 1) * cg');
-
-% divide inputs by the numeric filter
-specIT = specIT ./ (inst.sNF(:) * ones(1, 9));
-specSP = specSP ./ (inst.sNF(:) * ones(1, 9));
 
 specXX = specIT - specSP;
 
