@@ -46,7 +46,7 @@ cm = cm(:); cp = cp(:); Vinst = Vinst(:);
 ca = 8192/2.5;
 
 % combined gain factor 
-cg = cm .* cp .* ca;
+cg = cm .* cp * ca * inst.df / 2;
 
 % divide by the numeric filter
 rin = rin ./ (inst.sNF(:) * ones(1, 9));
@@ -57,7 +57,7 @@ rin = rin ./ (ones(inst.npts, 1) * cg');
 rsp = rsp ./ (ones(inst.npts, 1) * cg');
 
 % UW scaling factor
-UW_fudge = (max(inst.sNF)/UW_NF_scale) * 2/inst.df;
+UW_fudge = (max(inst.sNF)/UW_NF_scale);
 
 % get the DC level
 Vdc = Vinst + UW_fudge * mean(abs(rin - rsp))';

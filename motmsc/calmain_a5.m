@@ -25,9 +25,9 @@
 %   vcal    - nchan x 1 frequency grid, from inst.freq
 %
 % DISCUSSION
-%   output namees differe from standard versions of calmain.
-%   parity is flipped for the rSP and rIT indexes to match rES.
-%   so for example rES(:, :, 15, 30) matches rSP(:, :, 1, 30).
+%   output namees differ from standard versions of calmain.
+%   the flipped parity of IT and SP looks is preserved, so 
+%   for  example rES(:, :, 15, 30) matches rSP(:, :, 2, 30).
 %
 
 function [rES, rSP, rIT, vcal] = ...
@@ -73,8 +73,8 @@ cm = cm(:); cp = cp(:); Vinst = Vinst(:);
 % analog to digital gain
 ca = 8192/2.5;
 
-% combined gain factor 
-cg = cm .* cp .* ca;
+% combined gain factor
+cg = cm .* cp * ca * inst.df / 2;
 
 %---------------
 % loop on scans
@@ -106,8 +106,7 @@ for si = 1 : nscan
   %-------------------------
 
   % loop on sweep direction
-  for k = 1 : 2
-    j = mod(k, 2) + 1; % SP and IT index
+  for j = 1 : 2
 
     % divide by numeric filter and gain factors
     rtmp = avgSP(:,:,j,si);
@@ -125,16 +124,17 @@ for si = 1 : nscan
   % loop on earth scenes
   for iES = 1 : 30
 
-%   % divide by numeric filter and gain factors
-%   rtmp = rcnt(:, :, iES, si);
-%   rtmp = rtmp ./ (inst.sNF(:) * ones(1, 9));
-%   rtmp = rtmp ./ (ones(inst.npts, 1) * cg');  
-%   rES(:, :, iES, si) = rtmp;
+    % divide by numeric filter and gain factors
+    rtmp = rcnt(:, :, iES, si);
+    rtmp = rtmp ./ (inst.sNF(:) * ones(1, 9));
+    rtmp = rtmp ./ (ones(inst.npts, 1) * cg');  
+    rES(:, :, iES, si) = rtmp;
 
-    % apply the UW nonlinearlity correction
-    j = mod(iES, 2) + 1; % SP and IT index
-    rES(:, :, iES, si) = ...
-      nlc_new(inst, rcnt(:, :, iES, si), avgSP(:, :, j, si), eng);
+%   % apply the UW nonlinearlity correction
+%   j = mod(iES, 2) + 1; % SP and IT index
+%   rES(:, :, iES, si) = ...
+%     nlc_new(inst, rcnt(:, :, iES, si), avgSP(:, :, j, si), eng);
+
   end
 end
 

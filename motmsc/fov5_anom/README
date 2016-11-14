@@ -1,4 +1,5 @@
 
+find_anom3  - FOV 5 anom tab from ES_scaled ccast run
 find_anom2  - read hacked ccast data, tabulate relevant info
 fovdiff     - return max RMS FOV difference
 

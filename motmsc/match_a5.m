@@ -1,14 +1,18 @@
 %
-% find_anom4 - match ES calibrated and uncalibrated looks
+% match_a5 - match ES calibrated and uncalibrated looks
+%
+% uses uncalibrated data from ccast_test5/rdr2sdr_a5/calmain_a5
 %
 % tabulated values, 9 x nobs
-%   Tb_mean   - mean sensor grid brightness temp
 %   T900_val  - 900cm-1 brightness temp
-%   rad_mean  - mean sensor grid radiance
-%   ES_mean2  - mean(ES)
-%   ES_mean   - mean(abs(ES))
-%   ES_bias   - mean(abs(ES + 5))
-%   ES_diff   - mean(abs(ES - SP))
+%   Tb_mean   - mean sensor grid brightness temp
+%   radmean   - mean sensor grid radiance
+%   ESmean    - mean(ES)
+%   ESdiff    - mean(ES - SP)
+%   ESvlev    - mean(abs(ES - SP))
+%   scan_tab  - nobs x 1 scan index (1-60)
+%   for_tab   - nobs x 1 FOR (1-30)
+%   rid_tab   - nobs x 18 char array
 %
 
 addpath ../source
@@ -21,15 +25,18 @@ addpath ../motmsc/fov5_anom
 sFOR = 15:16;  % fields of regard, 1-30
 
 % path to SDR year
-tstr1 = 'sdr60_hr';
-% tstr2 = 'uncal_a5';
-  tstr2 = 'uwnlc_a5';
+  tstr1 = 'h3a2new';
+% tstr1 = 'newUWMWa2';
+% tstr1 = 'sdr60_hr';
+% tstr2 = 'uwnlc_a5';
+  tstr2 = 'uncal_a5';
+
 syear1 = fullfile('/asl/data/cris/ccast', tstr1, '2016');
 syear2 = fullfile('/asl/data/cris/ccast', tstr2, '2016');
 
 % SDR days of the year
-% sdays =  18 : 20;
-  sdays = 20;
+  sdays =  18 : 20;
+% sdays = 20;
 
 % initialize outputs
 n = length(sdays) * 181 * 61 * length(sFOR);
@@ -42,8 +49,10 @@ ESmeanLW = zeros(9, n);
 ESmeanMW = zeros(9, n);
 ESdiffLW = zeros(9, n);
 ESdiffMW = zeros(9, n);
-scan_tab = zeros(9, n);
-for_tab = zeros(9, n);
+ESvlevLW = zeros(9, n);
+ESvlevMW = zeros(9, n);
+scan_tab = zeros(n, 1);
+for_tab = zeros(n, 1);
 rid_tab = [];
 
 %------------------------
@@ -93,11 +102,13 @@ for di = sdays
         radmeanMW(:, k) = mean(d1.rMW(:, :, i, j))';
         ESmeanLW(:, k) = mean(d2.ESLW(:,:,i,j))';
         ESmeanMW(:, k) = mean(d2.ESMW(:,:,i,j))';
-        i2 = mod(i - 1, 2) + 1;
-        ESdiffLW(:, k) = mean(abs(d2.ESLW(:,:,i,j) - d2.SPLW(:,:,2,j)));
-        ESdiffMW(:, k) = mean(abs(d2.ESMW(:,:,i,j) - d2.SPMW(:,:,2,j)));
-        scan_tab(:, k) = j;
-        for_tab(:, k) =  i;
+        i2 = mod(i, 2) + 1;  % SP and IT index parity flip
+        ESdiffLW(:, k) = mean(d2.ESLW(:,:,i,j) - d2.SPLW(:,:,i2,j));
+        ESdiffMW(:, k) = mean(d2.ESMW(:,:,i,j) - d2.SPMW(:,:,i2,j));
+        ESvlevLW(:, k) = mean(abs(d2.ESLW(:,:,i,j) - d2.SPLW(:,:,i2,j)));
+        ESvlevMW(:, k) = mean(abs(d2.ESMW(:,:,i,j) - d2.SPMW(:,:,i2,j)));
+        scan_tab(k) = j;
+        for_tab(k) =  i;
         rid_tab = [rid_tab; rid];
 
       end % loop on selected FORs
@@ -118,15 +129,19 @@ ESmeanLW = ESmeanLW(:, 1:k);
 ESmeanMW = ESmeanMW(:, 1:k);
 ESdiffLW = ESdiffLW(:, 1:k);
 ESdiffMW = ESdiffMW(:, 1:k);
-scan_tab = scan_tab(:, 1:k);
-for_tab = for_tab(:, 1:k);
+ESvlevLW = ESvlevLW(:, 1:k);
+ESvlevMW = ESvlevMW(:, 1:k);
+scan_tab = scan_tab(1:k);
+for_tab = for_tab(1:k);
 
 vLW = d1.vLW;
-save find_anom4 vLW T900_val Tb_meanLW Tb_meanMW ...
-     radmeanLW radmeanMW ESmeanLW ESmeanMW ESdiffLW ESdiffMW ...
-     scan_tab for_tab rid_tab
+vMW = d1.vMW;
 
-% save uwnlc_anom4 vLW T900_val Tb_meanLW Tb_meanMW ...
+save match_a5 vLW T900_val Tb_meanLW Tb_meanMW ...
+     radmeanLW radmeanMW ESmeanLW ESmeanMW ESdiffLW ESdiffMW ...
+     ESvlevLW ESvlevMW scan_tab for_tab rid_tab
+
+% save match_newUWa2 vLW T900_val Tb_meanLW Tb_meanMW ...
 %      radmeanLW radmeanMW ESmeanLW ESmeanMW ESdiffLW ESdiffMW ...
-%      scan_tab for_tab rid_tab
+%      ESvlevLW ESvlevMW scan_tab for_tab rid_tab
 

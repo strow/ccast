@@ -1,4 +1,16 @@
 
+recent
+-------
+calmain_a4   - interactive calmain stub for nonlin tests
+ccast_test4  - top level driver for calmain_a4
+
+calmain_a5   - calmain_e7 hacked to dump uncalibrated spectra
+rdr2sdr_a5   - rdr2sdr hacked for calmain_a5 dump
+ccast_test5  - top level driver for calmain_a5
+
+testESmean  - plots and fit for ES vs rad matchups
+testESdiff  - plots and fit for ES-SP vs rad matchup
+
 top level 
 --------
 rad_svd - SVD on some sample radiance sets

@@ -1,11 +1,10 @@
 %
-% test_anom4 - try fitting data from find_anom4
+% testESdiff  - plots and fit for ES-SP vs rad matchup
 %
 
 addpath utils
 
-% load find_anom4
-  load uwnlc_anom4
+load match_a5
 
 band = upper(input('band > ', 's'));
 iFOV = input('FOV > ');
@@ -13,17 +12,20 @@ iFOV = input('FOV > ');
 % band specific params
 switch(band)
   case 'LW',
-    radmean = radmeanLW; ESmean = ESmeanLW; 
-    ax = [10, 120, -4, 3];
+    radmean = radmeanLW; ESmean = ESdiffLW; 
+    ax = [0, 120, -0.4, 0.4];
   case 'MW', 
-    radmean = radmeanMW; ESmean = ESmeanMW;
-    ax = [0,  18, -0.6, 0.6];
+    radmean = radmeanMW; ESmean = ESdiffMW;
+    ax = [0,  18, -0.12, 0.12];
 end
+
+% option to just use one FOV
+% radmean = ones(9, 1) * radmean(9, :);
 
 % initialize arrays
 [m, nobs] = size(radmean);
-d1 = find(mod(for_tab(1, :), 2) == 1);
-d2 = find(mod(for_tab(1, :), 2) == 0);
+d1 = find(mod(for_tab(:), 2) == 1);
+d2 = find(mod(for_tab(:), 2) == 0);
 
 n1 = length(d1);               n2 = length(d2);
 rad1 = radmean(:, d1);         rad2 = radmean(:, d2);
@@ -72,7 +74,7 @@ end
 % complex components for selected FOV
 %-------------------------------------
 figure(1); clf
-  set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 plot(rad1(iFOV,:), ES1re(iFOV,:), 'o', ...
      rad1(iFOV,:), ES1im(iFOV,:), 'o', ...
      rad2(iFOV,:), ES2re(iFOV,:), '+', ...
@@ -82,17 +84,17 @@ plot(rad1(iFOV,:), ES1re(iFOV,:), 'o', ...
 
 axis(ax)
 title(sprintf('%s FOV %d complex components', band, iFOV))
-legend('d1 real', 'd1 imag', 'd2 real', 'd2 imag', 'location', 'north')
+legend('d1 real', 'd1 imag', 'd2 real', 'd2 imag', 'location', 'southeast')
 xlabel('radiance, mW sr-1 m-2')
 ylabel('volts')
 grid on;
-  saveas(gcf, sprintf('%s_components', band), 'png')
+% saveas(gcf, sprintf('%s_FOV_%d_comp', band, iFOV), 'png')
 
 %----------------------------------
 % complex modulus for selected FOV
 %----------------------------------
 figure(2); clf
-  set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 subplot(2,1,1)
 plot(rad1(iFOV,:), abs(ESmean(iFOV, d1)), 'o', xfit, z1(:, iFOV));
 axis([ax(1), ax(2), 0, max(abs(ax(3)), abs(ax(4)))])
@@ -107,30 +109,32 @@ title(sprintf('%s FOV %d dir 2 complex modulus', band, iFOV))
 xlabel('radiance, mW sr-1 m-2')
 ylabel('volts')
 grid on;
-  saveas(gcf, sprintf('%s_modulus', band), 'png')
+% saveas(gcf, sprintf('%s_FOV_%d_mod', band, iFOV), 'png')
 
 %----------------------------------
 % fitted complex modulus, all FOVs
 %----------------------------------
 figure(3)
-  set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+set(gcf, 'DefaultAxesColorOrder', fovcolors);
 plot(xfit, z1(:, 1), xfit, z1(:, 2), xfit, z1(:, 3), ...
      xfit, z1(:, 4), xfit, z1(:, 5), xfit, z1(:, 6), ...
      xfit, z1(:, 7), xfit, z1(:, 8), xfit, z1(:, 9), 'linewidth', 2)
 
 axis([ax(1), ax(2), 0, max(abs(ax(3)), abs(ax(4)))])
 title(sprintf('%s fitted complex modulus', band))
-legend(fovnames, 'location', 'north')
+legend(fovnames, 'location', 'southeast')
 xlabel('radiance, mW sr-1 m-2')
 ylabel('volts')
 grid on;
-  saveas(gcf, sprintf('%s_mod_fit', band), 'png')
+% saveas(gcf, sprintf('%s_ES-SP_mod_fit', band), 'png')
 
 %---------------------------------
 % basic complex modulus, all FOVs
 %---------------------------------
 figure(4); clf
-  set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+set(gcf, 'DefaultAxesColorOrder', fovcolors);
 ix = d2;
 plot(radmean(1, ix), abs(ESmean(1, ix)), 'o', ...
      radmean(2, ix), abs(ESmean(2, ix)), 'o', ...
@@ -144,9 +148,9 @@ plot(radmean(1, ix), abs(ESmean(1, ix)), 'o', ...
 
 axis([ax(1), ax(2), 0, max(abs(ax(3)), abs(ax(4)))])
 title(sprintf('%s voltage as a function of radiance', band))
-legend(fovnames, 'location', 'north')
+legend(fovnames, 'location', 'southeast')
 xlabel('radiance, mW sr-1 m-2')
 ylabel('volts')
 grid on;
-  saveas(gcf, sprintf('%s_mod_obs', band), 'png')
+% saveas(gcf, sprintf('%s_ES-SP_mod_obs', band), 'png')
 
