@@ -41,8 +41,8 @@ flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(175);
 
 % select RID hack
-  flist = dir(fullfile(rdir, 'RDR_d20160119_t0416564.mat'));  % hot
-% flist = dir(fullfile(rdir, 'RDR_d20160120_t0040495.mat'));  % warmer
+% flist = dir(fullfile(rdir, 'RDR_d20160119_t0416564.mat'));  % hot
+  flist = dir(fullfile(rdir, 'RDR_d20160120_t0040495.mat'));  % warmer
 % flist = dir(fullfile(rdir, 'RDR_d20160120_t1808436.mat'));  % cold
 
 % path to matlab SDR output files

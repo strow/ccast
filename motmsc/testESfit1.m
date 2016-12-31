@@ -1,5 +1,12 @@
 %
-% testESdiff  - plots and fit for ES-SP vs rad matchup
+% testESfit1  - plots and fit for ES vs rad matchups
+%
+% this version does separate polynomial fits to the complex
+% components of ES or ES - SP 
+%
+% uses matchup data from match_a5, default is ccast runs h3a2new for
+% calibrated radiances and uncal_a5 for the uncalibrated ES, ICT and
+% space looks
 %
 
 addpath utils
@@ -9,18 +16,22 @@ load match_a5
 band = upper(input('band > ', 's'));
 iFOV = input('FOV > ');
 
+% polynomial degree
+pd = input('fit degree > ');
+
 % band specific params
 switch(band)
   case 'LW',
-    radmean = radmeanLW; ESmean = ESdiffLW; 
-    ax = [0, 120, -0.4, 0.4];
+    radmean = radmeanLW; ESmean = ESmeanLW; 
+    ax = [10, 120, -0.3, 0.2];
+%   radmean = radmeanLW; ESmean = ESdiffLW; 
+%   ax = [0, 120, -0.4, 0.4];
   case 'MW', 
-    radmean = radmeanMW; ESmean = ESdiffMW;
-    ax = [0,  18, -0.12, 0.12];
+    radmean = radmeanMW; ESmean = ESmeanMW;
+    ax = [0,  18, -0.08, 0.08];
+%   radmean = radmeanMW; ESmean = ESdiffMW;
+%   ax = [0,  18, -0.12, 0.12];
 end
-
-% option to just use one FOV
-% radmean = ones(9, 1) * radmean(9, :);
 
 % initialize arrays
 [m, nobs] = size(radmean);
@@ -31,22 +42,22 @@ n1 = length(d1);               n2 = length(d2);
 rad1 = radmean(:, d1);         rad2 = radmean(:, d2);
 ES1re = real(ESmean(:, d1));   ES1im = imag(ESmean(:, d1));
 ES2re = real(ESmean(:, d2));   ES2im = imag(ESmean(:, d2));
-X1re = zeros(2, 9);            X1im = zeros(2, 9);
-X2re = zeros(2, 9);            X2im = zeros(2, 9);
+P1re = zeros(pd+1, 9);         P1im = zeros(pd+1, 9);
+P2re = zeros(pd+1, 9);         P2im = zeros(pd+1, 9);
 rms1re = zeros(9, 1);          rms1im = zeros(9, 1);
 rms2re = zeros(9, 1);          rms2im = zeros(9, 1);
 
-% loop on FOVs, do linear fits
+% loop on FOVs, do quadratic fits
 for fi = 1 : 9
-  X1re(:, fi) = [rad1(fi,:)', ones(n1, 1)] \ ES1re(fi, :)';
-  X1im(:, fi) = [rad1(fi,:)', ones(n1, 1)] \ ES1im(fi, :)';
-  X2re(:, fi) = [rad2(fi,:)', ones(n2, 1)] \ ES2re(fi, :)';
-  X2im(:, fi) = [rad2(fi,:)', ones(n2, 1)] \ ES2im(fi, :)';
+  P1re(:, fi) = polyfit(rad1(fi,:)', ES1re(fi, :)', pd);
+  P1im(:, fi) = polyfit(rad1(fi,:)', ES1im(fi, :)', pd);
+  P2re(:, fi) = polyfit(rad2(fi,:)', ES2re(fi, :)', pd);
+  P2im(:, fi) = polyfit(rad2(fi,:)', ES2im(fi, :)', pd);
 
-  rms1re(fi) = rms((X1re(1,fi)*rad1(fi,:)' + X1re(2,fi)) - ES1re(fi,:)');
-  rms1im(fi) = rms((X1im(1,fi)*rad1(fi,:)' + X1im(2,fi)) - ES1re(fi,:)');
-  rms2re(fi) = rms((X2re(1,fi)*rad2(fi,:)' + X2re(2,fi)) - ES1re(fi,:)');
-  rms2im(fi) = rms((X2im(1,fi)*rad2(fi,:)' + X2im(2,fi)) - ES1re(fi,:)');
+  rms1re(fi) = rms(polyval(P1re(:, fi), rad1(fi,:)') - ES1re(fi,:)');
+  rms1im(fi) = rms(polyval(P1im(:, fi), rad1(fi,:)') - ES1im(fi,:)');
+  rms2re(fi) = rms(polyval(P2re(:, fi), rad2(fi,:)') - ES2re(fi,:)');
+  rms2im(fi) = rms(polyval(P2im(:, fi), rad2(fi,:)') - ES2im(fi,:)');
 end
 
 % dump rms residuals
@@ -62,10 +73,10 @@ y2re = zeros(nr, 9);  y2im = zeros(nr, 9);
 z1 = zeros(nr, 9);    z2 = zeros(nr, 9);
 
 for fi = 1 : 9
-  y1re(:, fi) =  X1re(1,fi)*xfit' + X1re(2,fi);
-  y1im(:, fi) =  X1im(1,fi)*xfit' + X1im(2,fi);
-  y2re(:, fi) =  X2re(1,fi)*xfit' + X2re(2,fi);
-  y2im(:, fi) =  X2im(1,fi)*xfit' + X2im(2,fi);
+  y1re(:, fi) = polyval(P1re(:, fi), xfit');
+  y1im(:, fi) = polyval(P1im(:, fi), xfit');
+  y2re(:, fi) = polyval(P2re(:, fi), xfit');
+  y2im(:, fi) = polyval(P2im(:, fi), xfit');
   z1(:, fi) = sqrt(y1re(:, fi).^2 + y1im(:, fi).^2);
   z2(:, fi) = sqrt(y2re(:, fi).^2 + y2im(:, fi).^2);
 end
@@ -84,11 +95,11 @@ plot(rad1(iFOV,:), ES1re(iFOV,:), 'o', ...
 
 axis(ax)
 title(sprintf('%s FOV %d complex components', band, iFOV))
-legend('d1 real', 'd1 imag', 'd2 real', 'd2 imag', 'location', 'southeast')
+legend('d1 real', 'd1 imag', 'd2 real', 'd2 imag', 'location', 'northwest')
 xlabel('radiance, mW sr-1 m-2')
 ylabel('volts')
 grid on;
-% saveas(gcf, sprintf('%s_FOV_%d_comp', band, iFOV), 'png')
+% saveas(gcf, sprintf('%s_components', band), 'png')
 
 %----------------------------------
 % complex modulus for selected FOV
@@ -96,20 +107,20 @@ grid on;
 figure(2); clf
 % set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 subplot(2,1,1)
-plot(rad1(iFOV,:), abs(ESmean(iFOV, d1)), 'o', xfit, z1(:, iFOV));
+plot(rad1(iFOV,:), abs(ESmean(iFOV, d1)), '.', xfit, z1(:, iFOV));
 axis([ax(1), ax(2), 0, max(abs(ax(3)), abs(ax(4)))])
 title(sprintf('%s FOV %d dir 1 complex modulus', band, iFOV))
 ylabel('volts')
 grid on
 
 subplot(2,1,2)
-plot(rad2(iFOV,:), abs(ESmean(iFOV, d2)), 'o', xfit, z2(:, iFOV));
+plot(rad2(iFOV,:), abs(ESmean(iFOV, d2)), '.', xfit, z2(:, iFOV));
 axis([ax(1), ax(2), 0, max(abs(ax(3)), abs(ax(4)))])
 title(sprintf('%s FOV %d dir 2 complex modulus', band, iFOV))
 xlabel('radiance, mW sr-1 m-2')
 ylabel('volts')
 grid on;
-% saveas(gcf, sprintf('%s_FOV_%d_mod', band, iFOV), 'png')
+% saveas(gcf, sprintf('%s_modulus', band), 'png')
 
 %----------------------------------
 % fitted complex modulus, all FOVs
@@ -123,11 +134,11 @@ plot(xfit, z1(:, 1), xfit, z1(:, 2), xfit, z1(:, 3), ...
 
 axis([ax(1), ax(2), 0, max(abs(ax(3)), abs(ax(4)))])
 title(sprintf('%s fitted complex modulus', band))
-legend(fovnames, 'location', 'southeast')
+legend(fovnames, 'location', 'northwest')
 xlabel('radiance, mW sr-1 m-2')
 ylabel('volts')
 grid on;
-% saveas(gcf, sprintf('%s_ES-SP_mod_fit', band), 'png')
+% saveas(gcf, sprintf('%s_mod_fit', band), 'png')
 
 %---------------------------------
 % basic complex modulus, all FOVs
@@ -148,9 +159,9 @@ plot(radmean(1, ix), abs(ESmean(1, ix)), 'o', ...
 
 axis([ax(1), ax(2), 0, max(abs(ax(3)), abs(ax(4)))])
 title(sprintf('%s voltage as a function of radiance', band))
-legend(fovnames, 'location', 'southeast')
+legend(fovnames, 'location', 'northwest')
 xlabel('radiance, mW sr-1 m-2')
 ylabel('volts')
 grid on;
-% saveas(gcf, sprintf('%s_ES-SP_mod_obs', band), 'png')
+% saveas(gcf, sprintf('%s_mod_obs', band), 'png')
 

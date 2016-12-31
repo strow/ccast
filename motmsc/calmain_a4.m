@@ -191,8 +191,8 @@ for si = 1 : nscan
  % set pause condition
  %---------------------
 
-  if ~(strcmp(inst.band, 'MW') && si == 2), continue, end   % hot
-% if ~(strcmp(inst.band, 'LW') && si == 21), continue, end  % warmer
+% if ~(strcmp(inst.band, 'MW') && si == 2), continue, end   % hot
+  if ~(strcmp(inst.band, 'LW') && si == 21), continue, end  % warmer
 % if ~(strcmp(inst.band, 'MW') && si == 59), continue, end  % cold
 
   fprintf(1, '*** %s scan %d FOR %d pause ***\n', inst.band, si, iES)
