@@ -2,7 +2,7 @@
 % testESfit2  - plots and fit for ES vs rad matchups
 %
 % this version fits to complex modulus rather than components,
-% and does the fitting for polynomials of any degree
+% components of ES or ES - SP 
 %
 % uses matchup data from match_a5, default is ccast runs h3a2new for
 % calibrated radiances and uncal_a5 for the uncalibrated ES, ICT and
@@ -22,15 +22,15 @@ pd = input('fit degree > ');
 % band specific params
 switch(band)
   case 'LW',
-    radmean = radmeanLW; ESmean = ESmeanLW; 
-    ax = [10, 120, -0.3, 0.2];
-%   radmean = radmeanLW; ESmean = ESdiffLW; 
-%   ax = [0, 120, -0.4, 0.4];
+%   radmean = radmeanLW; ESmean = ESmeanLW; 
+%   ax = [10, 120, -0.3, 0.2];
+    radmean = radmeanLW; ESmean = ESdiffLW; 
+    ax = [0, 120, -0.4, 0.4];
   case 'MW', 
-    radmean = radmeanMW; ESmean = ESmeanMW;
-    ax = [0,  18, -0.08, 0.08];
-%   radmean = radmeanMW; ESmean = ESdiffMW;
-%   ax = [0,  18, -0.12, 0.12];
+%   radmean = radmeanMW; ESmean = ESmeanMW;
+%   ax = [0,  18, -0.08, 0.08];
+    radmean = radmeanMW; ESmean = ESdiffMW;
+    ax = [0,  18, -0.12, 0.12];
 end
 
 % initialize arrays
@@ -57,7 +57,7 @@ end
 % dump rms residuals
 [rms1, rms2]
 
-% apply linear fits to a fixed grid
+% apply fits to a fixed grid
 r1 = ax(1); r2 = ax(2);
 dr = (r2 - r1) / 400;
 xfit = r1 : dr : r2;

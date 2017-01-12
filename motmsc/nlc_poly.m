@@ -1,9 +1,9 @@
 %
 % NAME
-%   nlc_ng - time domain nonlinearity correction
+%   nlc_poly - nonlinearity correction from polynomial fits
 %
 % SYNOPSIS
-%   rout = nlc_ng(inst, rin, rsp, eng, gfun)
+%   rout = nlc_poly(inst, rin, rsp, eng, gfun)
 %
 % INPUT
 %   inst   - sensor grid struct
@@ -18,7 +18,7 @@
 % DISCUSSION
 %
 
-function rdif = nlc_ng(inst, rin, rsp, eng, gfun)
+function rdif = nlc_poly(inst, rin, rsp, eng, gfun)
 
 % band params
 switch upper(inst.band)
@@ -51,23 +51,21 @@ rsp = rsp ./ (ones(inst.npts, 1) * cg');
 % translate to interferograms
 Idif = spec2igm(rin - rsp, inst);
 
+% test code
+% Isrc = Idif;
+
 % apply the corrections
 for fi = 1 : 9
-
-  Itmp = Idif(:, fi);
-  w1 = polyval(gfun.L1(:, iFOV), Itmp) ./ polyval(gfun.P1(:, fi), Itmp);
-  w2 = polyval(gfun.L2(:, iFOV), Itmp) ./ polyval(gfun.P2(:, fi), Itmp);
-
-  Idif(:, fi) = w1 .* Idif(:, fi);
-% Idif(:, fi) = w2 .* Idif(:, fi);
-
+  Idif(:, fi) = ...
+    polyval(gfun.L1(:, gfun.iLin), polyval(gfun.Q1(:, fi), Idif(:,fi))) ...
+      - gfun.LQ1(fi);
 end
 
 rdif = igm2spec(Idif, inst);
 
-% get the DC level
-% Vdc = Vinst + UW_fudge * mean(abs(rin - rsp))';
+% ix = 1:1052;
+% plot(ix, abs(Isrc), ix, abs(Idif))
+% pause
 
-% first-order correction
-% rdif = rin .* (ones(inst.npts, 1) * (1 + 2 * a2 .* Vdc)');
+
 

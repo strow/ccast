@@ -88,6 +88,9 @@ for di = sdays
         if ~isempty(find(isnan(d1.rLW(:, :, i, j))))
           continue
         end
+        if ~isempty(find(d1.rLW(:, :, i, j) <= 0))
+          continue
+        end        
 
         % calibrated brightness temps
         Tb_LW = real(rad2bt(d1.vLW, d1.rLW(:, :, i, j)));

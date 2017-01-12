@@ -47,7 +47,7 @@ P2re = zeros(pd+1, 9);         P2im = zeros(pd+1, 9);
 rms1re = zeros(9, 1);          rms1im = zeros(9, 1);
 rms2re = zeros(9, 1);          rms2im = zeros(9, 1);
 
-% loop on FOVs, do quadratic fits
+% loop on FOVs, do polynomial fits
 for fi = 1 : 9
   P1re(:, fi) = polyfit(rad1(fi,:)', ES1re(fi, :)', pd);
   P1im(:, fi) = polyfit(rad1(fi,:)', ES1im(fi, :)', pd);
@@ -63,7 +63,7 @@ end
 % dump rms residuals
 [rms1re, rms1im, rms2re, rms2im]
 
-% apply linear fits to a fixed grid
+% apply fits to a fixed grid
 r1 = ax(1); r2 = ax(2);
 dr = (r2 - r1) / 400;
 xfit = r1 : dr : r2;
