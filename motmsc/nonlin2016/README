@@ -1,0 +1,9 @@
+
+Feb 2016 nonlinarity a2 fitting
+
+a2_test*  - FOV differences as a function of a2 values
+nlc_ng    - nonlineary correction
+nlc_uw    - UW nonlinearity function
+nlc_test1 - compare old and new non-linearity correction codes
+nlc_test2 - plot old and new numeric filters
+

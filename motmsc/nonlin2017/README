@@ -1,0 +1,27 @@
+
+polynomial fits and nonlinearity corrections
+---------------------------------------------
+
+ccast_test4  - top level driver for calmain_a4
+calmain_a4   - interactive calmain stub for nonlin tests
+calaux_a4    - spec2igm demos, run from inside calmain_a4
+
+ccast_test5  - top level driver for calmain_a5
+calmain_a5   - calmain_e7 hacked to dump uncalibrated spectra
+rdr2sdr_a5   - rdr2sdr hacked for calmain_a5 dump
+match_a5     - match calibrated and uncalibrated ES looks
+plot_rlevs   - plot radiance level means from match_a5
+
+polynomial fit nonlinearity measurement and correction
+
+testESfit1  - complex component fits for ES vs rad matchups
+testESfit2  - complex modulus fits for ES vs rad matchups
+nlc_fit     - polynomial fit for nonlinearity correction
+nlc_poly    - time domain nonlinearity correction
+
+tests and mods to existing ATBD nonlinearity correction
+
+ccast_poly  - ccast driver for 20 Feb 2016 clear matchups
+nlc_quad    - nonlinearity correction with quadratic term
+cal_test4   - match kcarta, rtp, and CrIS for nonlin tests
+

@@ -46,7 +46,7 @@ flist = dir(fullfile(rdir, 'RDR*.mat'));
 flist = dir(fullfile(rdir, 'RDR_d20160120_t0304487.mat'));
 
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/quad_065a';
+shome = '/asl/data/cris/ccast/poly_t1';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
@@ -81,17 +81,17 @@ opts.nedn_filt = '../inst_data/nedn_filt_HR.mat';
 
 % 2016 UMBC a2 values
   opts.a2LW = [0.0175 0.0122 0.0137 0.0219 0.0114 0.0164 0.0124 0.0164 0.0305];
-% opts.a2MW = [0.0016 0.0173 0.0263 0.0079 0.0093 0.0015 0.0963 0.0410 0.0016];
+  opts.a2MW = [0.0016 0.0173 0.0263 0.0079 0.0093 0.0015 0.0963 0.0410 0.0016];
 
 % 2016 UW values via Yong Chen
-  opts.a2MW = [0.0033 0.0178 0.0271 0.0073 0.0104 0.0024 0.0936 0.0434 0.0026];
+% opts.a2MW = [0.0033 0.0178 0.0271 0.0073 0.0104 0.0024 0.0936 0.0434 0.0026];
 
 % current default a2 values (from eng and inst params)
 % opts.a2LW = [0.0194 0.0143 0.0161 0.0219 0.0134 0.0164 0.0146 0.0173 0.0305];
 % opts.a2MW = [0.0053 0.0216 0.0292 0.0121 0.0143 0.0037 0.1070 0.0456 0.0026];
 
 % test override
-opts.a2MW = 0.65 * opts.a2MW;
+% opts.a2MW = 0.65 * opts.a2MW;
 
 %--------------------------------
 % process matlab RDR to SDR data 

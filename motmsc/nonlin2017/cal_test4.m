@@ -12,9 +12,6 @@ addpath ../motmsc/utils
 
 % load the CrIS SDR granule
 % tstr = 'h3a2new';
-% tstr = 'quad_nlc';   % UMBC new a2 1.00 * MW FOV 7
-% tstr = 'quad_080';   % UMBC new a2 0.80 * MW FOV 7
-% tstr = 'quad_080a';  % UMBC new a2 0.80 * all FOVs
 % tstr = 'quad_070a';  % UMBC new a2 0.70 * all FOVs
 % tstr = 'newUWMWa2';  % 2016 UW a2, MW only
 % tstr = 'sdr60_hr';
@@ -98,11 +95,13 @@ ddifMW = resMW - (mean(resMW, 2) * ones(1, 9));
 % string for plot titles
 tplot = strrep(tstr, '_', ' ')
 
-figure(1); clf
+figure(1);
 set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 set(gcf, 'DefaultAxesColorOrder', fovcolors);
 subplot(2,1,1)
+plot(vobsMW, resMW, 'linewidth', 2)
 plot(vobsMW, resMW)
+% axis([1690, 1710, -0.5, 1.2])
 title(sprintf('%s minus calc', tplot))
 legend(fovnames, 'location', 'eastoutside')
 xlabel('wavenumber')
@@ -111,9 +110,10 @@ grid on; zoom on
 
 subplot(2,1,2)
 plot(vobsMW, ddifMW)
-  axis([1200, 1800, -1.2, 0.6])
+axis([1200, 1800, -1, 1])
+% plot(vobsMW, ddifMW, 'linewidth', 2)
+% axis([1200, 1800, -1.2, 0.6])
 % axis([1620, 1660, -0.6, 0.4])
-% axis([1680, 1720, -0.6, 0.4])
 % axis([1690, 1710, -0.6, 0.4])
 title(sprintf('%s double difference', tplot))
 legend(fovnames, 'location', 'eastoutside')

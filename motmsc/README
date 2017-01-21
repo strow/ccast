@@ -1,15 +1,7 @@
 
-recent
--------
-calmain_a4   - interactive calmain stub for nonlin tests
-ccast_test4  - top level driver for calmain_a4
-
-calmain_a5   - calmain_e7 hacked to dump uncalibrated spectra
-rdr2sdr_a5   - rdr2sdr hacked for calmain_a5 dump
-ccast_test5  - top level driver for calmain_a5
-
-testESmean  - plots and fit for ES vs rad matchups
-testESdiff  - plots and fit for ES-SP vs rad matchup
+nonlin2017
+-----------
+polynomial fits and nonlinearity corrections, see the README
 
 top level 
 --------
@@ -123,13 +115,9 @@ nedn_test4 - NEdN svd and filter demo plots
 mean_nedn  - get ccast NEdN average over several days
 nedn_plot  - show NEdN and NEdT from mean_nedn data
 
-nonlinear
+nonlin2016
 ----------
-a2_test*  - FOV differences as a function of a2 values
-nlc_ng    - nonlineary correction
-nlc_uw    - UW nonlinearity function
-nlc_test1 - compare old and new non-linearity correction codes
-nlc_test2 - plot old and new numeric filters
+Feb 2016 nonlinarity a2 fitting, see the README
 
 msc_test
 ---------
