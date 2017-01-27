@@ -1,16 +1,10 @@
 
-nonlin2017
------------
-polynomial fits and nonlinearity corrections, see the README
-
 top level 
 --------
 rad_svd - SVD on some sample radiance sets
 resamp[YXZ] - assorted resampling tests
 
-mkSArun - call mkSAinv with typical values
-
-mean_cfovs  - mean and std for each ccast FOV over selected FORs
+mean_cfovs  - mean and std for all FOVs and selected FORs
 mean_plots  - plot results from mean_cfovs
 mean_diffs1 - compare FOR 15 and FOR 16 runs of mean_cfovs
 mean_diffs2 - compare two FOR 15-16 runs of mean_cfovs
@@ -26,8 +20,8 @@ kc2resp  - convolve kcarta to CrIS responsivity
 
 cmp_sdr   - compare two ccast SDR files
 cmp_res   - compare ccast hi2low with user-grid finterp
-cmp_idps  - compare b/ccast and IDPS spectra
-cmp_loop1 - loop on ccast SDR files, compare with IDPS
+cmp_idps  - compare ccast and NOAA spectra
+cmp_loop1 - loop on ccast SDR files, compare with NOAA
 cmp_fovs1 - find a FOR with similar FOVs and compare them
 cmp_fovs2 - find obs with similar FOVs and compare them
 
@@ -40,6 +34,14 @@ inst_demo   - demo calls to inst_params
 sweep_diffs - compare space and IT looks by sweep direction
 rad_stats1  - long span CrIS radiance stats
 
+nonlin2017
+-----------
+polynomial fits and nonlinearity corrections, see the README
+
+fov5_anom (30 Aug 2016)
+-----------------------
+see the README there for more info
+
 resp_test (24 May 2016)
 ------------------------
 resp_test1 - compare kc2resp with kc2cris
@@ -51,10 +53,6 @@ resp_test6 - sample flat, flat + 20, and resp ref truth
 resp_obs - compare ccast minus noaa with flat minus resp ref truth
 resp_cmp - compare recent ccast with UW reference responsivity
 kc2resp3 - used for 2-stage responsivity test
-
-fov5_anom (30 Aug 2016)
------------------------
-see the README there for more info
 
 error_corr (29 Jul 2016)
 -------------------------
@@ -96,13 +94,13 @@ test_var    - test of recursive variance
 
 rtp_sarta
 ----------
-ccast2rtp  - take ccast SDR data to RTP structs
-cris_ichan - sarta ichan indices in frequency order
-cris_vchan - full CrIS grid with guard channels
-guard_ind  - indices for copying data with guard bands
-guard_test - test guard_ind
-ichan_demo - get sarta ichan and vchan values for CrIS
-rtp_test   - basic high level tests of ccast2rtp
+ccast2rtp   - take ccast SDR data to RTP structs
+cris_ichan  - sarta ichan indices in frequency order
+cris_vchan  - full CrIS grid with guard channels
+guard_ind   - indices for copying data with guard bands
+guard_test  - test guard_ind
+ichan_demo  - get sarta ichan and vchan values for CrIS
+rtp_test    - basic high level tests of ccast2rtp
 
 nedn_test
 ----------
@@ -138,7 +136,7 @@ check_days   - quick check for bad SDR data
 
 time
 -----
-new time functions, see time/README
+new time functions, see the README
 
 ils_test
 ---------

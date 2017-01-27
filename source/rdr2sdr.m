@@ -186,9 +186,9 @@ for fi = 1 : nfile
     fprintf(1, 'rdr2sdr: warning - flagging %d bad FORs, file %s\n', m, rid)
   end
 
-  % -----------------
-  % get count spectra
-  % -----------------
+  % ------------------------
+  % get uncalibrated spectra
+  % -------------------------
 
   % get instrument and user grid parameters
   [instLW, userLW] = inst_params('LW', wlaser, opts);
@@ -221,10 +221,6 @@ for fi = 1 : nfile
 
   clear rcLW rcMW rcSW
 
-  %-------------------
-  % save the SDR data
-  %-------------------
-
   % trim channel sets to user grid plus 2 guard channels
   % and return separate real values and complex residuals
 
@@ -249,11 +245,18 @@ for fi = 1 : nfile
   nSW = nSW(ix, :, :);
   vSW = vSW(ix);
 
+  % L1b validation
+  L1b_err = checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, L1a_err, rid);
+
+  %-------------------
+  % save the SDR data
+  %-------------------
+
   save(sfile, ...
        'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
        'cLW', 'cMW', 'cSW', 'rLW', 'rMW', 'rSW', 'nLW', 'nMW', 'nSW', ...
        'vLW', 'vMW', 'vSW', 'scTime', 'sci', 'eng', 'geo', 'L1a_err', ...
-       'rid', '-v7.3')
+       'L1b_err', 'rid', '-v7.3')
 
 end
 

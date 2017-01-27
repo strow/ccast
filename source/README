@@ -1,8 +1,8 @@
 
 top level wrappers
 -------------------
-ccast_main    - process matlab RDR to SDR data
-ccast_prepro  - ccast HDF to matlab preprocessing
+ccast_*       - drivers to take Matlab RDR to SDR data
+ccast_prepro  - driver to take NOAA HDF to Matlab RDR data
 
 ccast preprocessing
 --------------------
@@ -20,24 +20,45 @@ scanorder  - use FOR values to group data into scans
 geo_match  - match GCRSO and RDR scans
 calmain    - main calibration procedure
 
+current calmain versions
+-------------------------
+calmain_d2  - NOAA algorithm A4
+calmain_e5  - ccast ref algo 1, rIT after SA-1
+calmain_e6  - ccast ref algo 2, rIT before SA-1
+calmain_e7  - ccast ref algo 1 with resampling
+calmain_e8  - ccast ref algo 1 with resampling and new nlc
+
 SRF tabulation
 ---------------
-mkSRFtab   - build SRF matrix tables for interpolation
-mkSRFrun   - example using mkSRFtab with typical values
+mkSAinv  - make an inverse SA matrix
+mkSArun  - call mkSAinv with typical values
 
 utility functions
 ------------------
-newILS      - new cris ILS function
-psinc       - non-normalized periodic sinc  
-inst_params - sensor and user-grid parameters
-getSRFwl    - wlaser SRF matrix interpolation
 bandpass    - raised cosine bandpass filter
+cris_ugrid  - return CrIS user grid with guard channels
+f_atbd      - return ATBD and related NOAA filters
 finterp     - double-transform fourier interpolation 
-specNF      - spectral space FIR filter at the sensor grid
-bt2rad      - translate brightness temperature to radiance
-rad2bt      - translate radiance to brightness temperature
-movavg_app  - take moving average of SP and IT data
+fp_v33a     - SPNN focal plane values from Larrabee's v33a
+getSAinv    - load an SA inverse matrix
+igm_apod    - cosine apodization of interferogram wings
+inst_params - sensor and user-grid parameters
 movavg1     - vectorized moving average with NaNs
+movavg_app  - take moving average of SP and IT data
+newILS      - new cris ILS function
+nedn_filt   - principle component filter for NEdN data
+newILS      - CrIS ILS function
+nlc_new     - nonlineary correction with ATBD units
+nlc_vec     - vectorized nonlineary correction
 read_GCRSO  - read CrIS GCRSO geo data and attributes
+resamp      - CrIS resampling matrices
+seq_match   - find the matching subsequence of two sequences
+specNF      - spectral space FIR filter at the sensor grid
 ztail       - find the nonzero end a vector or array
+
+test and support
+-----------------
+bt2rad  - translate brightness temperature to radiance
+rad2bt  - translate radiance to brightness temperature
+pcorr2  - do a basic phase correction
 

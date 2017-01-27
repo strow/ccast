@@ -16,17 +16,17 @@
 %
 %   RDR and GCRSO FOR time fields are matched and this pairing is
 %   used to match RDR and GCRSO scans.  Selected GCRSO fields are
-%   then copied to the RDR scan timeline, which is also the bcast
+%   then copied to the RDR scan timeline, which is also the ccast
 %   SDR timeline.
 %
 %   if the residual difference between scTime and geo_out.FORTime 
 %   is greater than 1 ms, this is reported in a warning message
 %
-%   geo_match take into account the 1 Jul 2012 and 1 Jul 2015 leap
-%   seconds.  The 4 Jul 2012 application date may reflect a delay in
-%   updating instrument firmware.  The odd way of representing the
-%   leap second offset, dtRDR = 3817 + 4 * 8000, is due to counting
-%   it in scans and fractions of a scan.
+%   geo_match take leap seconds into account in comparing RDR and
+%   SDR times.  The 4 Jul 2012 leap second application date reflects
+%   (I think) a delay in updating instrument firmware.  The odd way
+%   of representing the leap second offset, dtRDR = 3817 + 4 * 8000,
+%   is due to counting in scans and fractions of a scan.
 %
 % AUTHOR
 %   H. Motteler, 2 May 2012
@@ -44,26 +44,27 @@ end
 % 18 char filler for missing gid 
 gfill = 'xxxxxxxxxxxxxxxxxx';
 
-% factor to convert Matlab datenums to IET, t_mit * mwt = t_ngas
+% factor to convert Matlab datenums to ccast time
 mwt = 8.64e7;
 
 mt0 = datenum('1-jan-1958');  % IET base time
 mt1 = datenum('1-jan-2012');  % CrIS data start
 mt2 = datenum('4-jul-2012');  % leap second
 mt3 = datenum('1-jul-2015');  % leap second
+mt4 = datenum('1-jan-2017');  % leap second
 
-t1 = mwt * (mt1 - mt0);  % IET time for CrIS start
-t2 = mwt * (mt2 - mt0);  % IET time for leap second
-t3 = mwt * (mt3 - mt0);  % IET time for leap second
+t1 = mwt * (mt1 - mt0);  % CrIS time for mission start
+t2 = mwt * (mt2 - mt0);  % CrIS time for leap second
+t3 = mwt * (mt3 - mt0);  % CrIS time for leap second
+t4 = mwt * (mt4 - mt0);  % CrIS time for leap second
 
-% set the RDR offset from SDR time, in ms
+% set the RDR offset from SDR time
 tx = min(scTime(:));  
-if t1 <= tx && tx < t2
-  dtRDR = 1817 + 4 * 8000;
-elseif t2 <= tx && tx < t3
-  dtRDR = 2817 + 4 * 8000;
-else
-  dtRDR = 3817 + 4 * 8000;
+if tx < t1, error('bad scTime value'), 
+elseif t1 <= tx && tx < t2,  dtRDR = 1817 + 4 * 8000;
+elseif t2 <= tx && tx < t3,  dtRDR = 2817 + 4 * 8000;
+elseif t3 <= tx && tx < t4,  dtRDR = 3817 + 4 * 8000;
+else,                        dtRDR = 4817 + 4 * 8000;
 end
 
 %-------------------
