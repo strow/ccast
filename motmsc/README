@@ -34,6 +34,11 @@ inst_demo   - demo calls to inst_params
 sweep_diffs - compare space and IT looks by sweep direction
 rad_stats1  - long span CrIS radiance stats
 
+error_corr (1 Mar 2017)
+------------------------
+correlation stats for instrument noise and obs minus calc residuals;
+see the README there for more info
+
 nonlin2017
 -----------
 polynomial fits and nonlinearity corrections, see the README
@@ -53,12 +58,6 @@ resp_test6 - sample flat, flat + 20, and resp ref truth
 resp_obs - compare ccast minus noaa with flat minus resp ref truth
 resp_cmp - compare recent ccast with UW reference responsivity
 kc2resp3 - used for 2-stage responsivity test
-
-error_corr (29 Jul 2016)
--------------------------
-nedn_stats1 - tabulate ICT radiance from a modified ccast run
-edn_stats2  - ICT noise correlation matrix, SVD, and plots
-cal_test3   - CrIS kcarta clear matchups for correlation tests
 
 filt_test
 ----------

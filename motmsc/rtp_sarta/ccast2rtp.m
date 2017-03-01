@@ -60,9 +60,9 @@ end
 load(sfile)
 
 % sanity check for ccast QC 
-if exist ('L1a_err') ~= 1
+if exist ('L1b_err') ~= 1
   sfile
-  error('L1a_err flags missing in ccast SDR file')
+  error('L1b_err flags missing in ccast SDR file')
 end
 
 % get total obs count
@@ -161,7 +161,7 @@ prof.udef(12,isub) = interp1(mtime(msel),xyz(3,msel),prof.rtime(isub),'linear','
 % trim output to a valid subset
 %-------------------------------
 % get good data index
-iok = find(reshape(ones(9,1) * ~L1a_err(:)', 1, nobs));
+iok = find(reshape(ones(9,1) * ~L1b_err(:)', 1, nobs));
 
 prof.rlat   = prof.rlat(:, iok);
 prof.rlon   = prof.rlon(:, iok);

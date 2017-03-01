@@ -1,7 +1,7 @@
 %
-% cal_test3 -- match kcarta, rtp, and cris SDR obs
+% cal_test3 - basic correlation stats for clear matchups
 %
-% this version is for covariance tests
+% basic correlation plots for a single FOV and all three bands
 %
 
 addpath /asl/matlib/h4tools

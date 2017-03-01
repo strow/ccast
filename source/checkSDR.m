@@ -51,6 +51,7 @@ for j = 1 : nscan
 
     % no check if we have an L1a error
     if L1a_err(i, j)
+      L1b_err(i, j) = 1;
       continue
     end
 

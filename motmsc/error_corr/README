@@ -1,0 +1,25 @@
+
+correlation stats for instrument noise and obs minus calc
+residuals
+
+  cal_test3   - basic correlation stats for clear matchups
+  cal_test5   - more detailed stats for clear matchups
+
+cal_test3 does basic unapodized correlation plots for each band.
+cal_test5 does more detailed apodized stats for the LW band.
+
+  nedn_stats1 - tabulate ICT radiance from a modified ccast run
+  nedn_stats2 - plot ICT noise correlation and singular values
+
+nedn_stats1 tabulates ICT obs from a modified calmain, and saves
+the results in nedn_cat.mat.  nedn_stats2 loads this and does noise
+correlation and SVD plots.  Note that data from the ccast run used 
+by nedn_stats1 has been deleted.
+
+The following are the start of a more comprehensive ICT and SP
+look dump; the dump works but I never did anything with the data.
+
+  calmain_nedn - mod to dump ICT and SP looks
+  ccast_nedn   - top level driver for NEdN tabulation
+  rdr2sdr_nedn - main processing loop for NEdN tabulation
+

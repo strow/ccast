@@ -35,13 +35,13 @@ addpath ../davet
 addpath ../source
 
 % path to matlab RDR input files
-rhome = '/asl/data/cris/ccast/rdr60_hr2';
+rhome = '/asl/data/cris/ccast/rdr60_hr3';
 rdir = fullfile(rhome, ystr, dstr);
 flist = dir(fullfile(rdir, 'RDR*.mat'));
 % flist = flist(91:96);
 
 % path to matlab SDR output files
-shome = '/asl/data/cris/ccast/sdr60_hr';
+shome = '/asl/data/cris/ccast/sdr60_nedn';
 sdir = fullfile(shome, ystr, dstr);
 unix(['mkdir -p ', sdir]);
 
@@ -57,16 +57,16 @@ geofile = fullfile(ghome, ystr, ['allgeo', tmp(1:8), '.mat']);
 opts = struct;            % initialize opts
 opts.cal_fun = 'e7';      % calibration function
 opts.version = 'snpp';    % current active CrIS
-opts.inst_res = 'hires2'; % high res #2 sensor grid
+opts.inst_res = 'hires3'; % high res #3 sensor grid
 opts.user_res = 'hires';  % high resolution user grid
 opts.geofile = geofile;   % geo filename for this doy
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 opts.resamp = 4;          % resampling algorithm
 
 % high-res SA inverse files
-opts.LW_sfile = '../inst_data/SAinv_HR2_Pn_ag_LW.mat';
-opts.MW_sfile = '../inst_data/SAinv_HR2_Pn_ag_MW.mat';
-opts.SW_sfile = '../inst_data/SAinv_HR2_Pn_ag_SW.mat';
+opts.LW_sfile = '../inst_data/SAinv_HR3_Pn_LW.mat';
+opts.MW_sfile = '../inst_data/SAinv_HR3_Pn_MW.mat';
+opts.SW_sfile = '../inst_data/SAinv_HR3_Pn_SW.mat';
 
 % time-domain FIR filter 
 opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';
@@ -92,7 +92,7 @@ opts.nedn_filt = '../inst_data/nedn_filt_HR.mat';
 % profile clear
 % profile on
 
-rdr2sdr(flist, rdir, sdir, opts);
+rdr2sdr_nedn(flist, rdir, sdir, opts);
 
 % profile viewer
 
