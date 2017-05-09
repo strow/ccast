@@ -1,5 +1,5 @@
 %
-% rad_plots1 -- plot stats from rad_stats1
+% imag_plots1 -- plot stats from imag_stats1
 %
 
 addpath utils

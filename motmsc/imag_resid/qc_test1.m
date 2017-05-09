@@ -1,8 +1,14 @@
+%
+% qc_test1 - single test call of checkSDR
+%
 
 addpath utils
+addpath imag_resid
+addpath ../source
 
 % bad
-  rid = 'd20160120_t0032496'
+% rid = 'd20160120_t0032496'
+  rid = 'd20160120_t0352485'
 
 % good
 % rid = 'd20160120_t1952431'
@@ -20,7 +26,6 @@ spath = '/asl/data/cris/ccast/sdr60_hr/2016';
 sfile = fullfile(spath, doy, ['SDR_', rid, '.mat']);
 load(sfile)
 
-L1b_err = checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, L1a_err, rid);
-
-sum(L1b_err(:))
+[L1b_err, L1b_stat] = ...
+   checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, L1a_err, rid);
 

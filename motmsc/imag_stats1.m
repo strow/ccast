@@ -1,7 +1,7 @@
 %
-% rad_stats1 -- long span CrIS radiance stats
+% imag_stats1 -- long span CrIS complex residual stats
 %
-% derived from mean_cfovs; version for complex residuals
+% derived from mean_cfovs; uses L1b_err for valid data
 %
 
 addpath ../source
@@ -11,8 +11,9 @@ addpath /asl/packages/airs_decon/source
 %-----------------
 % test parameters
 %-----------------
-% sFOR = 15;     % fields of regard, 1-30
-  sFOR = 15:16;  % fields of regard, 1-30
+% sFOR = 15;     % offset nadir FOR
+% sFOR = 15:16;  % near-nadir FOR pair
+  sFOR =  1:30;  % all fields of regard
 % aflag = 0;     % set to 1 for ascending
 
 % path to SDR year
@@ -21,9 +22,10 @@ addpath /asl/packages/airs_decon/source
 syear = fullfile('/asl/data/cris/ccast', tstr, '2016');
 
 % SDR days of the year
-% sdays =  48 :  50;   % 17-19 Feb 2015
-  sdays =  18 :  20;   % 2016 noaa test days
-% sdays =  61 :  63;   % randomly chosen 2016
+% sdays =  18 :  20;   % 18-20 Jan 2016, noaa test days
+% sdays =  61 :  63;   % 1-3 Mar 2016, randomly chosen 2016
+% sdays = 245 : 247;   % 1-3 Sep 2016, randomly chosen 2016
+  sdays = 1 : 19 : 366;  % longer test
 
 % loop initialization
 nLW = 717; nMW = 869; nSW = 637; % high res sizes
@@ -62,10 +64,13 @@ for di = sdays
 %     end
       % loop on selected FORs
       for i = sFOR
-        if L1a_err(i, j)
+%       if L1a_err(i, j)
+        if L1b_err(i, j)
           continue
         end
-        if ~isempty(find(isnan(rLW(:, :, i, j))))
+        if ~isempty(find(isnan(rLW(:, :, i, j)))) || ...
+           ~isempty(find(isnan(rMW(:, :, i, j)))) || ...
+           ~isempty(find(isnan(rSW(:, :, i, j))))
           continue
         end
 
@@ -77,12 +82,13 @@ for di = sdays
         tmpMW = double(cMW(:, :, i, j));
         tmpSW = double(cSW(:, :, i, j));
 
-        t1 = rms(tmpSW);
-        t2 = find(t1 > 0.10);
-        if ~isempty(t2)
-          [i, j, t2], rid
-          continue
-        end
+%       % ad hoc early limit
+%       t1 = rms(tmpSW);
+%       t2 = find(t1 > 0.10);
+%       if ~isempty(t2)
+%         [i, j, t2], rid
+%         continue
+%       end
 
         [bmLW, bwLW, bnLW] = rec_var(bmLW, bwLW, bnLW, bLW);
         [bmMW, bwMW, bnMW] = rec_var(bmMW, bwMW, bnMW, bMW);
@@ -108,7 +114,7 @@ cvMW = cwMW ./ (cnMW - 1);  csMW = sqrt(cvMW);
 cvSW = cwSW ./ (cnSW - 1);  csSW = sqrt(cvSW);
 
 % save the data
-save('rad_stats1', ...
+save('imag_stats1', ...
      'vLW', 'vMW', 'vSW', 'bnLW', 'bnMW', 'bnSW', ...
      'bmLW', 'bmMW', 'bmSW', 'bsLW', 'bsMW', 'bsSW', ...
      'cmLW', 'cmMW', 'cmSW', 'csLW', 'csMW', 'csSW', ...

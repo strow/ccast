@@ -1,5 +1,5 @@
 %
-% rad_stats2 -- long span checkSDR test
+% qc_test2 - simple test loop for checkSDR
 %
 
 addpath ../source
@@ -13,11 +13,9 @@ syear = fullfile('/asl/data/cris/ccast', tstr, '2016');
 
 % SDR days of the year
 % sdays =  48 : 50;   % 17-19 Feb 2015
-  sdays =  18 : 20;   % 2016 noaa test days (many SW errors...)
-% sdays =  61 : 63;   % randomly chosen 2016
-% sdays =  91 : 93;
-% sdays = 101 : 102;
-% sdays =  33 : 36;
+% sdays =  18 : 20;   % 2016 noaa test days (many SW errors...)
+  sdays = 20;
+% sdays =  61 : 63;   % 1-3 march
 
 % profile clear
 % profile on
@@ -36,7 +34,8 @@ for di = sdays
     sfile = fullfile(syear, doy, stmp);
     load(sfile)
 
-    L1b_err = checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, L1a_err, rid);
+    L1b_err = ...
+      checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, L1a_err, rid);
 
   end
 end

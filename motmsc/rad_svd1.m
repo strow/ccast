@@ -1,5 +1,5 @@
 %
-% rad_svd -- SVD on some sample radiance sets
+% rad_svd1 -- SVD on some sample radiance sets
 %
 
 addpath ../source
@@ -69,7 +69,7 @@ s3 = diag(s3);
 
 ix = 400;
 % semilogy(1:49, s1, 1:ix, s2(1:ix), 1:ix, s3(1:ix))
-loglog(1:48, s1, 1:ix, s2(1:ix), 1:ix, s3(1:ix))
+loglog(1:48, s1, 1:ix, s2(1:ix), 1:ix, s3(1:ix), 'linewidth', 2)
 % axis([0, ix, 1e-2, 1e5])
 title(sprintf('first %d singular values for 3 radiance sets', ix))
 legend('Scott 49 fitting', 'Sergio new 704', 'clear gran 3782')
