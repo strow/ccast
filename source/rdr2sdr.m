@@ -246,7 +246,8 @@ for fi = 1 : nfile
   vSW = vSW(ix);
 
   % L1b validation
-  L1b_err = checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, L1a_err, rid);
+  [L1b_err, L1b_stat] = ...
+     checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, L1a_err, rid);
 
   %-------------------
   % save the SDR data
@@ -256,7 +257,7 @@ for fi = 1 : nfile
        'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
        'cLW', 'cMW', 'cSW', 'rLW', 'rMW', 'rSW', 'nLW', 'nMW', 'nSW', ...
        'vLW', 'vMW', 'vSW', 'scTime', 'sci', 'eng', 'geo', 'L1a_err', ...
-       'L1b_err', 'rid', '-v7.3')
+       'L1b_err', 'L1b_stat', 'rid', '-v7.3')
 
 end
 

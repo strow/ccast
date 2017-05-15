@@ -44,7 +44,7 @@ sc1SW = std(c1SW, 0, 3);
 
 % LW separate sweeps all FOV means
 figure(1)
-set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 set(gcf, 'DefaultAxesColorOrder', fovcolors);
 subplot(2,1,1)
 plot(vLW, mc0LW)
@@ -62,11 +62,11 @@ legend(fovnames, 'location', 'eastoutside')
 xlabel('wavenumber')
 ylabel('radiance')
 grid on; zoom on
-saveas(gcf, 'LW_imag_means', 'png')
+% saveas(gcf, 'LW_imag_means', 'png')
 
 % MW separate sweeps all FOV means
 figure(2)
-set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 set(gcf, 'DefaultAxesColorOrder', fovcolors);
 subplot(2,1,1)
 plot(vMW, mc0MW)
@@ -84,11 +84,11 @@ legend(fovnames, 'location', 'eastoutside')
 xlabel('wavenumber')
 ylabel('radiance')
 grid on; zoom on
-saveas(gcf, 'MW_imag_means', 'png')
+% saveas(gcf, 'MW_imag_means', 'png')
 
 % SW separate sweeps all FOV means
 figure(3)
-set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 set(gcf, 'DefaultAxesColorOrder', fovcolors);
 subplot(2,1,1)
 plot(vSW, mc0SW)
@@ -106,11 +106,11 @@ legend(fovnames, 'location', 'eastoutside')
 xlabel('wavenumber')
 ylabel('radiance')
 grid on; zoom on
-saveas(gcf, 'SW_imag_means', 'png')
+% saveas(gcf, 'SW_imag_means', 'png')
 
 % MW separate sweeps all FOV stds
 figure(4)
-set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 set(gcf, 'DefaultAxesColorOrder', fovcolors);
 subplot(3,1,1)
 plot(vLW, sc0LW)
@@ -136,7 +136,7 @@ legend(fovnames, 'location', 'eastoutside')
 xlabel('wavenumber')
 ylabel('radiance')
 grid on; zoom on
-saveas(gcf, 'all_imag_stds', 'png')
+% saveas(gcf, 'all_imag_stds', 'png')
 
 return
 

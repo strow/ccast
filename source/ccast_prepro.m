@@ -67,8 +67,8 @@ addpath ../source
 addpath ../readers/MITreader380a
 
 % set data paths
-hdir = '/asl/data/cris/rdr60/hdf';     % HDF RDR files
-gdir = '/asl/data/cris/sdr60/hdf';     % HDF GCRSO files
+hdir = '/asl/data/cris/rdr60';         % HDF RDR files
+gdir = '/asl/data/cris/sdr60';         % HDF GCRSO files
 mdir = '/asl/data/cris/ccast';         % matlab RDR files
 ddir = '/asl/data/cris/ccast/daily';   % matlab daily files
 
