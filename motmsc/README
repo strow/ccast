@@ -34,6 +34,14 @@ inst_demo   - demo calls to inst_params
 sweep_diffs - compare space and IT looks by sweep direction
 rad_stats1  - long span CrIS radiance stats
 
+lat_subset
+-----------
+demo of equal area SDR subsampling
+
+imag_resid (15 May 2017)
+-------------------------
+complex residual stats and tests; see the README for details
+
 error_corr (1 Mar 2017)
 ------------------------
 correlation stats for instrument noise and obs minus calc residuals;

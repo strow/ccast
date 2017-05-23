@@ -1,0 +1,17 @@
+
+complex residual stats and tests
+---------------------------------
+
+imag_stats3 - long span CrIS complex residual stats
+
+imag_hotX - stats with at least 6 warm FOVs per FOR
+imag_nedn - plot complex residuals and NEdN from imag_stats3
+imag_plots1 - plot stats from imag_stats1
+imag_resid1 - a quick look at complex residuals and NEdN
+imag_resid2 - complex residuals by sweep direction
+
+qc_test5 - browse errors flagged by checkSDR
+qc_test4 - sample SDR complex residuals with std bands
+qc_test2 - simple test loop for checkSDR
+qc_test1 - single test call of checkSDR
+
