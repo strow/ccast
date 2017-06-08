@@ -1,9 +1,9 @@
 %
-% random selection for constant obs as a function of area
+% area_loop1 - raw and two different subset obs by lat bin
 %
 
 % number of latitude bands (2 x N)
-N = 12;
+N = 6;
 
 % allgeo year prefix
 ghome = '/asl/data/cris/ccast/daily';

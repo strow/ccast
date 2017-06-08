@@ -9,7 +9,7 @@
 # sbatch options
 #SBATCH --job-name=ccast
 #SBATCH --partition=batch
-#SBATCH --qos=medium
+#SBATCH --qos=medium_prod
 #SBATCH --account=pi_strow
 #SBATCH --mem-per-cpu=12000
 #SBATCH --ntasks=30
@@ -20,11 +20,11 @@ MATOPT='-nojvm -nodisplay -nosplash'
 
 # job step 1
 srun --output=ccast_%j_0_%t.out \
-    $MATLAB $MATOPT -r "ccast_batch($1, $2); exit"
+  $MATLAB $MATOPT -r "ccast_batch($1, $2); exit"
 
 # job step 2
-# srun --output=ccast_%j_1_%t.out \
-#   $MATLAB $MATOPT -r "ccast_batch($1+30, $2); exit"
+srun --output=ccast_%j_1_%t.out \
+  $MATLAB $MATOPT -r "ccast_batch($1+30, $2); exit"
 
 # job step 3
 # srun --output=ccast_%j_2_%t.out \
@@ -32,5 +32,5 @@ srun --output=ccast_%j_0_%t.out \
 
 # job step 4
 # srun --output=ccast_%j_3_%t.out \
-#   $MATLAB $MATOPT -r "ccast_batch($1+180, $2); exit"
+#   $MATLAB $MATOPT -r "ccast_batch($1+90, $2); exit"
 
