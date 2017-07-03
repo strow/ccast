@@ -7,7 +7,7 @@ function latbins = equal_area_spherical_bands(N);
 %% points start at equator (lat 0) and go up toward norht pole, then mirrored for south pole
 %%
 %% see /home/sergio/MATLABCODE/RTPMAKE/CLUST_RTPMAKE/CLUSTMAKE_ERA_CLOUD_NADIR
-addpath /home/sergio/MATLABCODE/PLOTTER
+% addpath /home/sergio/MATLABCODE/PLOTTER
 
 %N = 20;
 
@@ -20,11 +20,12 @@ end
 latbins(end+1) = 90;
 latbins = [-fliplr(latbins(2:end)) latbins];
 
-[A,V] = surfacearea_sphericalzones(latbins);
-latbinsx = 0.5 * (latbins(1:end-1) + latbins(2:end));
-%{
-fprintf(1,'clear sky latbinsbins  : %8.6f \n',sum(A))
-plot(latbinsx,A,'ro-')
-plot(latbinsx,A/max(A),'ro-')
-title('Equal Area latbins')
-%}    
+% [A,V] = surfacearea_sphericalzones(latbins);
+% latbinsx = 0.5 * (latbins(1:end-1) + latbins(2:end));
+% %{
+% fprintf(1,'clear sky latbinsbins  : %8.6f \n',sum(A))
+% plot(latbinsx,A,'ro-')
+% plot(latbinsx,A/max(A),'ro-')
+% title('Equal Area latbins')
+% %}    
+
