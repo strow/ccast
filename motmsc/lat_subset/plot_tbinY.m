@@ -1,5 +1,5 @@
 %
-% plot_tbin - show results from airs_tbin and cris_tbin
+% plot_tbin - combine two airs/cris_tbin tests
 %
 % *_tbin1, 2016 SW 29-day test
 % *_tbin3, 2016 LW 29-day test
@@ -9,10 +9,10 @@
 % *_tbin7, 2016 LW 48 day test 2 w/ lat subsetting
 %
 
-d1 = load('airs_tbin8');
-d3 = load('airs_tbin9');
-d2 = load('cris_tbin8');
-d4 = load('cris_tbin9');
+d1 = load('airs_tbin11');
+d3 = load('airs_tbin12');
+d2 = load('cris_tbin11');
+d4 = load('cris_tbin12');
 
 d1.tbin = d1.tbin + d3.tbin;
 d2.tbin = d2.tbin + d4.tbin;
@@ -24,7 +24,8 @@ tind = d1.tind;
 figure(1)
 subplot(2,1,1)
 plot(tind, d1.tbin, tind, (na/nc)*d2.tbin, 'linewidth', 2)
-  axis([200, 305, 0, 9e5])
+% axis([200, 305, 0, 9e5])
+  axis([200, 330, 0, 4e5])
   title('obs count by 900 cm-1 temperature bins')
 % title('obs count by SW cm-1 temperature bins')
 legend('AIRS', 'CrIS', 'location', 'northwest')
@@ -32,7 +33,8 @@ grid on
 
 subplot(2,1,2)
 plot(tind, ((na/nc)* d2.tbin - d1.tbin) ./ d1.tbin, 'linewidth', 2)
-axis([200, 305, -0.2, 0.3])
+% axis([200, 305, -0.2, 0.3])
+  axis([200, 330,-0.1, 0.2])
 title('CrIS minus AIRS relative difference')
 xlabel('Tb, K')
 grid on

@@ -1,0 +1,20 @@
+
+near nadir tests
+
+  1 - 2016 SW 29-day test
+  3 - 2016 LW 29-day test
+  4 - 2017 SW 36 day test
+  5 - 2016 LW 32 day test w/ lat subsetting
+  6 - 2016 LW 48 day test 1 w/ lat subsetting
+  7 - 2016 LW 48 day test 2 w/ lat subsetting
+  8 - 2016 LW 48 day test 1 w/ lat & ocean subsetting
+  9 - 2016 LW 48 day test 2 w/ lat & ocean subsetting
+ 10 - 2016 LW 16 day test w/ lat & ocean subsetting
+ 11 - 2016 LW 16 day test 1 w/ lat subsetting
+ 12 - 2016 LW 16 day test 2 w/ lat subsetting
+
+extended nadir tests 
+
+ 21 - 2016 LW 16 day - test 1, lat subsetting
+ 22 - 2016 LW 16 day - test 2, lat subsetting
+

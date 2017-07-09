@@ -1,10 +1,10 @@
 %
 % NAME
-%   equal_area_trap - equal area trapezoids for count and mean
+%   equal_area_bins - equal area trapezoids for count and mean
 %
 % SYNOPSIS
 %   [latB, lonB, gtot, gavg] = ...
-%          equal_area_grid(nLat, dLon, lat, lon, obs)
+%          equal_area_bins(nLat, dLon, lat, lon, obs)
 %
 % INPUTS
 %   nLat  - number of latitude bands from equator to pole
@@ -23,7 +23,7 @@
 %
 
 function [latB, lonB, gtot, gavg] = ...
-          equal_area_trap(nLat, dLon, lat, lon, obs)
+          equal_area_bins(nLat, dLon, lat, lon, obs)
 
 nobs = length(lat);
 

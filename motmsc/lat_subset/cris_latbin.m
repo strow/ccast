@@ -2,6 +2,8 @@
 % cris_latbin -- lat and lon bins for CrIS obs
 %
 
+addpath ./time
+
 % number of latitude bands is 2 x N
 % N1 = 40; N2 = 80; N3 = 120; N4 = 160;
   N1 = 10; N2 = 20; N3 = 30; N4 = 40;
@@ -18,12 +20,14 @@ year = 2016;
 ystr = sprintf('%d', year);
 
 % specify days of the year
-  dlist = 91 : 106;
-% dlist = 181 : 196;
+dlist = 111 : 126;  % no missing granules
 
 % specify FORs
-  iFOR = 15:16;
-% iFOR = 1 : 30;
+% iFOR = 15 : 16;       % 1 near nadir
+% iFOR =  1 : 30;       % 2 full scan
+% iFOR = [8 15 16 23];  % 3 near nadir plus half scan
+% iFOR = [8 23];        % 4 half scan only
+  iFOR = 13 : 18;       % 5 expanded nadir
 nFOR = length(iFOR);
 
 % cosine exponent
@@ -32,6 +36,8 @@ w = 1.1;
 % all obs in one pot
 lat = [];
 lon = [];
+zen = [];
+tai = [];
 
 % loop on days
 for doy = dlist
@@ -40,15 +46,24 @@ for doy = dlist
   d1 = load(geofile);
   lat = cat(3, lat, d1.allgeo.Latitude(:,iFOR,:));
   lon = cat(3, lon, d1.allgeo.Longitude(:,iFOR,:));
+% zen = cat(3, zen, d1.allgeo.SatelliteZenithAngle(:,iFOR,:));
+  tmp = double(iet2tai(d1.allgeo.FORTime(iFOR,:)));
+  [m,n] = size(tmp);
+  tmp = reshape(single(ones(9,1)) * reshape(tmp, 1, m*n), 9, m, n);
+  tai = cat(3, tai, tmp);
 end
 
 % get good obs subset
 lat = lat(:);
 lon = lon(:);
+% zen = zen(:);
+tai = tai(:);
 iOK = -90 <= lat & lat <= 90 & -180 <= lon & lon <= 180 & ...
       ~isnan(lat) & ~isnan(lon);
 lat = lat(iOK);
 lon = lon(iOK);
+% zen = zen(iOK);
+tai = tai(iOK);
 nobs = numel(lat);
 fprintf(1, '%d initial good obs\n', nobs)
 
@@ -57,8 +72,13 @@ lat_rad = deg2rad(lat);
 ix = rand(nobs, 1) < abs(cos(lat_rad).^w);
 slat = lat(ix);
 slon = lon(ix);
+% szen = zen(ix);
+stai = tai(ix);
 nsub = numel(slat);
 fprintf(1, '%d obs after subset\n', nsub)
+
+clear d1
+save cris_latbin year dlist iFOR nobs nsub slat slon stai
 
 %---------------------------
 % plot equal area grid bins
@@ -78,7 +98,7 @@ gtmp(1:m, 1:n) = grel;
 figure(1); clf
 pcolor(lonB, latB, gtmp)
 caxis([-0.5, 0.5])
-title('CrIS equal area (count - mean) / count')
+title('CrIS equal area (count - mean) / mean')
 xlabel('longitude')
 ylabel('latitude')
 shading flat

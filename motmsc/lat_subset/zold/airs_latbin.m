@@ -18,8 +18,8 @@ dlist = 111 : 126;  % no missing granules
 
 % xtrack subset
 % ixt = 43 : 48;              % 1 near nadir
-% ixt =  1 : 90;              % 2 full scan
-  ixt = [21:23 43:48 68:70];  % 3 near nadir plus half scan
+  ixt =  1 : 90;              % 2 full scan
+% ixt = [21:23 43:48 68:70];  % 3 near nadir plus half scan
 % ixt = [21:23 68:70];        % 4 half scan only
 % ixt = 37 : 54;              % 5 expanded nadir
 
@@ -32,7 +32,6 @@ w = 1.1;
 lat = [];
 lon = [];
 zen = [];
-tai = [];
 
 % loop on days of the year
 for di = dlist
@@ -46,24 +45,20 @@ for di = dlist
     afile = fullfile(ayear, doy, flist(fi).name);
     tlat = hdfread(afile, 'Latitude');
     tlon = hdfread(afile, 'Longitude');
-%   tzen = hdfread(afile, 'satzen');
-    ttai = airs2tai(hdfread(afile, 'Time'));
+    tzen = hdfread(afile, 'satzen');
 
     tlat = tlat(:, ixt);  tlat = tlat(:);
     tlon = tlon(:, ixt);  tlon = tlon(:);
-%   tzen = tzen(:, ixt);  tzen = tzen(:);
-    ttai = ttai(:, ixt);  ttai = ttai(:);
+    tzen = tzen(:, ixt);  tzen = tzen(:);
 
     iOK = -90 <= tlat & tlat <= 90 & -180 <= tlon & tlon <= 180;
     tlat = tlat(iOK); 
     tlon = tlon(iOK);
-%   tzen = tzen(iOK); 
-    ttai = ttai(iOK); 
+    tzen = tzen(iOK); 
 
     lat = [lat;, tlat];
     lon = [lon;, tlon];
-%   zen = [zen;, tzen];
-    tai = [tai;, ttai];
+    zen = [zen;, tzen];
 
     if mod(fi, 10) == 0, fprintf(1, '.'), end
   end
@@ -79,12 +74,11 @@ lat_rad = deg2rad(lat);
 ix = rand(nobs, 1) < abs(cos(lat_rad).^w);
 slat = lat(ix);
 slon = lon(ix);
-% szen = zen(ix);
-stai = tai(ix);
+szen = zen(ix);
 nsub = numel(slat);
 fprintf(1, '%d obs after subset\n', nsub)
 
-save airs_latbin ayear dlist ixt nobs nsub slat slon stai
+save airs_latbin ayear dlist ixt nobs nsub slat slon szen
 
 %---------------------------
 % plot equal area grid bins
