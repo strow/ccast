@@ -2,8 +2,8 @@
 % plot_tbin - show results from airs_tbin and cris_tbin
 %
 
-d1 = load('airs_tbin22');
-d2 = load('cris_tbin22');
+d1 = load('airs_tbin33');
+d2 = load('cris_tbin33');
 
 na = sum(d1.tbin)
 nc = sum(d2.tbin)
@@ -12,7 +12,7 @@ tind = d1.tind;
 figure(1)
 subplot(2,1,1)
 plot(tind, d1.tbin, tind, (na/nc)*d2.tbin, 'linewidth', 2)
-  axis([200, 330, 0, 2e5])
+  axis([200, 330, 0, 2e6])
 % axis([200, 305, 0, 4e5])
   title('obs count by 900 cm-1 temperature bins')
 % title('obs count by SW cm-1 temperature bins')

@@ -16,9 +16,9 @@ ccast allgeo files
 
 The AIRS and CrIS tbin functions take a list of days, cross track
 indices, and frequencies, and build a table of obs per temperature
-bin.  Relatively slow because they read all granules over the time
-span.  plot_tbin plots comparison results and has a list of recent
-tests in the comments.
+bin.  These functions are relatively slow because they read all
+granules over the time span.  The plot_tbin scripts plot comparison
+results.  tbin_list.txt is a list of recent tests.
 
   airs_tbin  - AIRS Tb bins with optional lat and ocean subsetting
   cris_tbin  - CrIS Tb bins with optional lat and ocean subsetting

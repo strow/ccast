@@ -1,6 +1,6 @@
 %
 % NAME
-%   equal_area_bins - equal area trapezoids for count and mean
+%   equal_area_bins - count and mean for equal area trapezoids
 %
 % SYNOPSIS
 %   [latB, lonB, gtot, gavg] = ...
@@ -14,12 +14,25 @@
 %   obs   - optional k-vector, associated data values
 %
 % OUTPUTS
-%   latB  - m+1 vector, latitude band boundaries
-%   lonB  - n+1 vector, longitude band boundaries
+%   latB  - m+1 vector, latitude bin boundaries
+%   lonB  - n+1 vector, longitude bin boundaries
 %   gtot  - m x n array, obs counts
 %   gavg  - m x n array, obs means
 %
 % DISCUSSION
+%   equal_area_bins takes a list of lat, lon, and data values and
+%   returns count and mean for equal area bins.  Data values and
+%   means are optional.  The bins are trapezoide obtained by slicing
+%   up equal area latitude bands, with pie-shaped wedges at the
+%   poles.
+%
+%   The grid for the bins is specified with nLat, the number of
+%   latitude bands from equator to the pole, and dLon, the longitude
+%   band width in degrees.  The output parameters latB and lonB are
+%   the grid boundaries. 
+%
+% AUTHOR
+%  H.  Motteler, 20 June 2017
 %
 
 function [latB, lonB, gtot, gavg] = ...

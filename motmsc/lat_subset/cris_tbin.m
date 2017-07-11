@@ -13,10 +13,10 @@ dlist = 111 : 126;  % no missing granules
 
 % specify FORs
 % iFOR = 15 : 16;       % 1 near nadir
-% iFOR =  1 : 30;       % 2 full scan
+  iFOR =  1 : 30;       % 2 full scan
 % iFOR = [8 15 16 23];  % 3 near nadir plus half scan
 % iFOR = [8 23];        % 4 half scan only
-  iFOR = 13 : 18;       % 5 expanded nadir
+% iFOR = 13 : 18;       % 5 expanded nadir
 nFOR = length(iFOR);
 
 % freq span for Tb
@@ -75,7 +75,7 @@ for di = dlist
     lat = lat(:,iOK);
     lon = lon(:,iOK);
 
-   % latitude subsample
+    % latitude subsample
     lat_rad = deg2rad(lat);
     [m,n] = size(lat_rad);
     jx = rand(m, n) < abs(cos(lat_rad));
@@ -83,10 +83,10 @@ for di = dlist
     lon = lon(jx);
     rad = rad(:,jx);
 
-%   % ocean subset
-%   [~, landfrac] = usgs_deg10_dem(lat', lon');
-%   ocean = landfrac(:) == 0;
-%   rad = rad(:, ocean);
+    % ocean subset
+    [~, landfrac] = usgs_deg10_dem(lat', lon');
+    ocean = landfrac(:) == 0;
+    rad = rad(:, ocean);
 
     % brightness temp bins
     Tb = real(rad2bt(frq, rad));

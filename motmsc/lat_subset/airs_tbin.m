@@ -13,10 +13,10 @@ dlist = 111 : 126;  % 2016 no missing granules
 
 % xtrack subset
 % ixt = 43 : 48;              % 1 near nadir
-% ixt =  1 : 90;              % 2 full scan
+  ixt =  1 : 90;              % 2 full scan
 % ixt = [21:23 43:48 68:70];  % 3 near nadir plus half scan
 % ixt = [21:23 68:70];        % 4 half scan only
-  ixt = 37 : 54;              % 5 expanded nadir
+% ixt = 37 : 54;              % 5 expanded nadir
 nxt = length(ixt);
 
 % freq span for Tb
@@ -61,12 +61,12 @@ for di = dlist
     jx = rand(nxt, 135) < abs(cos(lat_rad));
     jx = jx & iOK;
 
-%   % land fraction xtrack subset
-%   landfrac = hdfread(afile, 'landFrac');
-%   landfrac = landfrac(:,ixt);
-%   landfrac = permute(landfrac, [2,1]);
-%   ocean = landfrac == 0;
-%   jx = jx & ocean;
+    % land fraction xtrack subset
+    landfrac = hdfread(afile, 'landFrac');
+    landfrac = landfrac(:,ixt);
+    landfrac = permute(landfrac, [2,1]);
+    ocean = landfrac == 0;
+    jx = jx & ocean;
 
     % apply cumulative subsetting
     lat = lat(jx);

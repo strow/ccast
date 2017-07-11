@@ -18,3 +18,9 @@ extended nadir tests
  21 - 2016 LW 16 day - test 1, lat subsetting
  22 - 2016 LW 16 day - test 2, lat subsetting
 
+full scan tests
+
+ 31 - 2016 LW 16 day test 1, lat subsetting
+ 32 - 2016 LW 16 day test 2, lat subsetting
+ 33 - 2016 LW 16 day test w/ lat & ocean subsetting
+
