@@ -1,22 +1,26 @@
 %
-% plot_mscbin - equal area zenith stats
-%
-% *_latbin1 - 16 day good, near nadir
-% *_latbin2 - 16 day good, full scan
-% *_latbin3 - 16 day good, near nadir plus half-scan
-% *_latbin5 - 16 day good, extended nadir
+% plot_timebin - equal area time stats
 %
 
-d1 = load('airs_latbin1');
-d2 = load('cris_latbin1');
+addpath ./time
+
+d1 = load('airs_obs_d2s2');
+d2 = load('cris_obs_d2s2');
 
 % nLat = 20;  dLon = 6;
   nLat = 24;  dLon = 4;
+
+tbase = mean([mean(d1.stai), mean(d2.stai)]);
+datestr(tai2dnum(tbase))
+
+t1 = (d1.stai-tbase) / (60 * 60 * 24);
+t2 = (d2.stai-tbase) / (60 * 60 * 24);
+
 [latB1, lonB1, gtot1, gavg1] = ...
-    equal_area_bins(nLat, dLon, d1.slat, d1.slon, d1.slon);
+    equal_area_bins(nLat, dLon, d1.slat, d1.slon, t1);
 
 [latB2, lonB2, gtot2, gavg2] = ...
-    equal_area_bins(nLat, dLon, d2.slat, d2.slon, d2.slon);
+    equal_area_bins(nLat, dLon, d2.slat, d2.slon, t2);
 
 gdiff = gavg2 - gavg1;
 
@@ -51,9 +55,10 @@ axesm('mapprojection', 'eqdcylin', ...
 surfm(glat, glon, gtmp3)
 S = shaperead('landareas','UseGeoCoords',true);
 geoshow([S.Lat], [S.Lon],'Color','black');
-th = title('CrIS minus AIRS mean equal area longitude bins');
+th = title('CrIS minus AIRS mean equal area time bins');
 set(th, 'FontSize', 12')
 % caxis([-0.25, 0.24])
+% caxis([-1, 1])
 colorbar
 tightmap
 
@@ -70,12 +75,10 @@ axesm('mapprojection', 'eqdcylin', ...
 surfm(glat, glon, gtmp1)
 S = shaperead('landareas','UseGeoCoords',true);
 geoshow([S.Lat], [S.Lon],'Color','black');
-th = title('AIRS mean equal area longitude bins');
+th = title('AIRS mean equal area time bins');
 set(th, 'FontSize', 12')
 colorbar
 tightmap
-
-return
 
 figure(3); clf
 set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
@@ -90,7 +93,7 @@ axesm('mapprojection', 'eqdcylin', ...
 surfm(glat, glon, gtmp2)
 S = shaperead('landareas','UseGeoCoords',true);
 geoshow([S.Lat], [S.Lon],'Color','black');
-th = title('CrIS mean equal area longitude bins');
+th = title('CrIS mean equal area time bins');
 set(th, 'FontSize', 12')
 colorbar
 tightmap

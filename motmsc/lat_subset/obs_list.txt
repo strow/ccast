@@ -1,0 +1,19 @@
+
+% specify days of the year
+%   dlist = 111 : 126;  % d1, 2016 16 day all good
+%   dlist = 118 : 133;  % d2, 2016 16 day all good
+
+% CrIS scan spec
+%   iFOR = 15 : 16;       % s1, near nadir
+%   iFOR =  1 : 30;       % s2, full scan
+%   iFOR = [8 15 16 23];  % s3, near nadir plus half scan
+%   iFOR = [8 23];        % s4, half scan only
+%   iFOR = 13 : 18;       % s5, expanded nadir
+
+% AIRS scan spec
+%   ixt = 43 : 48;              % s1, near nadir
+%   ixt =  1 : 90;              % s2, full scan
+%   ixt = [21:23 43:48 68:70];  % s3, near nadir plus half scan
+%   ixt = [21:23 68:70];        % s4, half scan only
+%   ixt = 37 : 54;              % s5, expanded nadir
+

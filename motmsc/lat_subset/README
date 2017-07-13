@@ -1,18 +1,18 @@
 
-The AIRS and CrIS latbin functions tabulate lat, lon, time, and
+The AIRS and CrIS obslist functions tabulate lat, lon, time, and
 zenith angles for all obs over a set of days and selected scan
 pattern.  They take a latitude weighted subset and plot stats both
-as histograms and as area weighted maps.  airs_latbin reads the lat
-and lon fields from the airs granules, while cris_latbin reads the
+as histograms and as area weighted maps.  airs_obslist reads the lat
+and lon fields from the airs granules, while cris_obslist reads the
 ccast allgeo files
 
-  airs_latbin - lat and lon bins for AIRS obs
-  cris_latbin - lat and lon bins for CrIS obs
+  airs_obslist - lat and lon bins for AIRS obs
+  cris_obslist - lat and lon bins for CrIS obs
 
-  plot_latbin - equal area obs counts and diffs
-  plot_zenbin - equal area secant means and diffs
-  plot_mscbin - equal area longitude means and difs
-  plot_taibin - equal area time means and diffs
+  plot_obsbin  - equal area obs counts and diffs
+  plot_timebin - equal area time means and diffs
+  plot_zenbin  - equal area secant means and diffs
+  plot_lonbin  - equal area longitude means and difs
 
 The AIRS and CrIS tbin functions take a list of days, cross track
 indices, and frequencies, and build a table of obs per temperature
@@ -25,13 +25,16 @@ results.  tbin_list.txt is a list of recent tests.
   plot_tbin  - comparison plots for airs_tbin and cris_tbin
   plot_tbin? - variations on the basic plot_tbin tests
 
+other scripts
+
+  zen_angle   - plot AIRS and CrIS secant by scan angle
+  plot_subpt  - AIRS and CrIS 16 day track map
+  airs_fields - list most AIRS granule fields
+
 functions
 
   equal_area_bins - count and mean for equal area trapezoids
+  equal_area_map  - global map for equal area trapezoids
   equal_area_spherical_bands - equal area latitude bands
-  usgs_deg10_dem - calculate land fraction
-
-other scripts
-
- zen_angle - plot AIRS and CrIS secant by scan angle
+  usgs_deg10_dem  - calculate land fraction
 

@@ -14,5 +14,5 @@
 
 function dnum = iet2dnum(iet)
 
-dnum = tai2dnum(iet * 1e-6);
+dnum = tai2dnum(double(iet) * 1e-6);
 

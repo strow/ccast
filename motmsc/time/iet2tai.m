@@ -14,5 +14,5 @@
 
 function tai = iet2tai(iet)
 
-tai = iet * 1e-6;
+tai = double(iet) * 1e-6;
 
