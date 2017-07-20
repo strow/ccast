@@ -2,8 +2,8 @@
 % plot_obsbin - cris minus airs equal area obs
 %
 
-d1 = load('airs_obs_d2s1');
-d2 = load('cris_obs_d2s1');
+d1 = load('airs_obs_d1s2w1');
+d2 = load('cris_obs_d1s2w1');
 
 % nLat = 20;  dLon = 6;
   nLat = 24;  dLon = 4;

@@ -1,21 +1,19 @@
 %
-% plot_tbin - combine two airs/cris_tbin tests
-%
-% *_tbin1, 2016 SW 29-day test
-% *_tbin3, 2016 LW 29-day test
-% *_tbin4, 2017 SW 36 day test
-% *_tbin5, 2016 LW 32 day test w/ lat subsetting
-% *_tbin6, 2016 LW 48 day test 1 w/ lat subsetting
-% *_tbin7, 2016 LW 48 day test 2 w/ lat subsetting
+% plot_tbinY - show combined results from airs_tbin and cris_tbin
 %
 
-d1 = load('airs_tbin11');
-d3 = load('airs_tbin12');
-d2 = load('cris_tbin11');
-d4 = load('cris_tbin12');
+d1 = load('airs_tbinW');
+d3 = load('airs_tbinX');
+d5 = load('airs_tbinY');
+d7 = load('airs_tbinZ');
 
-d1.tbin = d1.tbin + d3.tbin;
-d2.tbin = d2.tbin + d4.tbin;
+d2 = load('cris_tbinW');
+d4 = load('cris_tbinX');
+d6 = load('cris_tbinY');
+d8 = load('cris_tbinZ');
+
+d1.tbin = d1.tbin + d3.tbin + d5.tbin + d7.tbin;
+d2.tbin = d2.tbin + d4.tbin + d6.tbin + d8.tbin;
 
 na = sum(d1.tbin)
 nc = sum(d2.tbin)
@@ -23,18 +21,20 @@ tind = d1.tind;
 
 figure(1)
 subplot(2,1,1)
-plot(tind, d1.tbin, tind, (na/nc)*d2.tbin, 'linewidth', 2)
-% axis([200, 305, 0, 9e5])
-  axis([200, 330, 0, 4e5])
+  plot(tind, d1.tbin, tind, (na/nc)*d2.tbin, 'linewidth', 2)
+% plot(tind, d1.tbin, tind, d2.tbin, 'linewidth', 2)
+  axis([200, 330, 0, 8e6])
+% axis([200, 305, 0, 4e5])
   title('obs count by 900 cm-1 temperature bins')
 % title('obs count by SW cm-1 temperature bins')
 legend('AIRS', 'CrIS', 'location', 'northwest')
 grid on
 
 subplot(2,1,2)
-plot(tind, ((na/nc)* d2.tbin - d1.tbin) ./ d1.tbin, 'linewidth', 2)
-% axis([200, 305, -0.2, 0.3])
+  plot(tind, ((na/nc)* d2.tbin - d1.tbin) ./ d1.tbin, 'linewidth', 2)
+% plot(tind, (d2.tbin - d1.tbin) ./ d1.tbin, 'linewidth', 2)
   axis([200, 330,-0.1, 0.2])
+% axis([200, 305 -0.1, 0.4])
 title('CrIS minus AIRS relative difference')
 xlabel('Tb, K')
 grid on
@@ -44,7 +44,7 @@ return
 figure(2)
 subplot(2,1,1)
 plot(tind, d1.tbin, tind, (na/nc)* d2.tbin, 'linewidth', 2)
-  axis([285, 305, 0, 4e5])
+% axis([285, 305, 0, 4e5])
   title('obs count by 900 cm-1 temperature bins')
 % title('obs count by SW temperature bins')
 legend('AIRS', 'CrIS')

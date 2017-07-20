@@ -5,11 +5,12 @@
 addpath ../source
 
 % year and path to data
-  ayear = '/asl/data/cris/ccast/sdr60_hr/2016';
+  ayear = '/asl/data/cris/ccast/sdr60/2016';
 % ayear = '/asl/data/cris/ccast/sdr60_hr/2017';
 
 % specify days of the year
-dlist = 111 : 126;  % no missing granules
+% dlist = 111 : 126;  % no missing granules
+  dlist = 1 : 360;
 
 % specify FORs
 % iFOR = 15 : 16;       % 1 near nadir
@@ -109,5 +110,5 @@ for di = dlist
   fprintf(1, '\n')
 end
 
-save cris_tbin ayear dlist iFOR v1 v2 frq tind tbin
+save cris_tbinA ayear dlist iFOR v1 v2 frq tind tbin
 

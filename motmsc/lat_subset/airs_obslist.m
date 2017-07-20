@@ -8,8 +8,8 @@ addpath ./time
 ayear = '/asl/data/airs/L1C/2016';
 
 % days of the year
-% dlist = 111 : 126;  % d1, 2016 16 day all good
-  dlist = 118 : 133;  % d2, 2016 16 day all good
+  dlist = 111 : 126;  % d1, 2016 16 day all good
+% dlist = 118 : 133;  % d2, 2016 16 day all good
 
 % AIRS scan spec
     ixt = 43 : 48;              % s1, near nadir
@@ -20,7 +20,8 @@ ayear = '/asl/data/airs/L1C/2016';
 nxt = length(ixt);  
 
 % cosine exponent
-w = 1.1;
+  w = 1.0;
+% w = 1.1;
 
 % tabulated values
 lat = [];
@@ -82,33 +83,20 @@ save airs_obs_xxxx ayear dlist ixt nobs nsub slat slon stai
 
 % save airs_subpt ayear dlist ixt nobs lat lon tai
 
-return
+% return
 
 %---------------------------
 % plot equal area grid bins
 %---------------------------
 
-nLat = 20;  dLon = 6;
+nLat = 24;  dLon = 4;
 [latB, lonB, gtot] = equal_area_bins(nLat, dLon, slat, slon);
 
 gmean = mean(gtot(:));
 grel = (gtot - gmean) / gmean;
 
-% pcolor grid extension
-[m,n] = size(grel);
-gtmp = NaN(m+1,n+1);
-gtmp(1:m, 1:n) = grel;
-
-figure(1); clf
-pcolor(lonB, latB, gtmp)
-caxis([-0.5, 0.5])
-title('AIRS equal area (count - mean) / mean')
-xlabel('longitude')
-ylabel('latitude')
-shading flat
-load llsmap5
-colormap(llsmap5)
-colorbar
+tstr = 'AIRS equal area (count - mean) / mean';
+equal_area_map(1, latB, lonB, grel, tstr);
 
 %-------------------------
 % plot raw latitude bins
@@ -152,7 +140,7 @@ grid on
 % plot subset latitude bins
 %---------------------------
 figure(3); clf
-% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+  set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 subplot(4,1,1)
 histogram(slat, vb1)
 title(sprintf('cos(lat) subset by latitude band, N = %d', N1))
@@ -177,6 +165,8 @@ title(sprintf('cos(lat) subset by latitude band, N = %d', N4))
 xlabel('latitude')
 ylabel('obs count')
 grid on
+
+return
 
 %--------------------------
 % plot raw longitude bins

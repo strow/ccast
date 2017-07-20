@@ -80,9 +80,9 @@ for i = 1 : nobs
     error('latitude or longitude index out of range')
   end
 
-  if mod(i, 1e6) == 0, fprintf(1, '.'), end
+% if mod(i, 1e6) == 0, fprintf(1, '.'), end
 end
-fprintf(1, '\n')
+% fprintf(1, '\n')
 
 % take the mean 
 gavg = gavg ./ gtot;

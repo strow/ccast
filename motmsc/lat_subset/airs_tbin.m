@@ -53,6 +53,11 @@ for di = dlist
     lat = lat(:,ixt);
     lat = permute(lat, [2,1]);
 
+    % longitude xtrack subset
+    lon = hdfread(afile, 'Longitude');
+    lon = lon(:,ixt);
+    lon = permute(lon, [2,1]);
+
     % basic latitude QC
     iOK = -90 <= lat & lat <= 90;
 
@@ -61,16 +66,17 @@ for di = dlist
     jx = rand(nxt, 135) < abs(cos(lat_rad));
     jx = jx & iOK;
 
-    % land fraction xtrack subset
-    landfrac = hdfread(afile, 'landFrac');
-    landfrac = landfrac(:,ixt);
-    landfrac = permute(landfrac, [2,1]);
-    ocean = landfrac == 0;
-    jx = jx & ocean;
-
-    % apply cumulative subsetting
-    lat = lat(jx);
+    % apply subsetting
     rad = rad(:,jx);
+    lat = lat(jx);
+    lon = lon(jx);
+
+    [~, landfrac] = usgs_deg10_dem(lat', lon');
+    ocean = landfrac == 0;
+    rad = rad(:, ocean);
+%   land = landfrac == 1;
+%   rad = rad(:, land);
+    if isempty(rad), continue, end
 
     % brightness temp bins
     Tb = real(rad2bt(afrq, rad));

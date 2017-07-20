@@ -4,8 +4,8 @@
 
 addpath ./time
 
-d1 = load('airs_obs_d1s2w1');
-d2 = load('cris_obs_d1s2w1');
+d1 = load('cris_obs_d2s1f1');
+d2 = load('cris_obs_d2s1f9');
 
 % nLat = 20;  dLon = 6;
   nLat = 24;  dLon = 4;
@@ -21,13 +21,13 @@ t2 = (d2.stai-tbase) / (60 * 60 * 24);
 
 gdiff = gavg2 - gavg1;
 
-tstr = 'CrIS minus AIRS mean equal area time bins';
+tstr = 'FOV 9 minus FOV 1 mean equal area time bins';
 equal_area_map(1, latB1, lonB1, gdiff, tstr);
 
-tstr = 'AIRS mean equal area time bins';
+tstr = 'FOV 1 mean equal area time bins';
 equal_area_map(2, latB1, lonB1, gavg1, tstr);
 
-tstr = 'CrIS mean equal area time bins';
+tstr = 'FOV 9 mean equal area time bins';
 equal_area_map(3, latB1, lonB1, gavg2, tstr);
 
 

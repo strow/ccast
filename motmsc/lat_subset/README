@@ -1,10 +1,10 @@
 
 The AIRS and CrIS obslist functions tabulate lat, lon, time, and
-zenith angles for all obs over a set of days and selected scan
-pattern.  They take a latitude weighted subset and plot stats both
-as histograms and as area weighted maps.  airs_obslist reads the lat
-and lon fields from the airs granules, while cris_obslist reads the
-ccast allgeo files
+sometimes zenith angles for all obs over a set of days and selected
+scan pattern.  They take a latitude weighted subset and plot stats
+both as histograms and as area weighted maps.  airs_obslist reads
+the lat and lon fields from the airs granules, while cris_obslist
+reads the ccast allgeo files
 
   airs_obslist - lat and lon bins for AIRS obs
   cris_obslist - lat and lon bins for CrIS obs
@@ -13,6 +13,8 @@ ccast allgeo files
   plot_timebin - equal area time means and diffs
   plot_zenbin  - equal area secant means and diffs
   plot_lonbin  - equal area longitude means and difs
+  ddiff_obs    - obs count double difference
+  ddiff_time   - time double difference
 
 The AIRS and CrIS tbin functions take a list of days, cross track
 indices, and frequencies, and build a table of obs per temperature

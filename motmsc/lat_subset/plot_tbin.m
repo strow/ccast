@@ -2,8 +2,11 @@
 % plot_tbin - show results from airs_tbin and cris_tbin
 %
 
-d1 = load('airs_tbin33');
-d2 = load('cris_tbin33');
+% d1 = load('airs_tbinZ');
+% d2 = load('cris_tbinZ');
+
+d1 = load('airs_tbin31');
+d2 = load('cris_tbin31');
 
 na = sum(d1.tbin)
 nc = sum(d2.tbin)
@@ -11,7 +14,8 @@ tind = d1.tind;
 
 figure(1)
 subplot(2,1,1)
-plot(tind, d1.tbin, tind, (na/nc)*d2.tbin, 'linewidth', 2)
+  plot(tind, d1.tbin, tind, (na/nc)*d2.tbin, 'linewidth', 2)
+% plot(tind, d1.tbin, tind, d2.tbin, 'linewidth', 2)
   axis([200, 330, 0, 2e6])
 % axis([200, 305, 0, 4e5])
   title('obs count by 900 cm-1 temperature bins')
@@ -20,7 +24,8 @@ legend('AIRS', 'CrIS', 'location', 'northwest')
 grid on
 
 subplot(2,1,2)
-plot(tind, ((na/nc)* d2.tbin - d1.tbin) ./ d1.tbin, 'linewidth', 2)
+  plot(tind, ((na/nc)* d2.tbin - d1.tbin) ./ d1.tbin, 'linewidth', 2)
+% plot(tind, (d2.tbin - d1.tbin) ./ d1.tbin, 'linewidth', 2)
   axis([200, 330,-0.1, 0.2])
 % axis([200, 305 -0.1, 0.4])
 title('CrIS minus AIRS relative difference')
