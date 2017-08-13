@@ -9,7 +9,7 @@ addpath ../source
 % ayear = '/asl/data/airs/L1C/2017';
 
 % specify days of the year
-dlist = 111 : 126;  % 2016 no missing granules
+dlist =  92 : 182;  % X spring
 
 % xtrack subset
 % ixt = 43 : 48;              % 1 near nadir
@@ -102,5 +102,5 @@ for di = dlist
   fprintf(1, '\n')
 end
 
-save airs_tbin ayear dlist ixt v1 v2 afrq tind tbin
+save airs_tbinX ayear dlist ixt v1 v2 afrq tind tbin
 

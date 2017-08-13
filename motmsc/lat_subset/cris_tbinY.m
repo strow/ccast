@@ -9,7 +9,7 @@ addpath ../source
 % ayear = '/asl/data/cris/ccast/sdr60_hr/2017';
 
 % specify days of the year
-dlist = 111 : 126;  % no missing granules
+dlist = 183 : 273;  % Y summer
 
 % specify FORs
 % iFOR = 15 : 16;       % 1 near nadir
@@ -62,7 +62,7 @@ for di = dlist
 %               d1.cLW, d1.cMW, d1.cSW, d1.L1a_err, d1.rid);
 %   iOK = ~L1b_err(:,iFOR,:);
 %   rad = rad(:,iOK);
- 
+
     % new L1b_err from file
     iOK = ~d1.L1b_err(:,iFOR,:);
     rad = rad(:,iOK);
@@ -107,5 +107,5 @@ for di = dlist
   fprintf(1, '\n')
 end
 
-save cris_tbin ayear dlist iFOR v1 v2 frq tind tbin
+save cris_tbinY ayear dlist iFOR v1 v2 frq tind tbin
 

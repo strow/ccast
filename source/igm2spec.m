@@ -13,10 +13,7 @@
 %   spec  - nchan x 9 x 34 x nscan count spectra
 %
 % DISCUSSION
-%   works for both inst.npts = nchan and inst.npts + 2 = nchan
-%
-%   could be updated to use matlab fftshift w/ proper dimension
-%   parameter
+%   should update to use circshift rather than inst.cind
 %
 % AUTHOR
 %   H. Motteler, 10 Apr 2012

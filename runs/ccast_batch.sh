@@ -15,7 +15,7 @@
 #SBATCH --ntasks=30
 
 # matlab options
-MATLAB=/usr/cluster/matlab/2014a/bin/matlab
+MATLAB=/usr/cluster/matlab/2016a/bin/matlab
 MATOPT='-nojvm -nodisplay -nosplash'
 
 # job step 1
@@ -23,8 +23,8 @@ srun --output=ccast_%j_0_%t.out \
   $MATLAB $MATOPT -r "ccast_batch($1, $2); exit"
 
 # job step 2
-srun --output=ccast_%j_1_%t.out \
-  $MATLAB $MATOPT -r "ccast_batch($1+30, $2); exit"
+# srun --output=ccast_%j_1_%t.out \
+#   $MATLAB $MATOPT -r "ccast_batch($1+30, $2); exit"
 
 # job step 3
 # srun --output=ccast_%j_2_%t.out \

@@ -1,0 +1,39 @@
+
+currently doing 2015 low res cleanup
+
+  sbatch --array=349,354,361 ccast_array.sh 2015
+
+15 May 2017 doy 135: new QC; need to reprocess all older runs
+
+done:
+   all high res 2014-2017
+   all low res 2017
+   most low res 2015, cleaning up now
+
+sample search for old files
+
+  find /asl/data/cris/ccast/sdr60/2015 -depth -type f -mtime +70 -print | more
+
+typical cleanup batch command, do 3 selected days
+
+  sbatch --array=349,354,361 ccast_array.sh 2015
+
+typical production batch command, span with jobs limit
+
+  sbatch --array=306-365%20 ccast_array.sh 2015
+
+note sbatch_array.m must be edited for the desired production script
+typically ccast_lowres, hires2, hires3, h2tolow, or h3tolow
+
+format changes
+  4 Dec 2014 (doy xxx) change from lowres to hires2
+  2 Nov 2015 (doy xxx) change from hires2 to hires3
+  
+The output scripts merge data to low (sdr60) and high (sdr60_hr) res
+directories
+
+The driver scripts read RDR mat files that are partitioned into
+separate groups for low res, high res 2, and high res 3.  So running
+the script outside the defined range does not hurt anything, it will
+will simply produce no output.
+

@@ -15,6 +15,7 @@ reads the ccast allgeo files
   plot_lonbin  - equal area longitude means and difs
   ddiff_obs    - obs count double difference
   ddiff_time   - time double difference
+  extend_time  - compare 16 and 32 day sequences
 
 The AIRS and CrIS tbin functions take a list of days, cross track
 indices, and frequencies, and build a table of obs per temperature

@@ -18,8 +18,8 @@ ystr = sprintf('%d', year);
 % dlist = 117 : 132;  % d4, 2016 CrIS-only good span 2
 
 % CrIS scan spec
-  iFOR = 15 : 16;       % s1, near nadir
-% iFOR =  1 : 30;       % s2, full scan
+% iFOR = 15 : 16;       % s1, near nadir
+  iFOR =  1 : 30;       % s2, full scan
 % iFOR = [8 15 16 23];  % s3, near nadir plus half scan
 % iFOR = [8 23];        % s4, half scan only
 % iFOR = 13 : 18;       % s5, expanded nadir
@@ -39,6 +39,7 @@ nFOV = length(iFOV);
 lat = [];
 lon = [];
 zen = [];
+sol = [];
 tai = [];
 asc = logical([]);
 
@@ -50,12 +51,14 @@ for doy = dlist
   tlat = d1.allgeo.Latitude(iFOV, iFOR, :);
   tlon = d1.allgeo.Longitude(iFOV, iFOR, :);
 % tzen = d1.allgeo.SatelliteZenithAngle(:, iFOR, :);
+  tsol = d1.allgeo.SolarZenithAngle(:, iFOR, :);
   ttai = iet2tai(d1.allgeo.FORTime(iFOR, :));
   tasc = d1.allgeo.Asc_Desc_Flag;
 
   tlat = tlat(:);
   tlon = tlon(:);
 % tzen = tzen(:);
+  tsol = tsol(:);
   ttai = ones(nFOV,1) * ttai(:)';
   ttai = ttai(:);
   tasc = ones(nFOV*nFOR,1) * tasc(:)';
@@ -64,6 +67,7 @@ for doy = dlist
   lat = [lat; tlat];
   lon = [lon; tlon];
 % zen = [zen; tzen];
+  sol = [sol; tsol];
   tai = [tai; ttai];
   asc = [asc; tasc];
 end
@@ -74,6 +78,7 @@ iOK = -90 <= lat & lat <= 90 & -180 <= lon & lon <= 180 & ...
 lat = lat(iOK);
 lon = lon(iOK);
 % zen = zen(iOK);
+  sol = sol(iOK);
 tai = tai(iOK);
 asc = asc(iOK);
 
@@ -89,6 +94,7 @@ slon = lon(ix);
 stai = tai(ix);
 sasc = asc(ix);
 % szen = zen(ix);
+  ssol = sol(ix);
 nsub = numel(slat);
 fprintf(1, '%d obs after subset\n', nsub)
 
@@ -97,11 +103,12 @@ fprintf(1, '%d obs after subset\n', nsub)
 % slon = slon(~sasc);
 % stai = stai(~sasc);
 
-save cris_obs_xxxx year dlist iFOR iFOV nobs nsub slat slon stai
+save cris_obs_xxxx year dlist iFOR iFOV nobs nsub slat slon stai ssol
 
+% save cris_obs_xxxx year dlist iFOR iFOV nobs nsub slat slon stai
 % save cris_subpt year dlist iFOR iFOV nobs lat lon tai
 
-% return
+return
 
 %---------------------------
 % plot equal area grid bins
