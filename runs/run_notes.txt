@@ -1,6 +1,7 @@
 
 currently doing 2015 low res cleanup
 
+  sbatch --array=68,69,201,202 ccast_array.sh 2015
   sbatch --array=349,354,361 ccast_array.sh 2015
 
 15 May 2017 doy 135: new QC; need to reprocess all older runs
