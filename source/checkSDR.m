@@ -3,7 +3,7 @@
 %   checkSDR -- SDR validation
 %
 % SYNOPSIS
-%   L1b_err = ...
+%   [L1b_err, L1b_stat] = ...
 %     checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, L1a_err, rid, opts);
 %
 % INPUTS
@@ -44,8 +44,10 @@
 % DISCUSSION
 %   Complex residual, negative radiance, hot scene, and NaN checks.
 %
-%   L1b_err is set for complex residual, negative radiance, and L1a
-%   errors, but not currently for hot scenes.
+%   L1a_err is set in rdr2sdr and flags bad time and geo values
+%
+%   L1b_err is currently set for L1a errors, negative radiance too
+%   large, and calibration NaNs.
 %
 %   The complex residual test uses a mean and standard deviation
 %   from files imag_stat_LR and HR in ccast/inst_data.  The complex
@@ -78,7 +80,7 @@ imag_stats_LR = '/asl/packages/ccast/inst_data/imag_stats_LR';
 imag_stats_HR = '/asl/packages/ccast/inst_data/imag_stats_HR';
 
 % complex residual std bounds
-swLR = [10, 11, 14];  % low res [LW MW SW] std multiples
+swLR = [10, 12, 16];  % low res [LW MW SW] std multiples
 swHR = [10, 10, 12];  % high res [LW MW SW] std multiples
 
 % apply recognized parameter options
@@ -189,7 +191,6 @@ for j = 1 : nscan
     % set summary flags
     L1b_err(:,i,j) = ...
       nanLW(:,i,j) | nanMW(:,i,j) | nanSW(:,i,j) | ...
-      imgLW(:,i,j) | imgMW(:,i,j) | imgSW(:,i,j) | ...
       negLW(:,i,j) | negMW(:,i,j) | negSW(:,i,j);
 
     L1b_old(:,i,j) = ...

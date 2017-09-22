@@ -15,8 +15,8 @@
 #SBATCH --account=pi_strow
 #SBATCH --mem-per-cpu=16000
 
-# current bad node list
-#SBATCH --exclude=n254,n249,n78,n82,n139,n170,n273,n150,n285,n111,n212,n305,n308,n315
+# new bad node list
+#SBATCH --exclude=n71
 
 # matlab options
 MATLAB=/usr/cluster/matlab/2016a/bin/matlab
