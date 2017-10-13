@@ -14,9 +14,9 @@ res shifts, since each res mode uses a different driver script.
 sbatch_array.m must be edited for the desired production script
 typically ccast_lowres, hires2, hires3, h2tolow, or h3tolow
 
-currently running
+currently running low res 2017:
 
-  sbatch --array=1-365%20 ccast_array.sh 2013
+  sbatch --array=1-250%20 ccast_array.sh 2017
 
 typical production batch command, span with jobs limit
 
@@ -25,12 +25,6 @@ typical production batch command, span with jobs limit
 typical cleanup batch command, do 3 selected days
 
   sbatch --array=349,354,361 ccast_array.sh 2015
-
-done:
-  all high res 2014-2017
-  low res 2014 h2tolow, 2015, 2017
-
-15 May 2017 doy 135: new QC; need to reprocess all older runs.  
 
 sample search for old files
 

@@ -4,122 +4,134 @@
 %
 % SYNOPSIS
 %   [L1b_err, L1b_stat] = ...
-%       checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, ...
-%                userLW, userMW, userSW, L1a_err, rid, opts);
+%     checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, L1a_err, rid, opts);
 %
 % INPUTS
-%   vLW   - nchan LW frequency
-%   vMW   - nchan MW frequency
-%   vSW   - nchan SW frequency
-%   rLW   - nchan x 9 x 30 x nscan LW radiance
-%   rMW   - nchan x 9 x 30 x nscan MW radiance
-%   rSW   - nchan x 9 x 30 x nscan SW radiance
-%   cLW   - nchan x 9 x 30 x nscan LW complex residual
-%   cMW   - nchan x 9 x 30 x nscan MW complex residual
-%   cSW   - nchan x 9 x 30 x nscan SW complex residual
-%   userLW   - LW user grid specs
-%   userMW   - MW user grid specs
-%   userSW   - SW user grid specs
-%   L1a_err  - 30 x nscan L1a error flags
-%   rid      - SDR date and time string
-%   opts     - optional parameter struct
+%   vLW     - nchan LW frequency
+%   vMW     - nchan MW frequency
+%   vSW     - nchan SW frequency
+%   rLW     - nchan x 9 x 30 x nscan LW radiance
+%   rMW     - nchan x 9 x 30 x nscan MW radiance
+%   rSW     - nchan x 9 x 30 x nscan SW radiance
+%   cLW     - nchan x 9 x 30 x nscan LW complex residual
+%   cMW     - nchan x 9 x 30 x nscan MW complex residual
+%   cSW     - nchan x 9 x 30 x nscan SW complex residual
+%   L1a_err - 30 x nscan L1a error flags
+%   rid     - SDR date and time string
+%   opts    - optional parameter struct
 %
 % opts fields, with defaults
-%   emax   - 4, max messages per call
-%   bUB    - [350 350 360], [LW MW SW] Tb upper bounds
+%   emsg   - true, false to turn off messages
+%   emax   - 4, max messages to print if emsg is true
+%   bUB    - [350 350 360], [LW MW SW] brightness temp upper bounds
 %   rLB    - [0 -1.0 -0.1], [LW MW SW] radiance lower bounds
-%   cLR    - [2 0.88 0.06], low res complex residual bounds
-%   cHR    - [2 1.25 0.12], high res complex residual bounds
+%   swLR   - [10, 11, 14],  [LW MW SW] low res std multiples
+%   swHR   - [10, 10, 12],  [LW MW SW] high res std multiples
+%   imag_stats_LR  - 'imag_stats_LR', low res complex resid stats
+%   imag_stats_HR  - 'imag_stats_HR', high res complex resid stats
 %
 % OUTPUTS
 %   L1b_err  - 9 x 30 x nscan L1b error flags
 %   L1b_stat - struct with 9 x 30 x nscan error flags
 %
 % L1b_stat fields 
-%   negLW, negMW, negSW - negative radiance
-%   nanLW, nanMW, nanSW - NaNs from calibration
 %   imgLW, imgMW, imgSW - complex residual too large
+%   negLW, negMW, negSW - negative radiance
 %   hotLW, hotMW, hotSW - scene too hot
+%   nanLW, nanMW, nanSW - NaNs from calibration
 %   L1b_old - the old 30 x nscan L1b_err flag
 %
 % DISCUSSION
-%   checkSDR sets warning flags for each band for calibration NaNs,
-%   negative radiance, complex residuals, and hot scenes.  These are
-%   returned as booleans in the L1b_stat struct
+%   Complex residual, negative radiance, hot scene, and NaN checks.
 %
-%   L1b_err is currently set for L1a errors, negative radiance, and
-%   calibration NaNs occuring in any band
+%   L1a_err is set in rdr2sdr and flags bad time and geo values
+%
+%   L1b_err is currently set for L1a errors, negative radiance too
+%   large, and calibration NaNs.
+%
+%   The complex residual test uses a mean and standard deviation
+%   from files imag_stat_LR and HR in ccast/inst_data.  The complex
+%   residual std bounds swLR and swHR are multiples of the standard
+%   deviation, for example mean +- swLR * std.
 %
 % AUTHOR
 %   H. Motteler, 26 Jan 2017
 %
 
 function [L1b_err, L1b_stat] = ...
-   checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, ...
-            userLW, userMW, userSW, L1a_err, rid, opts)
+    checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, L1a_err, rid, opts)
 
 %--------------------
 % default parameters
 %--------------------
-emax = 4;              % max error messages
-user_res = 'lowres';   % 'lowres' or 'hires'
+% error messages
+emsg = true;
+emax = 4;
+ecnt = 0;
 
-% QC limits
-bUB = [350 350 360];   % Tb upper bounds
-rLB = [0 -1.0 -0.1];   % radiance lower bounds
-cLR = [2 0.88 0.06];   % low res complex residual bounds
-cHR = [2 0.25 0.12];   % high res complex residual bounds
+% brightness temp upper bounds
+bUB = [350 350 360];
 
-% apply parameter options
-if nargin == 15
+% radiance lower bounds
+rLB = [0 -1.0 -0.1];
+
+% complex residual stats
+imag_stats_LR = '/asl/packages/ccast/inst_data/imag_stats_LR';
+imag_stats_HR = '/asl/packages/ccast/inst_data/imag_stats_HR';
+
+% complex residual std bounds
+swLR = [10, 12, 16];  % low res [LW MW SW] std multiples
+swHR = [10, 10, 12];  % high res [LW MW SW] std multiples
+
+% apply recognized parameter options
+if nargin == 12
+  if isfield(opts, 'emsg'), emsg = opts.emsg; end
   if isfield(opts, 'emax'), emax = opts.emax; end
-  if isfield(opts, 'user_res'), user_res = opts.user_res; end
-  if isfield(opts, 'bUB'), bUB = opts.bUB; end
-  if isfield(opts, 'rLB'), rLB = opts.rLB; end
-  if isfield(opts, 'cLR'), cLR = opts.cLR; end
-  if isfield(opts, 'cHR'), cHR = opts.cHR; end
+
+  if isfield(opts, 'bUBLW'), bUBLW = opts.bUBLW; end
+  if isfield(opts, 'bUBMW'), bUBMW = opts.bUBMW; end
+  if isfield(opts, 'bUBSW'), bUBSW = opts.bUBSW; end
+
+  if isfield(opts, 'rLBLW'), rLBLW = opts.rLBLW; end
+  if isfield(opts, 'rLBMW'), rLBMW = opts.rLBMW; end
+  if isfield(opts, 'rLBSW'), rLBSW = opts.rLBSW; end
+
+  if isfield(opts, 'imag_stats_LR'), imag_stats_LR = opts.imag_stats_LR; end
+  if isfield(opts, 'imag_stats_HR'), imag_stats_HR = opts.imag_stats_HR; end
+
+  if isfield(opts, 'swLR'), swLR = opts.swLR; end
+  if isfield(opts, 'swHR'), swHR = opts.swHR; end
 end
 
 %----------------
 % initialization
 %----------------
-% error message count
-ecnt = 0;
-
-% frequency index for range checks
-ixLW = find(userLW.v1 + 10 <= vLW & vLW <= userLW.v2);
-ixMW = find(userMW.v1 <= vMW & vMW <= userMW.v2);
-ixSW = find(userSW.v1 <= vSW & vSW <= userSW.v2);
+% radiance upper bounds
+rUBLW = bt2rad(vLW, bUB(1)) * ones(1,9);
+rUBMW = bt2rad(vMW, bUB(2)) * ones(1,9);
+rUBSW = bt2rad(vSW, bUB(3)) * ones(1,9);
 
 % radiance lower bounds
 rLBLW = rLB(1);
 rLBMW = rLB(2);
 rLBSW = rLB(3);
 
-% radiance upper bounds
-rUBLW = bt2rad(vLW(ixLW), bUB(1)) * ones(1,9);
-rUBMW = bt2rad(vMW(ixMW), bUB(2)) * ones(1,9);
-rUBSW = bt2rad(vSW(ixSW), bUB(3)) * ones(1,9);
-
-% complex residual bounds
-switch(user_res)
-  case 'lowres',
-    cLBLW = -cLR(1); cUBLW = cLR(1); 
-    cLBMW = -cLR(2); cUBMW = cLR(2);
-    cLBSW = -cLR(3); cUBSW = cLR(3);
-    if userSW.dv ~= 2.5
-      error(sprintf('unexpected userSW.dv value %g', userSW.dv));
-    end
-  case 'hires',
-    cLBLW = -cHR(1); cUBLW = cHR(1); 
-    cLBMW = -cHR(2); cUBMW = cHR(2);
-    cLBSW = -cHR(3); cUBSW = cHR(3);
-    if userSW.dv ~= 0.625
-      error(sprintf('unexpected userSW.dv value %g', userSW.dv));
-    end
-  otherwise
-    error(sprintf('unexpected use_res value %s', user_res));
+% choose complex residual bounds by res mode
+switch length(vSW)
+  case 163, ftmp = imag_stats_LR; sw = swLR;
+  case 637, ftmp = imag_stats_HR; sw = swHR;
+  otherwise, error(sprintf('unexpected SW size %d', length(vSW)));
 end
+
+% load stats and get complex residual bounds
+d1 = load(ftmp);
+cUBLW = d1.cmLW + sw(1) * d1.csLW;
+cLBLW = d1.cmLW - sw(1) * d1.csLW;
+cUBMW = d1.cmMW + sw(2) * d1.csMW;
+cLBMW = d1.cmMW - sw(2) * d1.csMW;
+cUBSW = d1.cmSW + sw(3) * d1.csSW;
+cLBSW = d1.cmSW - sw(3) * d1.csSW;
+clear d1
 
 % initialize output
 [~, ~, ~, nscan] = size(rLW);
@@ -144,12 +156,12 @@ for j = 1 : nscan
     end
 
     % temp vars for this FOR
-    rtmpLW = rLW(ixLW,:,i,j);
-    ctmpLW = cLW(ixLW,:,i,j);
-    rtmpMW = rMW(ixMW,:,i,j);
-    ctmpMW = cMW(ixMW,:,i,j);
-    rtmpSW = rSW(ixSW,:,i,j);
-    ctmpSW = cSW(ixSW,:,i,j);
+    rtmpLW = rLW(:,:,i,j);
+    rtmpMW = rMW(:,:,i,j);
+    rtmpSW = rSW(:,:,i,j);
+    ctmpLW = cLW(:,:,i,j);
+    ctmpMW = cMW(:,:,i,j);
+    ctmpSW = cSW(:,:,i,j);
 
     % check for NaNs
     nanLW(:,i,j) = cOR(isnan(rtmpLW)) | cOR(isnan(ctmpLW));
@@ -187,23 +199,23 @@ for j = 1 : nscan
       hotLW(:,i,j) | hotMW(:,i,j) | hotSW(:,i,j);
 
     % error messages
-    if emax > 0
+    if emsg
 
       if cOR(nanLW(:,i,j)), err_msg(i,j,'LW NaN'), end
       if cOR(nanMW(:,i,j)), err_msg(i,j,'MW NaN'), end
       if cOR(nanSW(:,i,j)), err_msg(i,j,'SW NaN'), end
 
-%     if cOR(imgLW(:,i,j)), err_msg(i,j,'LW complex residual too large'), end
-%     if cOR(imgMW(:,i,j)), err_msg(i,j,'MW complex residual too large'), end
-%     if cOR(imgSW(:,i,j)), err_msg(i,j,'SW complex residual too large'), end
+      if cOR(imgLW(:,i,j)), err_msg(i,j,'LW complex residual too large'), end
+      if cOR(imgMW(:,i,j)), err_msg(i,j,'MW complex residual too large'), end
+      if cOR(imgSW(:,i,j)), err_msg(i,j,'SW complex residual too large'), end
 
       if cOR(negLW(:,i,j)), err_msg(i,j,'LW negative radiance'), end
       if cOR(negMW(:,i,j)), err_msg(i,j,'MW negative radiance'), end
       if cOR(negSW(:,i,j)), err_msg(i,j,'SW negative radiance'), end
 
-%     if cOR(hotLW(:,i,j)), err_msg(i,j,'LW too hot'), end
-%     if cOR(hotMW(:,i,j)), err_msg(i,j,'MW too hot'), end
-%     if cOR(hotSW(:,i,j)), err_msg(i,j,'SW too hot'), end
+      if cOR(hotLW(:,i,j)), err_msg(i,j,'LW too hot'), end
+      if cOR(hotMW(:,i,j)), err_msg(i,j,'MW too hot'), end
+      if cOR(hotSW(:,i,j)), err_msg(i,j,'SW too hot'), end
 
     end
   end
@@ -216,7 +228,7 @@ end
 nRDRerr = sum(L1a_err(:));
 etmp = cOR(L1b_err);
 nSDRerr = sum(etmp(:)) - nRDRerr;
-if emax > 0 && nSDRerr > 0
+if emsg && nSDRerr > 0
   fprintf(1, 'checkSDR: %s %d RDR errors, %d SDR errors\n', ...
           rid, nRDRerr, nSDRerr)
 end
@@ -256,5 +268,6 @@ function err_msg(i, j, msg)
   end
 
 end % err_msg
+
 end % checkSDR
 

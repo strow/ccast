@@ -249,7 +249,8 @@ for fi = 1 : nfile
 
   % L1b validation
   [L1b_err, L1b_stat] = ...
-     checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, L1a_err, rid);
+     checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, ...
+              userLW, userMW, userSW, L1a_err, rid, opts);
 
   %-------------------
   % save the SDR data

@@ -86,10 +86,15 @@ unix(['mkdir -p ', odir]);
 
 % list all the geo files for this date
 glist = dir(fullfile(gsrc, 'GCRSO_npp*.h5'));
+n1 = length(glist);
 
 % drop anything too small to be a 60-scan file
-ix = find([glist.bytes] > 500000);
+ix = find([glist.bytes] > 400000);
 glist = glist(ix);
+n2 = length(glist);
+if n2 < n1
+  fprintf(1, 'geo_daily: WARNING: %d short file(s)\n', n1 - n2)
+end
 
 if isempty(glist)
   fprintf(1, 'geo_daily: WARNING: no 60-scan files for doy %s\n', doy)

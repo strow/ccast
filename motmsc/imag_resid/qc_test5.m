@@ -57,7 +57,8 @@ for di = sdays
     load(sfile)
 
     [L1b_err, L1b_stat] = ...
-      checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, L1a_err, rid, opt1);
+      checkSDRv1(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, ...
+                 L1a_err, rid, opt1);
 
     % cumulative error stats
     nimgLW = nimgLW + sum(L1b_stat.imgLW(:));

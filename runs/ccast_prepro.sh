@@ -16,7 +16,7 @@
 #SBATCH --exclude=n126,n150
 
 # matlab options
-MATLAB=/usr/cluster/matlab/2014a/bin/matlab
+MATLAB=/usr/cluster/matlab/2016a/bin/matlab
 MATOPT='-nojvm -nodisplay -nosplash'
 
 # run the matlab wrapper

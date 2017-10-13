@@ -17,7 +17,7 @@ syear = fullfile('/asl/data/cris/ccast', tstr, '2016');
   sdays = 20;
 % sdays =  61 : 63;   % 1-3 march
 
-opts = struct
+opts = struct;
 opts.emsg = false;
 
 profile clear
@@ -38,7 +38,8 @@ for di = sdays
     load(sfile)
 
     L1b_err = ...
-      checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, L1a_err, rid, opts);
+      checkSDR(vLW, vMW, vSW, rLW, rMW, rSW, cLW, cMW, cSW, ...
+               userLW, userMW, userSW, L1a_err, rid, opts);
 
   end
 end
