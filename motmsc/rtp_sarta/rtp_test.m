@@ -1,12 +1,21 @@
 %
 % rtp_test -- basic high level tests of ccast2rtp
 %
+% run from ccast/motmsc
 
-% high res test file
-sfile = '/asl/data/cris/ccast/sdr60_hr/2015/032/SDR_d20150201_t0704280.mat';
+addpath rtp_sarta
+addpath time
 
-% low res test file
-% sfile = '/asl/data/cris/ccast/sdr60/2014/002/SDR_d20140102_t2053431.mat';
+% path to data
+  spath = '/asl/data/cris/ccast/sdr60/2016/020';
+% spath = '/asl/data/cris/ccast/sdr60_hr/2016/020';
+
+% test granule
+% sgran = 'SDR_d20160120_t0536479.mat';
+% sgran = 'SDR_d20160120_t0544478.mat';
+  sgran = 'SDR_d20160120_t0352485.mat';
+
+sfile = fullfile(spath, sgran);
 
 % set the number of output guard channels
 nguard = 2;

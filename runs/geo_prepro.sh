@@ -5,7 +5,7 @@
 
 #SBATCH --job-name=geo_prepro
 #SBATCH --partition=prod
-#SBATCH --qos=normal
+#SBATCH --qos=medium_prod
 #SBATCH --account=pi_strow
 #SBATCH --ntasks=1
 #SBATCH --mem-per-cpu=12000

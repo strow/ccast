@@ -161,7 +161,10 @@ prof.udef(12,isub) = interp1(mtime(msel),xyz(3,msel),prof.rtime(isub),'linear','
 % trim output to a valid subset
 %-------------------------------
 % get good data index
-iok = find(reshape(ones(9,1) * ~L1b_err(:)', 1, nobs));
+% iok = find(~L1b_err(:)');
+  [eLW, eMW, eSW] = fixmyQC(L1a_err, L1b_stat);
+  etmp = eLW | eMW | eSW;
+  iok = find(~etmp(:)');
 
 prof.rlat   = prof.rlat(:, iok);
 prof.rlon   = prof.rlon(:, iok);
