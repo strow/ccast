@@ -1,10 +1,13 @@
 
-Copyright 2012-2014, Atmospheric Spectroscopy Laboratory and Space
-Science and Engineering Center.  ccast is distributed under the terms 
-of the GNU GPL v3
+Copyright 2012-2017, Atmospheric Spectroscopy Laboratory.
+CAST is distributed under the terms of the GNU GPL v3, included
+below.
 
-The subdirectory MITreader380a is the property of MIT and may be
-licensed separately.
+The subdirectory readers/MITreader380a is the property of MIT 
+and licensed separately; see the file COPYING there for details.
+
+The subdirectory davet is Copyright 2008 University of Wisconsin-
+Madison Space Science and Engineering Center.
 
 --------------------------------------------------------------------
 
