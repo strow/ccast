@@ -103,7 +103,7 @@ end
 
 % build a list of RIDs
 for ix = 1 : length(glist)
-  rid = glist(ix).name(17:34);
+  rid = glist(ix).name(11:28);
   rlist{ix} = rid;
 end
 

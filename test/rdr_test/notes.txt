@@ -1,0 +1,13 @@
+
+MIT reader calling seq
+  rdr2mat
+    read_cris_hdf5_rdr(h5Filename, saveFilename, btrimFile)
+      extract_hdf5_rdr(h5Filename, saveFilename);
+      initialize_packet_structures
+      loop on packets
+        read_packet_headers
+        read_packet_body
+      loop on packets   
+        read_packet_headers
+        read_packet_spacecraft_diary
+

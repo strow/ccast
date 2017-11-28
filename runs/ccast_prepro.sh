@@ -13,7 +13,7 @@
 #SBATCH --mem-per-cpu=12000
 
 # new bad node list
-#SBATCH --exclude=n126,n150
+#SBATCH --exclude=n11,n71
 
 # matlab options
 MATLAB=/usr/cluster/matlab/2016a/bin/matlab
