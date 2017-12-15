@@ -1,23 +1,22 @@
 %
 % NAME
-%   read_cris_hdf5_rdr -- read a CrIS RDR file
+%   read_cris_ccsds -- read a CrIS CCSDS packet file
 %
 % SYNOPSIS
-%   [DATA META] = read_cris_hdf5_rdr(h5Filename, saveFilename, btrimFile)
+%   DATA = read_cris_ccsds(saveFilename, btrimFile)
 %
 % INPUTS
-%   h5Filename    - CrIS RDR HDF5 input file
-%   saveFilename  - optional CCSDS packet file
+%   saveFilename  - CCSDS packet file
 %   btrimFile     - optional named bit trim cache
 %   
-% OUTPUTS
+% OUTPUT
 %   DATA   - CCSDS packet data
-%   META   - H5 metadata
 %
 % DISCUSSION
 %   This is Dan's v380 reader modified to work with his general
 %   purpose interferogram unpacker bit_unpack_all.c and to cache
-%   the current bit trim mask.
+%   the current bit trim mask, and further stripped down to just
+%   the ccsds reader.
 %
 %   btrimFile should be the full filename, including extension.
 %   Watch out for other files with the same name on the current
@@ -42,7 +41,7 @@
 %  obligation to provide maintenance, support, updates, enhancements,
 %  or modifications.
 
-function [DATA META] = read_cris_hdf5_rdr(h5Filename, saveFilename, btrimFile)
+function DATA = read_cris_ccsds(saveFilename, btrimFile)
 
 global fid  VERBOSE timeval idata qdata data ...
 packet_counter packet header sweep_direction FOR diagint
@@ -55,23 +54,9 @@ stmp = mfilename('fullpath');
 pathcris = fullfile(pathbase, 'CrIS');
 addpath(pathbase, pathcris);
 
-% packet file default filename
-if nargin < 2
-    saveFilename = tempname;
-    deleteTemp = 1;
-else
-    deleteTemp = 0;
-end
-
 % bit trim cache default filename
-if nargin < 3
+if nargin < 2
   btrimFile = 'btrim_cache.mat';
-end
-
-% Extract the Raw Application Packets from the hdf5 file
-saveFilename = extract_hdf5_rdr(h5Filename, saveFilename);
-if isempty(saveFilename),
-    return
 end
 
 apid_counts = zeros(1,1403);
@@ -116,31 +101,6 @@ while err==0
     if header.apid<0 || header.apid>1403 ;disp('invalid apid');return;end
 end
 
-% read spacecraft diary data
-
-% frewind(fid)
-% err = read_packet_headers;
-% while err==0
-%     if header.apid==11
-%     read_packet_spacecraft_diary
-%     else
-%         read_packet_to_end
-%     end
-%     num_packets = num_packets + 1;
-%     apid_counts(header.apid+1) = apid_counts(header.apid+1) + 1;
-%  
-%     err = read_packet_headers;
-%         if header.apid<0 || header.apid>1403 ;
-%         disp('invalid apid');
-%         return;
-%         end
-% end
-
-% Delete the temp save file
-if deleteTemp,
-    delete(saveFilename);
-end
-
 % save current bit trim struct
 BitTrimMask = packet.BitTrimMask;
 save(btrimFile, 'BitTrimMask');
@@ -153,13 +113,9 @@ DATA.FOR = FOR;
 DATA.diag = diagint;
 DATA.packet_counter=packet_counter;
 DATA.apid_counts=apid_counts;
-% DATA.diary_data=diary_data;
 DATA.ESflags=data.ESflags;
 DATA.ITflags=data.ITflags;
 DATA.SPflags=data.SPflags;
 DATA.sweep_dir = sweep_direction;
 
-[hdf5_data META filetype] = read_npp_hdf5_tdr_sdr_rsdr_geo(h5Filename);
-
 end
-

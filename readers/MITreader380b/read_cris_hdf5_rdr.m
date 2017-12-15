@@ -45,15 +45,9 @@
 function [DATA META] = read_cris_hdf5_rdr(h5Filename, saveFilename, btrimFile)
 
 global fid  VERBOSE timeval idata qdata data ...
-packet_counter packet header sweep_direction FOR diagint
+  packet_counter packet header sweep_direction FOR diagint
 
 DATA = struct();
-
-% Add CrIS directory to the Matlab Path
-stmp = mfilename('fullpath');
-[pathbase, fname] = fileparts(stmp);
-pathcris = fullfile(pathbase, 'CrIS');
-addpath(pathbase, pathcris);
 
 % packet file default filename
 if nargin < 2
@@ -88,14 +82,14 @@ if exist(btrimFile) == 2
   d1 = load(btrimFile);
   packet.BitTrimMask = d1.BitTrimMask;
   bittrim_update
-  fprintf(1, '%s: starting with cached bit trim mask\n', fname)
+% fprintf(1, '%s: starting with cached bit trim mask\n', mfilename)
 else
   % use a default 
   [BitTrimBitsRetained, BitTrimIndex, BitTrimNpts] = btrim_lowres;
   packet.BitTrimBitsRetained = BitTrimBitsRetained;
   packet.BitTrimIndex = BitTrimIndex;
   packet.BitTrimNpts = BitTrimNpts;
-  fprintf(1, '%s: starting with default bit trim mask\n', fname)
+  fprintf(1, '%s: starting with default bit trim mask\n', mfilename)
 end
 
 fid = fopen(saveFilename, 'rb', 'b');
@@ -116,25 +110,27 @@ while err==0
     if header.apid<0 || header.apid>1403 ;disp('invalid apid');return;end
 end
 
-% read spacecraft diary data
-
-% frewind(fid)
-% err = read_packet_headers;
-% while err==0
-%     if header.apid==11
-%     read_packet_spacecraft_diary
-%     else
-%         read_packet_to_end
-%     end
-%     num_packets = num_packets + 1;
-%     apid_counts(header.apid+1) = apid_counts(header.apid+1) + 1;
-%  
-%     err = read_packet_headers;
-%         if header.apid<0 || header.apid>1403 ;
-%         disp('invalid apid');
-%         return;
-%         end
-% end
+if 0
+  % read spacecraft diary data
+  frewind(fid)
+  err = read_packet_headers;
+  while err==0
+      if header.apid==11
+      read_packet_spacecraft_diary
+      else
+          read_packet_to_end
+      end
+      num_packets = num_packets + 1;
+      apid_counts(header.apid+1) = apid_counts(header.apid+1) + 1;
+   
+      err = read_packet_headers;
+      if header.apid<0 || header.apid>1403 ;
+          disp('invalid apid');
+          return;
+      end
+  end
+  DATA.diary_data=diary_data;
+end
 
 % Delete the temp save file
 if deleteTemp,
@@ -153,7 +149,6 @@ DATA.FOR = FOR;
 DATA.diag = diagint;
 DATA.packet_counter=packet_counter;
 DATA.apid_counts=apid_counts;
-% DATA.diary_data=diary_data;
 DATA.ESflags=data.ESflags;
 DATA.ITflags=data.ITflags;
 DATA.SPflags=data.SPflags;

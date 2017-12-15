@@ -6,6 +6,8 @@
 %   sdir  - SDR output files
 %   opts  - options struct
 
+addpath ../source
+
 gdir = '/asl/data/cris/sdr60/2017/091';
 rdir = '/asl/data/cris/rdr60/2017/091';
 sdir = './test_tmp';

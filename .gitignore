@@ -39,3 +39,9 @@
 *.bak
 *~
 
+# NFS junk
+.nfs*
+
+# temp files
+*.tmp
+
