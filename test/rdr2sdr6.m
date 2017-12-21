@@ -1,31 +1,37 @@
 %
-% NAME
-%   rdr2sdr - take RCRIS and GCRSO files to ccast SDRs
+% rdr2sdr - take RCRIS and GCRSO files to ccast SDRs
 %
 % SYNOPSIS
-%   rdr2sdr(rdir, gdir, sdir, opts)
+%   rdr2sdr(rlist, glist, sdir, opts)
 %
 % INPUTS
-%   rdir  - NOAA RCRIS RDR files
-%   gdir  - NOAA GCRSO geo files
-%   sdir  - SDR output files
-%   opts  - options struct
+%   rlist  - NOAA RCRIS RDR file list
+%   glist  - NOAA GCRSO geo file list
+%   sdir   - SDR output files
+%   opts   - options struct
 %
 % opts fields
 %   see recent driver scripts
 %   
 % OUTPUT
-%   SDR mat files
+%   ccast SDR mat files
 %
 % DISCUSSION
-%   drives main processing loop from RDR files
+%   drives main processing loop from RDR and Geo files
 %
+%   if we set SDR frames from geo, we don't have to copy 
+%   the geo struct 
+%   
 % AUTHOR
 %  H. Motteler, 24 Nov 2017
 %
 
-% function rdr2sdr(rdir, gdir, sdir, opts);
-function rdr2sdr
+%------------
+% test setup
+%------------
+
+% function rdr2sdr6(rdir, gdir, sdir, opts);
+function rdr2sdr6
 
 addpath ../source
 addpath ../davet
@@ -33,18 +39,26 @@ addpath ../motmsc/time
 addpath ../readers/MITreader380b
 addpath ../readers/MITreader380b/CrIS
 
-rdir = '/asl/data/cris/rdr60/2017/181';
-gdir = '/asl/data/cris/sdr60/2017/181';
-sdir = './sdr_test';
-opts = struct;
-opts.mvspan = 4;
-nscanSDR = 60;
-nscanRDR = 60;
+% scans per file
+nscanRDR = 60;  
 nscanGeo = 60;
+nscanSC = 60;
 
-%---------------
-% general setup 
-%---------------
+% get a list of GCRSO geo files
+gdir = '/asl/data/cris/sdr60/2017/181';
+glist = dir2list(gdir, 'GCRSO', nscanGeo);
+  glist = glist(1:4);  % TEST TEST TEST
+
+% get a list of RCRIS RDR files
+rdir = '/asl/data/cris/rdr60/2017/181';
+rlist = dir2list(rdir, 'RCRIS', nscanRDR);
+  rlist = rlist(1:4);  % TEST TEST TEST
+
+sdir = './sdr_test';
+
+% moving average span is 2 * mvspan + 1
+% mvspan = opts.mvspan;
+mvspan = 4;
 
 btrim = 'btrim_cache.mat';
 
@@ -60,159 +74,207 @@ end
 % create the output path, if needed
 unix(['mkdir -p ', sdir]);
 
-% moving average span is 2 * mvspan + 1
-mvspan = opts.mvspan;
-
 % initial eng packet
 eng = struct;
 
-% get a list of GCRSO geo files
-glist = dir2list(gdir, 'GCRSO', nscanGeo);
-glist = glist(1:4);  % TEST TEST TEST
-
-% get a list of RCRIS RDR files
-rlist = dir2list(rdir, 'RCRIS', nscanRDR);
-rlist = rlist(1:4);  % TEST TEST TEST
-
-% geo initial read
-gi = 0;
-[geo, geoTime, geoTimeOK, gi] = nextGeo(gdir, glist, gi);
+%-------------------------------
+% Geo and RDR read buffer setup
+%-------------------------------
+% geo read setup
+Gbp = 0;     % Geo buffer pointer
+Gfp = 0;     % Geo file pointer
+gcount = 0;  % count next_Gbp calls
+[geo, geoTime, geoTimeOK, Gfp] = nextGeo(gdir, glist, Gfp);
 nobsGeo = length(geoTime);
-gptr = 0;
+next_Gbp
 
-% RDR initial read
-ri = 0;
-eng = [];
+% RDR read setup
+Rbp = 0;     % RDR buffer pointer
+Rfp = 0;     % RDR file pointer
+rcount = 0;  % count next_Rbp calls
+eng = struct([]);
 [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSD, ...
-  sci, eng, igmTimeOK, ri] = nextRDR(rdir, rlist, eng, ctmp, ri);
+  sci, eng, igmTimeOK, Rfp] = nextRDR(rdir, rlist, eng, ctmp, Rfp);
 nobsRDR = length(igmTime);
-rptr = 0;
+next_Rbp
 
-nobsRDR = length(igmTime);
+% get array sizes from RDR data
 [nchanLW, ~, ~] = size(igmLW);
 [nchanMW, ~, ~] = size(igmMW);
 [nchanSW, ~, ~] = size(igmSW);
 
-% Initialize the scan-order arrays
-si = 1;
-scLW = NaN(nchanLW, 9, 34, nscanSDR);
-scMW = NaN(nchanMW, 9, 34, nscanSDR);
-scSW = NaN(nchanSW, 9, 34, nscanSDR);
-scTime = NaN(1, 34 * nscanSDR);
+%-----------------------
+% SC write buffer setup
+%-----------------------
+Sbp = 1;     % SC buffer pointer
+Sfp = 1;     % SC file pointer
+scount = 0;  % count next_Sbp calls
+% set up scTime for the first buffer
+% fakeTime takes initial time, scans/file, file indes, and an
+% optional FOR offset and extrapolates obs times by file index
+% scT0 = dnum2iet(datenum('1 jan 2017 12:08:00'));
+% ix = find(igmFOR == 1, 1);
+% scT0 = igmTime(ix);
+  scT0 = geoTime(1);
+scTime = fakeTime(scT0, nscanSC, Sfp, 0);
 nobsSC = length(scTime);
-sptr = 0;
+scTimeOK = false(nobsSC, 1);
+scMatch = false(nobsSC, 1);
 
-% set SDR time grid to first RDR FOR 1
-ix = find(igmFOR == 1, 1);
-t0 = igmTime(ix);
-datestr(iet2dnum(t0))
-[scTime, jx] = fakeTime(t0, nscanSDR, 1, 0);
+% set SC buffer to undefined
+scLW = NaN(nchanLW, 9, 34, nscanSC);
+scMW = NaN(nchanMW, 9, 34, nscanSC);
+scSW = NaN(nchanSW, 9, 34, nscanSC);
 
-% test vars
-nmatch = 0;
-nloop = 0;
-ncopy = 0;
+% initialize test counters
+nloop = 0;   % count main loop iterations
+nmatch = 0;  % count RDR-Geo time matchups
+ncopy = 0;   % count RDR and Geo copies to SC
+nskip = 0;   % Sbp catchup steps to RDR-Geo match 
 
-% loop on obs (ES, SP, and IT looks)
-% nextGptr and nextRptr return next valid buffer pointers or 
-% zero if no more data; geoTime not-empty implies gptr is valid
-nextGptr
-nextRptr
-nextSptr
+%-------------------------
+% loop on RDR and Geo obs
+%-------------------------
 while ~isempty(geoTime) && ~isempty(igmTime)
 
-  tg = geoTime(gptr);
-  tr = igmTime(rptr);
-  ts = scTime(sptr);
+  tg = geoTime(Gbp);   % current Geo time
+  tr = igmTime(Rbp);   % current RDR time
+  ts = scTime(Sbp);    % current SC time
 
-  % match values within 2ms
-  if abs(tg - tr) < 2e3
-     % found an RDR-Geo match
-     nmatch = nmatch + 1;
-     % let sptr catch up
-     while ts < tg - 2e3;
-       nextSptr
-       ts = scTime(sptr);
+  % test for a Geo-RDR match (time diff < 2 ms)
+  if abs(tg - tr) < 2e3 
+     nmatch = nmatch + 1;   % increment the match count
+     while ts < tg - 2e3;   % while SC is behind Geo
+       next_Sbp             % increment the SC pointer
+       nskip = nskip + 1;   % increment SC skip count
+       ts = scTime(Sbp);    % get current SC time
      end  
-     % 3-way match, so copy
-     if abs(ts - tg) < 2e3
-       % ** do the copy here **
-       ncopy = ncopy + 1;
-       nextSptr
+     if abs(ts - tg) < 2e3  % test for an SC-Geo match
+       copy2sc              % copy data on a 3-way match
+       ncopy = ncopy + 1;   % increment the copy count
+       next_Sbp             % increment the SC pointer
      end
-     % if ts > tg, we just continue until obs catch up
-     nextGptr
-     nextRptr
+     next_Gbp      % get next Geo pointer
+     next_Rbp      % get next RDR pointer
+
+  % test for an unexpected Geo-RDR time difference
   elseif(abs(tg - tr) < 100e3)
-     % too close for comfort
-     fprintf(1, 'rdr2sdr: warning 2 < dT < 100 ms\n');
-     nextGptr
-     nextRptr
-  elseif tg > tr, nextRptr;
-  elseif tr > tg, nextGptr;
+    fprintf(1, 'rdr2sdr: unexpected Geo-RDR time difference\n');
+    next_Gbp       % get next Geo pointer
+    next_Rbp       % get next RDR pointer
+
+  elseif tg > tr,  % if Geo is ahead of RDR
+    next_Rbp;      % get next RDR pointer
+
+  elseif tr > tg,  % if RDR is ahead of Geo
+    next_Gbp;      % get next Geo pointer
+
   else, error('cosmic meltdown'), end
   nloop = nloop + 1;
 end
 
+close_Sbp
+
+fprintf(1, 'nloop = %d\n', nloop)
 fprintf(1, 'nmatch = %d\n', nmatch)
 fprintf(1, 'ncopy  = %d\n', ncopy)
-% fprintf(1, 'nloop = %d\n', nloop)
-% fprintf(1, 'nloop - nmatch = %d\n', nloop - nmatch)
+fprintf(1, 'scount - nskip = %d\n', scount - nskip)
+fprintf(1, 'gcount - 1 = %d\n', gcount - 1);
+fprintf(1, 'rcount - 1 = %d\n', rcount - 1);
+isequal(scTimeOK, scMatch)
 
 keyboard
 
-function nextSptr
-  sptr = sptr + 1;
-  if sptr > nobsSC
-    fprintf(1, 'writing SDR file %d\n', si)
-    sptr = 1;
-    si = si + 1;
-    t0 = scTime(end) + 800e3;
-    scTime = fakeTime(t0, nscanSDR, si, 0);
-    nobsSC = length(scTime);
-    datestr(iet2dnum(t0))
+%---------------------------
+% SC write buffer functions
+%---------------------------
+function next_Sbp
+  Sbp = Sbp + 1;
+  if Sbp > nobsSC
+    Sbp = 1;
+%   datestr(iet2dnum(scTime(1)))
+    fprintf(1, 'writing SDR file %d\n', Sfp)
+    save(fullfile(sdir, sprintf('SDR_test_%03d', Sfp)), ...
+      'scLW', 'scMW', 'scSW', 'scTime', 'geo', 'sci', 'eng')
+
+    % reset SC buffer to undefined
+    scLW = NaN(nchanLW, 9, 34, nscanSC);
+    scMW = NaN(nchanMW, 9, 34, nscanSC);
+    scSW = NaN(nchanSW, 9, 34, nscanSC);
+    scMatch = false(nobsSC, 1);
+
+    % set up scTime for the next buffer
+    Sfp = Sfp + 1;
+    scTime = fakeTime(scT0, nscanSC, Sfp, 0);
+  end
+  scount = scount + 1;
+end
+
+function close_Sbp
+  if Sbp > 1
+%   datestr(iet2dnum(scTime(1)))
+    fprintf(1, 'writing SDR file %d, %d values\n', Sfp, Sbp - 1)
   end
 end
 
-function incGptr
-  gptr = gptr + 1;
-  if gptr > nobsGeo
-    [geo, geoTime, geoTimeOK, gi] = nextGeo(gdir, glist, gi);
+function copy2sc
+  scMatch(Sbp) = true;
+  scTimeOK(Sbp) = igmTimeOK(Rbp) & geoTimeOK(Gbp);
+
+  Sbr = mod(Sbp - 1, 34) + 1;
+  Sbc = floor((Sbp - 1) / 34) + 1;
+  scLW(:, :, Sbr, Sbc) = igmLW(:, :, Rbp);
+  scMW(:, :, Sbr, Sbc) = igmMW(:, :, Rbp);
+  scSW(:, :, Sbr, Sbc) = igmSW(:, :, Rbp);
+end
+
+%---------------------------
+% Geo read buffer functions
+%---------------------------
+function inc_Gbp
+  Gbp = Gbp + 1;
+  if Gbp > nobsGeo
+    [geo, geoTime, geoTimeOK, Gfp] = nextGeo(gdir, glist, Gfp);
     if isempty(geoTime), 
-      gptr = 0; 
+      Gbp = 0; 
     else 
-      gptr = 1; 
+      Gbp = 1; 
       nobsGeo = length(geoTime);
     end
   end
+  gcount = gcount + 1;
 end 
 
-function nextGptr
-  incGptr;
-  while ~isempty(geoTime) && ~geoTimeOK(gptr)
-     incGptr;
+function next_Gbp
+  inc_Gbp;
+  while ~isempty(geoTime) && ~geoTimeOK(Gbp)
+     inc_Gbp;
   end
 end
 
-function incRptr
-  rptr = rptr + 1;
-  if rptr > nobsRDR
+%---------------------------
+% RDR read buffer functions
+%---------------------------
+function inc_Rbp
+  Rbp = Rbp + 1;
+  if Rbp > nobsRDR
     [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSD, ...
-      sci, eng, igmTimeOK, ri] = nextRDR(rdir, rlist, eng, ctmp, ri);
+      sci, eng, igmTimeOK, Rfp] = nextRDR(rdir, rlist, eng, ctmp, Rfp);
     nobsRDR = length(igmTime);
     if isempty(igmTime)
-      rptr = 0; 
+      Rbp = 0; 
     else 
-      rptr = 1; 
+      Rbp = 1; 
       nobsRDR = length(igmTime);
     end
   end
+  rcount = rcount + 1;
 end 
 
-function nextRptr
-  incRptr;
-  while ~isempty(igmTime) && ~igmTimeOK(rptr)
-     incRptr;
+function next_Rbp
+  inc_Rbp;
+  while ~isempty(igmTime) && ~igmTimeOK(Rbp)
+     inc_Rbp;
   end
 end
 

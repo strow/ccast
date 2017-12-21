@@ -3,10 +3,8 @@
 %
 % mainly just a wrapper for read_GCRSO
 %
-% gi is the file index pointer
-%   gi = 0, initial or done, geoTime is empty
-%   1 <= gi <= n, geoTime valid, file gi is in the buffer
-%
+% gi = zero initially, index of last valid read or end of list
+%  
 % output geoTime is geo.FORTime extended with SP and IT times
 %
 % scan times
@@ -34,23 +32,24 @@ geo = struct([]);
 geoTime = [];
 timeOK = [];
 
-% % use fake times for tests
-%   gi = gi + 1;
-%   if gi > length(glist), 
-%     gi = 0;
-%   else
-%     t0 = dnum2iet(datenum('1 jan 2017 12:00:00'));
-% %   t0 = t0 + 2 * 8e6;   % 2 scans
-%     [geoTime, timeOK] = fakeTime(t0, 60, gi, 0);
-%   end
-%   return
+test = false;
+if test
+  % generate fake time for tests
+    if gi < length(glist), 
+      gi = gi + 1;
+      t0 = dnum2iet(datenum('1 jan 2017 12:16:00'));
+      t0 = t0 + 2 * 8e6;   % 2 scans
+      [geoTime, timeOK] = fakeTime(t0, 60, gi, 6);
+    end
+    return
+end
 
-% loop on file indices
-gi = gi + 1;
+% loop on file list
 no_data = true;
-while no_data && gi <= length(glist)
+while no_data && gi < length(glist)
 
-  % read the next geo file
+  % read the next file
+  gi = gi + 1;
   gid = glist(gi).name(11:28);  
   fprintf(1, 'nextGeo: reading geo index %d file %s\n', gi, gid)
   gfile = fullfile(gdir, glist(gi).name); 
@@ -59,7 +58,6 @@ while no_data && gi <= length(glist)
   catch
     fprintf(1, 'nextGeo: error reading %s\n', gfile)
     fprintf(1, 'continuing with the next file...\n')
-    gi = gi + 1;
     continue
   end
 
@@ -77,7 +75,4 @@ while no_data && gi <= length(glist)
   timeOK = ~isnan(geoTime) & tmin <= geoTime & geoTime <= tmax;
 
 end
-
-% wrap file index pointer to zero
-if gi > length(glist), gi = 0; end
 

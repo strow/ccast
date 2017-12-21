@@ -11,8 +11,8 @@
 %   k  - obs index shift, 0-34, 0 = no shift
 %
 % output
-%   tf - fake IET obs times for file gi
-%   OK - fake QC for fake obs times
+%   tf - IET obs time frames for file gi
+%   OK - fake QC for fake time frames
 %   ix - obs index for fake times
 %
 % discussion
