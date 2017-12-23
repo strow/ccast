@@ -149,9 +149,9 @@ DATA.FOR = FOR;
 DATA.diag = diagint;
 DATA.packet_counter=packet_counter;
 DATA.apid_counts=apid_counts;
-DATA.ESflags=data.ESflags;
-DATA.ITflags=data.ITflags;
-DATA.SPflags=data.SPflags;
+% DATA.ESflags=data.ESflags;
+% DATA.ITflags=data.ITflags;
+% DATA.SPflags=data.SPflags;
 DATA.sweep_dir = sweep_direction;
 
 [hdf5_data META filetype] = read_npp_hdf5_tdr_sdr_rsdr_geo(h5Filename);

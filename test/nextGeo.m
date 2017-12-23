@@ -1,11 +1,22 @@
 %
 % nextGeo - read successive GCRSO files
 %
-% mainly just a wrapper for read_GCRSO
+% SYNOPSIS
+%  [geo, geoTime, timeOK, gi] = nextGeo(glist, gi)
 %
-% gi = zero initially, index of last valid read or end of list
-%  
-% output geoTime is geo.FORTime extended with SP and IT times
+% INPUTS
+%   glist   - NOAA GCRSO geo file list
+%   gi      - previous file index in glist
+%
+% OUTPUTS
+%   geo     - NOAA format 30 x nscan geo struct
+%   geoTime - 34 * nscan ES, SP, and IT obs times
+%   timeOK  - geoTime valid flags
+%   gi      - current file index in glist
+%
+% DISCUSSION
+%   mainly just a wrapper for read_GCRSO
+%   geoTime is geo.FORTime extended with SP and IT times
 %
 % scan times
 % 200 200 ...  200  200  200 200 200  200  200 200 200  200  200  200
@@ -17,8 +28,9 @@
 %   tES = tx(1:30);
 %   tSP = tx(32:33);
 %   tIT = tx(36:37);
+%
 
-function [geo, geoTime, timeOK, gi] = nextGeo(gdir, glist, gi)
+function [geo, geoTime, timeOK, gi] = nextGeo(glist, gi)
 
 % time offsets for calibration looks
 tcal = [400, 600, 1200, 1400] * 1e3;
@@ -32,16 +44,20 @@ geo = struct([]);
 geoTime = [];
 timeOK = [];
 
-test = false;
-if test
-  % generate fake time for tests
-    if gi < length(glist), 
-      gi = gi + 1;
-      t0 = dnum2iet(datenum('1 jan 2017 12:16:00'));
-      t0 = t0 + 2 * 8e6;   % 2 scans
-      [geoTime, timeOK] = fakeTime(t0, 60, gi, 6);
-    end
-    return
+% edit for time tests, see fakeTime params
+if false
+  if gi < length(glist), 
+    gi = gi + 1;
+    t0 = dnum2iet(datenum('1 jan 2017 12:00:00'));
+%   t0 = t0 + 3 * 8e6;   % 3 scans
+%   t0 = t0 + 2.1e3;     % timing error
+    ns = 60; % number of scans per file
+    k = 0;   % obs index shift, 0-34 
+    geoTime = fakeTime(t0, 60, gi, 0);
+%   timeOK = rand(1, length(geoTime)) > 0;
+    timeOK = rand(1, length(geoTime)) > 0.05;
+  end
+  return % skip the regular nextGeo code
 end
 
 % loop on file list
@@ -52,7 +68,7 @@ while no_data && gi < length(glist)
   gi = gi + 1;
   gid = glist(gi).name(11:28);  
   fprintf(1, 'nextGeo: reading geo index %d file %s\n', gi, gid)
-  gfile = fullfile(gdir, glist(gi).name); 
+  gfile = fullfile(glist(gi).folder, glist(gi).name); 
   try 
     geo = read_GCRSO(gfile);
   catch
@@ -60,9 +76,6 @@ while no_data && gi < length(glist)
     fprintf(1, 'continuing with the next file...\n')
     continue
   end
-
-  % we got someting
-  no_data = false;
 
   % geoTime extends geo.FORTime ES times with IT and SP times
   [~, nscanGeo] = size(geo.FORTime);
@@ -73,6 +86,15 @@ while no_data && gi < length(glist)
 
   % basic time QC
   timeOK = ~isnan(geoTime) & tmin <= geoTime & geoTime <= tmax;
+  if sum(timeOK) == 0
+    % if no good obs, clear and continue
+    geo = struct([]);
+    geoTime = [];
+    geoTimeOK = [];
+    continue
+  end
 
+  % we got someting
+  no_data = false;
 end
 

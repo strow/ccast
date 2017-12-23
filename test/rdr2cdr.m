@@ -1,27 +1,28 @@
 %
-% rdr2sdr - take RCRIS and GCRSO files to ccast SDRs
+% rdr2cdr - take RCRIS and GCRSO to ccast CDR files
 %
 % SYNOPSIS
-%   rdr2sdr(rlist, glist, sdir, opts)
+%   rdr2cdr(rlist, glist, sdir, opts)
 %
 % INPUTS
-%   rlist  - NOAA RCRIS RDR file list
-%   glist  - NOAA GCRSO geo file list
-%   sdir   - SDR output files
+%   rlist  - NOAA RCRIS RDR file list, malab dir format
+%   glist  - NOAA GCRSO geo file list, malab dir format
+%   cdir   - directory for CDR (L1a + Geo) output files
 %   opts   - options struct
 %
 % opts fields
-%   see recent driver scripts
+%   scans/file
 %   
 % OUTPUT
-%   ccast SDR mat files
+%   ccast CDR (L1a + Geo) mat files
 %
 % DISCUSSION
-%   drives main processing loop from RDR and Geo files
+%   drives match loop from the RDR and Geo files
 %
-%   if we set SDR frames from geo, we don't have to copy 
-%   the geo struct 
-%   
+%  CDR/SDR granules can be defined from FOR 1 in the first Geo
+%  or RDR files or set to any other desired time, which should 
+%  at least intersect with times in the Geo and RDR lists
+%
 % AUTHOR
 %  H. Motteler, 24 Nov 2017
 %
@@ -30,8 +31,8 @@
 % test setup
 %------------
 
-% function rdr2sdr6(rdir, gdir, sdir, opts);
-function rdr2sdr6
+% function rdr2cdr6(rdir, gdir, cdir, opts);
+function rdr2cdr6
 
 addpath ../source
 addpath ../davet
@@ -40,21 +41,21 @@ addpath ../readers/MITreader380b
 addpath ../readers/MITreader380b/CrIS
 
 % scans per file
-nscanRDR = 60;  
-nscanGeo = 60;
-nscanSC = 60;
+nscanRDR = 60;  % used for initial file selection
+nscanGeo = 60;  % used for initial file selection
+nscanSC = 60;   % used to define the output format
 
 % get a list of GCRSO geo files
 gdir = '/asl/data/cris/sdr60/2017/181';
 glist = dir2list(gdir, 'GCRSO', nscanGeo);
-  glist = glist(1:4);  % TEST TEST TEST
+% glist = glist(2:4);  % TEST TEST TEST
 
 % get a list of RCRIS RDR files
 rdir = '/asl/data/cris/rdr60/2017/181';
 rlist = dir2list(rdir, 'RCRIS', nscanRDR);
-  rlist = rlist(1:4);  % TEST TEST TEST
+% rlist = rlist(1:3);  % TEST TEST TEST
 
-sdir = './sdr_test';
+cdir = './cdr_181';
 
 % moving average span is 2 * mvspan + 1
 % mvspan = opts.mvspan;
@@ -72,10 +73,10 @@ else
 end
 
 % create the output path, if needed
-unix(['mkdir -p ', sdir]);
+unix(['mkdir -p ', cdir]);
 
 % initial eng packet
-eng = struct;
+eng = struct([]);
 
 %-------------------------------
 % Geo and RDR read buffer setup
@@ -84,7 +85,11 @@ eng = struct;
 Gbp = 0;     % Geo buffer pointer
 Gfp = 0;     % Geo file pointer
 gcount = 0;  % count next_Gbp calls
-[geo, geoTime, geoTimeOK, Gfp] = nextGeo(gdir, glist, Gfp);
+[geo, geoTime, geoTimeOK, Gfp] = nextGeo(glist, Gfp);
+if isempty(geoTime)
+  fprintf(1, 'rdr2cdr: no valid Geo values on initial read\n')
+  return
+end
 nobsGeo = length(geoTime);
 next_Gbp
 
@@ -94,7 +99,11 @@ Rfp = 0;     % RDR file pointer
 rcount = 0;  % count next_Rbp calls
 eng = struct([]);
 [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSD, ...
-  sci, eng, igmTimeOK, Rfp] = nextRDR(rdir, rlist, eng, ctmp, Rfp);
+  sci, eng, igmTimeOK, Rfp] = nextRDR(rlist, ctmp, eng, Rfp);
+if isempty(igmTime)
+  fprintf(1, 'rdr2cdr: no valid RDR values on initial read\n')
+  return
+end
 nobsRDR = length(igmTime);
 next_Rbp
 
@@ -159,7 +168,7 @@ while ~isempty(geoTime) && ~isempty(igmTime)
 
   % test for an unexpected Geo-RDR time difference
   elseif(abs(tg - tr) < 100e3)
-    fprintf(1, 'rdr2sdr: unexpected Geo-RDR time difference\n');
+    fprintf(1, 'rdr2cdr: unexpected Geo-RDR time difference\n');
     next_Gbp       % get next Geo pointer
     next_Rbp       % get next RDR pointer
 
@@ -181,31 +190,37 @@ fprintf(1, 'ncopy  = %d\n', ncopy)
 fprintf(1, 'scount - nskip = %d\n', scount - nskip)
 fprintf(1, 'gcount - 1 = %d\n', gcount - 1);
 fprintf(1, 'rcount - 1 = %d\n', rcount - 1);
-isequal(scTimeOK, scMatch)
+if ~isequal(scTimeOK, scMatch), fprintf(1, 'scTimeOK != scMatch\n'), end
 
-keyboard
+% keyboard
 
 %---------------------------
 % SC write buffer functions
 %---------------------------
+% next_Sbp is called after writing data to the SC buffer at Sbp.
+% next_Sbp increments the buffer pointer Sbp and writes and resets
+% the buffer when the pointer wraps.  SC buffer times in scTime are
+% set on initialization and updated on the wraps.
+
 function next_Sbp
   Sbp = Sbp + 1;
   if Sbp > nobsSC
     Sbp = 1;
 %   datestr(iet2dnum(scTime(1)))
-    fprintf(1, 'writing SDR file %d\n', Sfp)
-    save(fullfile(sdir, sprintf('SDR_test_%03d', Sfp)), ...
+    fprintf(1, 'writing SDR file %d, %d values\n', Sfp, nobsSC)
+    save(fullfile(cdir, sprintf('SDR_test_%03d', Sfp)), ...
       'scLW', 'scMW', 'scSW', 'scTime', 'geo', 'sci', 'eng')
 
     % reset SC buffer to undefined
     scLW = NaN(nchanLW, 9, 34, nscanSC);
     scMW = NaN(nchanMW, 9, 34, nscanSC);
     scSW = NaN(nchanSW, 9, 34, nscanSC);
-    scMatch = false(nobsSC, 1);
 
     % set up scTime for the next buffer
     Sfp = Sfp + 1;
     scTime = fakeTime(scT0, nscanSC, Sfp, 0);
+    scTimeOK = false(nobsSC, 1);
+    scMatch = false(nobsSC, 1);
   end
   scount = scount + 1;
 end
@@ -223,6 +238,17 @@ function copy2sc
 
   Sbr = mod(Sbp - 1, 34) + 1;
   Sbc = floor((Sbp - 1) / 34) + 1;
+
+  % FOR index sanity checks
+  jFOR = igmFOR(Rbp);
+  if 1 <= jFOR && jFOR <= 30
+    if jFOR ~= Sbr, error('FOR ES mismatch'), end
+  elseif jFOR == 31
+    if Sbr ~= 31 && Sbr ~= 32, error('FOR SP mismatch'), end
+  elseif jFOR == 0
+    if Sbr ~= 33 && Sbr ~= 34, error('FOR IT mismatch'), end
+  end
+
   scLW(:, :, Sbr, Sbc) = igmLW(:, :, Rbp);
   scMW(:, :, Sbr, Sbc) = igmMW(:, :, Rbp);
   scSW(:, :, Sbr, Sbc) = igmSW(:, :, Rbp);
@@ -231,10 +257,16 @@ end
 %---------------------------
 % Geo read buffer functions
 %---------------------------
+% next_Gbp is called before reading new Geo buffer time or data
+% values at Gbp.  next_Gbp increments the buffer pointer to the
+% next valid Geo obs and reloads the buffer when the pointer wraps.
+% An obs is considered valid if geoTime is non-empty and geoTimeOK 
+% is true.
+
 function inc_Gbp
   Gbp = Gbp + 1;
   if Gbp > nobsGeo
-    [geo, geoTime, geoTimeOK, Gfp] = nextGeo(gdir, glist, Gfp);
+    [geo, geoTime, geoTimeOK, Gfp] = nextGeo(glist, Gfp);
     if isempty(geoTime), 
       Gbp = 0; 
     else 
@@ -255,11 +287,17 @@ end
 %---------------------------
 % RDR read buffer functions
 %---------------------------
+% next_Rbp is called before reading new RDR buffer time or data
+% values at Rbp.  next_Rbp increments the buffer pointer to the
+% next valid RDR obs and reloads the buffer when the pointer wraps.
+% An obs is considered valid if igmTime is non-empty and igmTimeOK 
+% is true.
+
 function inc_Rbp
   Rbp = Rbp + 1;
   if Rbp > nobsRDR
     [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSD, ...
-      sci, eng, igmTimeOK, Rfp] = nextRDR(rdir, rlist, eng, ctmp, Rfp);
+      sci, eng, igmTimeOK, Rfp] = nextRDR(rlist, ctmp, eng, Rfp);
     nobsRDR = length(igmTime);
     if isempty(igmTime)
       Rbp = 0; 

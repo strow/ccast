@@ -2,7 +2,7 @@
 % fakeTime - return fake granule obs times
 %
 % synopsis
-%   tf = fakeTime(t0, ns, gi, k)
+%   [tf, ix] = fakeTime(t0, ns, gi, k)
 %
 % inputs
 %   t0 - sequence IET start time
@@ -12,7 +12,6 @@
 %
 % output
 %   tf - IET obs time frames for file gi
-%   OK - fake QC for fake time frames
 %   ix - obs index for fake times
 %
 % discussion
@@ -31,7 +30,7 @@
 %   t1 - relative obs times in ms for an n-scan granule
 %
 
-function [tf, OK, ix] = fakeTime(t0, ns, gi, k)
+function [tf, ix] = fakeTime(t0, ns, gi, k)
 
 % sweep times in ms relative to scan start
 tx = (0:39) * 200;  % all sweep start times
@@ -53,7 +52,4 @@ ix = repmat(1:34, 1, ns+1);
 % obs times index shift
 tf = tf((k+1):(k+ns*34));
 ix = ix((k+1):(k+ns*34));
-
-% OK = rand(1, length(tf)) > 0.05;
-  OK = logical(ones(1, length(tf)));
 

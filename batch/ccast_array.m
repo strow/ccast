@@ -26,7 +26,7 @@ fprintf(1, 'ccast_batch: processing day %d, year %d, node %d\n', ...
 
 % ccast_lowres(taskid, year)
 % ccast_hires2(taskid, year)
-% ccast_hires3(taskid, year)
+  ccast_hires3(taskid, year)
 % ccast_h2tolow(taskid, year)
-  ccast_h3tolow(taskid, year)
+% ccast_h3tolow(taskid, year)
 

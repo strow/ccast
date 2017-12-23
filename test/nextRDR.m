@@ -1,18 +1,44 @@
 %
 % nextRDR - read successive RDR files
 %
-% mainly just a wrapper for read_cris_hdf5_rdr and checkRDR
+% SYNOPSIS
+%    function [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSD, ...
+%              sci, eng, timeOK, ri] = nextRDR(rlist, ctmp, eng, ri)
 %
-% ri = zero initially, index of last valid read or end of list
+% INPUTS
+%   rlist   - NOAA RCRIS RDR file list
+%   ctmp    - temp filename for packet data
+%   eng     - prev eng packet, empty if none
+%   ri      - previous file index in rlist
 %
-% eng input is current eng packet or empty for no data
-% eng output is the current or most recent eng packt
+% OUTPUTS
+%   igmLW   - nchan x 9 x nobs, LW interferograms
+%   igmMW   - nchan x 9 x nobs, MW interferograms
+%   igmSW   - nchan x 9 x nobs, SW interferograms
+%   igmTime - nobs x 1, IGM times, IET time
+%   igmFOR  - nobs x 1, IGM FOR values, 0-31
+%   igmSD   - nobs x 1, IGM sweep direction, 0-1
+%   sci     - sci (8-second) telemetery data
+%   eng     - eng (4-minute) engineering data
+%   timeOK  - igmTime valid flags
+%   ri      - current file index
 %
-% igmTime is IET, translated with the ccast time lib
+% DISCUSSION
+%   mainly just a wrapper for read_cris_hdf5_rdr and checkRDR
+%
+%   ri iszero initially, index of last valid read or end of list
+%
+%   eng input is current eng packet or empty for no data
+%   eng output is the current or most recent eng packt
+%
+%   igmTime is IET, translated with the ccast time lib
 %
 
 function [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSD, ...
-          sci, eng, timeOK, ri] = nextRDR(rdir, rlist, eng, ctmp, ri)
+          sci, eng, timeOK, ri] = nextRDR(rlist, ctmp, eng, ri)
+
+% MIT reader fid and larger globals
+global fid idata qdata data diagint
 
 % Geo = RDR - dtRDR
 dtRDR = 183e3;
@@ -22,30 +48,32 @@ tmin = 1.7e15;  % 14-Nov-2011
 tmax = 2.4e15;  % 19-Jan-2034
 
 % initialize outputs
-igmLW = []; 
-igmMW = []; 
-igmSW = [];
-igmTime = []; 
-igmFOR = []; 
-igmSD = [];
-sci = [];
-timeOK = [];
+igmLW = [];   igmMW = []; 
+igmSW = [];   igmTime = []; 
+igmFOR = [];  timeOK = [];
+igmSD = [];   sci = [];    
 
 % reader bit trim default
 btrim = 'btrim_cache.mat';
 
-test = false;
-if test
-  % generate fake times for tests
-    if ri < length(rlist), 
-      ri = ri + 1;
-      t0 = dnum2iet(datenum('1 jan 2017 12:00:00'));
-      t0 = t0 + 3 * 8e6;   % 3 scans
-%     t0 = t0 + 183e3;     % Geo to RDR shift
-%     t0 = t0 + 2.1e3;     % timing error
-      [igmTime, timeOK] = fakeTime(t0, 60, ri, 30);
-    end
-    return
+% edit for time tests, see fakeTime params
+if false
+  if ri < length(rlist), 
+    ri = ri + 1;
+    t0 = dnum2iet(datenum('1 jan 2017 12:00:00'));
+    t0 = t0 + 3 * 8e6;   % 3 scans
+%   t0 = t0 + 2.1e3;     % timing error
+    ns = 60; % number of scans per file
+    k = 4;   % obs index shift, 0-34 
+    [igmTime, jx] = fakeTime(t0, ns, ri, k);
+%   timeOK = rand(1, length(igmTime)) > 0;
+    timeOK = rand(1, length(igmTime)) > 0.05;
+    igmFOR = jx;
+    igmLW = zeros(4, 9, 34, ns);
+    igmMW = zeros(4, 9, 34, ns);
+    igmSW = zeros(4, 9, 34, ns);
+  end
+  return % skip the regular nextRDR code
 end
 
 % loop on file indices
@@ -56,17 +84,25 @@ while no_data && ri < length(rlist)
   ri = ri + 1;
   rid = rlist(ri).name(17:34);
   fprintf(1, 'nextRDR: reading RDR index %d file %s\n', ri, rid)
-  rfile = fullfile(rdir, rlist(ri).name); 
+  rfile = fullfile(rlist(ri).folder, rlist(ri).name); 
   try
     [d1, m1] = read_cris_hdf5_rdr(rfile, ctmp, btrim);
-    delete(ctmp);
   catch
     fprintf(1, 'nextRDR: error reading %s\n', rfile)
     fprintf(1, 'continuing with the next file...\n')
-%   fclose('all'); % only MIT reader open files...
-    delete(ctmp);
+    fid_all = fopen('all');
+    if ismember(fid, fid_all);
+      fclose(fid)
+    end
+    if exist(ctmp) == 2
+      delete(ctmp);  % delete the ccsds packet temp file
+    end
     continue
   end
+  delete(ctmp);  % delete the ccsds packer temp file
+
+  % clear the larger MIT reader globals
+  clearvars -global fid idata qdata data diagint
 
   % read the sci and eng packets
   [sci, eng] = scipack(d1, eng);
@@ -85,8 +121,8 @@ while no_data && ri < length(rlist)
     continue
   end
 
-  % we got someting
-  no_data = false;
+  % clear the MIT reader output
+  clear d1
 
   % this assumes checkRDR returns the old ccast UTC ms since 1958
   igmTime = tai2iet(utc2tai(igmTime/1000));
@@ -96,6 +132,17 @@ while no_data && ri < length(rlist)
 
   % basic time QC
   timeOK = ~isnan(igmTime) & tmin <= igmTime & igmTime <= tmax;
+  if sum(timeOK) == 0
+    % if no good obs, clear and continue
+    fprintf(1, 'nextRDR: no valid obs, skipping file %s\n', rid)
+    igmLW = [];   igmMW = []; 
+    igmSW = [];   igmTime = []; 
+    igmFOR = [];  timeOK = [];
+    igmSD = [];   sci = [];    
+    continue
+  end
 
+  % we got someting
+  no_data = false;
 end
 
