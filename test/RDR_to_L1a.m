@@ -1,27 +1,32 @@
 %
-% rdr2cdr - take RCRIS and GCRSO to ccast CDR files
+% RDR_to_L1a - take NOAA RDR and Geo to ccast L1a
 %
 % SYNOPSIS
-%   rdr2cdr(rlist, glist, sdir, opts)
+%   RDR_to_L1a(rlist, glist, L1a_dir, opts)
 %
 % INPUTS
-%   rlist  - NOAA RCRIS RDR file list, malab dir format
-%   glist  - NOAA GCRSO geo file list, malab dir format
-%   cdir   - directory for CDR (L1a + Geo) output files
-%   opts   - options struct
+%   rlist    - NOAA RCRIS RDR file list, malab dir format
+%   glist    - NOAA GCRSO geo file list, malab dir format
+%   L1a_dir  - directory for the L1a output files
+%   opts     - options struct
 %
 % opts fields
 %   scans/file
 %   
 % OUTPUT
-%   ccast CDR (L1a + Geo) mat files
+%   ccast L1a (with Geo) mat files
 %
 % DISCUSSION
-%   drives match loop from the RDR and Geo files
+%   RDR_to_L1a matches RDR and Geo obs (ES, SP, and IT FORs) with
+%   time slots in a regular L1b framework, taking into account the
+%   CrIS scan timing.  The L1a start time and scans/granule are
+%   parameters
 %
-%  CDR/SDR granules can be defined from FOR 1 in the first Geo
-%  or RDR files or set to any other desired time, which should 
-%  at least intersect with times in the Geo and RDR lists
+%   The L1a variables are scLW, scMW, scSW, scTime, scGeo, and
+%   scMatch.  "SC" is for scan-order, and as a group these are
+%   sometimes called the SC buffer.  The names were chosen for
+%   backwards compatibility with the calibration and other ccast
+%   functions
 %
 % AUTHOR
 %  H. Motteler, 24 Nov 2017
@@ -31,8 +36,8 @@
 % test setup
 %------------
 
-% function rdr2cdr6(rdir, gdir, cdir, opts);
-function rdr2cdr6
+% function RDR_to_L1a(rdir, gdir, cdir, opts);
+function RDR_to_L1a
 
 addpath ../source
 addpath ../davet
@@ -43,19 +48,28 @@ addpath ../readers/MITreader380b/CrIS
 % scans per file
 nscanRDR = 60;  % used for initial file selection
 nscanGeo = 60;  % used for initial file selection
-nscanSC = 60;   % used to define the output format
+nscanSC = 45;   % used to define the SC output format
 
 % get a list of GCRSO geo files
-gdir = '/asl/data/cris/sdr60/2017/181';
+gdir = '/asl/data/cris/sdr60/2017/224';
+
 glist = dir2list(gdir, 'GCRSO', nscanGeo);
-% glist = glist(2:4);  % TEST TEST TEST
+  glist = glist(2:5);  % TEST TEST TEST
 
 % get a list of RCRIS RDR files
-rdir = '/asl/data/cris/rdr60/2017/181';
+rdir = '/asl/data/cris/rdr60/2017/224';
 rlist = dir2list(rdir, 'RCRIS', nscanRDR);
-% rlist = rlist(1:3);  % TEST TEST TEST
+  rlist = rlist(1:4);  % TEST TEST TEST
 
-cdir = './cdr_181';
+% L1a output files
+L1a_dir = './L1a_2017_224';
+
+% NOAA-style CrIS version
+% cvers = 'npp';
+  cvers = 'j01';
+
+% git hashtag; replace with function call
+gitID = 'c0a1bce';
 
 % moving average span is 2 * mvspan + 1
 % mvspan = opts.mvspan;
@@ -73,10 +87,11 @@ else
 end
 
 % create the output path, if needed
-unix(['mkdir -p ', cdir]);
+unix(['mkdir -p ', L1a_dir]);
 
-% initial eng packet
-eng = struct([]);
+% initial sci and eng data
+sci = struct([]);
+eng = struct;
 
 %-------------------------------
 % Geo and RDR read buffer setup
@@ -87,7 +102,7 @@ Gfp = 0;     % Geo file pointer
 gcount = 0;  % count next_Gbp calls
 [geo, geoTime, geoTimeOK, Gfp] = nextGeo(glist, Gfp);
 if isempty(geoTime)
-  fprintf(1, 'rdr2cdr: no valid Geo values on initial read\n')
+  fprintf(1, 'RDR_to_L1a: no valid Geo values on initial read\n')
   return
 end
 nobsGeo = length(geoTime);
@@ -99,9 +114,9 @@ Rfp = 0;     % RDR file pointer
 rcount = 0;  % count next_Rbp calls
 eng = struct([]);
 [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSD, ...
-  sci, eng, igmTimeOK, Rfp] = nextRDR(rlist, ctmp, eng, Rfp);
+  sci2, eng, igmTimeOK, Rfp] = nextRDR(rlist, ctmp, eng, Rfp);
 if isempty(igmTime)
-  fprintf(1, 'rdr2cdr: no valid RDR values on initial read\n')
+  fprintf(1, 'RDR_to_L1a: no valid RDR values on initial read\n')
   return
 end
 nobsRDR = length(igmTime);
@@ -122,18 +137,18 @@ scount = 0;  % count next_Sbp calls
 % fakeTime takes initial time, scans/file, file indes, and an
 % optional FOR offset and extrapolates obs times by file index
 % scT0 = dnum2iet(datenum('1 jan 2017 12:08:00'));
-% ix = find(igmFOR == 1, 1);
-% scT0 = igmTime(ix);
-  scT0 = geoTime(1);
+  ix = find(igmFOR == 1, 1);
+  scT0 = igmTime(ix);
+% scT0 = geoTime(1);
 scTime = fakeTime(scT0, nscanSC, Sfp, 0);
 nobsSC = length(scTime);
 scTimeOK = false(nobsSC, 1);
 scMatch = false(nobsSC, 1);
-
-% set SC buffer to undefined
-scLW = NaN(nchanLW, 9, 34, nscanSC);
-scMW = NaN(nchanMW, 9, 34, nscanSC);
-scSW = NaN(nchanSW, 9, 34, nscanSC);
+scLW = []; 
+scMW = []; 
+scSW = [];
+scGeo = struct;
+init_SC
 
 % initialize test counters
 nloop = 0;   % count main loop iterations
@@ -144,6 +159,7 @@ nskip = 0;   % Sbp catchup steps to RDR-Geo match
 %-------------------------
 % loop on RDR and Geo obs
 %-------------------------
+
 while ~isempty(geoTime) && ~isempty(igmTime)
 
   tg = geoTime(Gbp);   % current Geo time
@@ -168,7 +184,7 @@ while ~isempty(geoTime) && ~isempty(igmTime)
 
   % test for an unexpected Geo-RDR time difference
   elseif(abs(tg - tr) < 100e3)
-    fprintf(1, 'rdr2cdr: unexpected Geo-RDR time difference\n');
+    fprintf(1, 'RDR_to_L1a: unexpected Geo-RDR time difference\n');
     next_Gbp       % get next Geo pointer
     next_Rbp       % get next RDR pointer
 
@@ -182,7 +198,8 @@ while ~isempty(geoTime) && ~isempty(igmTime)
   nloop = nloop + 1;
 end
 
-close_Sbp
+% write out any remaining data
+close_SC
 
 fprintf(1, 'nloop = %d\n', nloop)
 fprintf(1, 'nmatch = %d\n', nmatch)
@@ -192,29 +209,28 @@ fprintf(1, 'gcount - 1 = %d\n', gcount - 1);
 fprintf(1, 'rcount - 1 = %d\n', rcount - 1);
 if ~isequal(scTimeOK, scMatch), fprintf(1, 'scTimeOK != scMatch\n'), end
 
-% keyboard
-
 %---------------------------
 % SC write buffer functions
 %---------------------------
-% next_Sbp is called after writing data to the SC buffer at Sbp.
-% next_Sbp increments the buffer pointer Sbp and writes and resets
-% the buffer when the pointer wraps.  SC buffer times in scTime are
-% set on initialization and updated on the wraps.
 
+% next_Sbp - called after writing to the SC buffer at obs index Sbp;
+% increments Sbp and writes and resets the SC buffer when Sbc wraps.
+%
 function next_Sbp
   Sbp = Sbp + 1;
   if Sbp > nobsSC
     Sbp = 1;
 %   datestr(iet2dnum(scTime(1)))
-    fprintf(1, 'writing SDR file %d, %d values\n', Sfp, nobsSC)
-    save(fullfile(cdir, sprintf('SDR_test_%03d', Sfp)), ...
-      'scLW', 'scMW', 'scSW', 'scTime', 'geo', 'sci', 'eng')
 
-    % reset SC buffer to undefined
-    scLW = NaN(nchanLW, 9, 34, nscanSC);
-    scMW = NaN(nchanMW, 9, 34, nscanSC);
-    scSW = NaN(nchanSW, 9, 34, nscanSC);
+    % remove sci from the head of the sci2 list
+    ix = tai2iet(utc2tai([sci2.time]/1000)) < ts + 4e6;
+    sci = sci2(ix);   % sci2 before the SC buffer end + 4 sec
+    sci2 = sci2(~ix); % sci2 after the SC buffer end + 4 sec
+
+    % write and reset the SC buffer
+    fprintf(1, 'writing L1a file %d, %d values\n', Sfp, nobsSC)
+    write_SC;
+    init_SC;
 
     % set up scTime for the next buffer
     Sfp = Sfp + 1;
@@ -225,19 +241,61 @@ function next_Sbp
   scount = scount + 1;
 end
 
-function close_Sbp
+% close_SC - called after the last SC buffer write.  If there is any
+% data left in the SC buffer it writes a final L1a file
+%
+function close_SC
   if Sbp > 1
 %   datestr(iet2dnum(scTime(1)))
-    fprintf(1, 'writing SDR file %d, %d values\n', Sfp, Sbp - 1)
+    fprintf(1, 'writing L1a file %d, %d values\n', Sfp, Sbp - 1)
+    write_SC
   end
 end
 
+% write_SC - build an L1a filename and write the SC buffer
+%
+function write_SC
+  dvec = datevec(iet2dnum(scTime(1)));
+  dvec(6) = round(dvec(6) * 10);
+  stmp = sprintf('CrIS_L1a_%s_s%02d_d%04d%02d%02d_t%02d%02d%03d_%s', ...
+    cvers, nscanSC, dvec, gitID);
+  save(fullfile(L1a_dir, stmp), ...
+    'scLW', 'scMW', 'scSW', 'scTime', 'scGeo', 'scMatch', 'sci', 'eng')
+end
+
+% init_SC - initialize the SC igm and Geo buffers
+%
+function init_SC
+  % set the SC igm buffers to undefined
+  scLW = NaN(nchanLW, 9, 34, nscanSC);
+  scMW = NaN(nchanMW, 9, 34, nscanSC);
+  scSW = NaN(nchanSW, 9, 34, nscanSC);
+
+  % set the SC geo buffer to undefined
+  scGeo.FORTime               = NaN(30,nscanSC);
+  scGeo.Height                = NaN(9,30,nscanSC);
+  scGeo.Latitude              = NaN(9,30,nscanSC);
+  scGeo.Longitude             = NaN(9,30,nscanSC);
+  scGeo.MidTime               = NaN(nscanSC);
+  scGeo.PadByte1              = NaN(nscanSC);
+  scGeo.QF1_CRISSDRGEO        = NaN(nscanSC);
+  scGeo.SatelliteAzimuthAngle = NaN(9,30,nscanSC);
+  scGeo.SatelliteRange        = NaN(9,30,nscanSC);
+  scGeo.SatelliteZenithAngle  = NaN(9,30,nscanSC);
+  scGeo.SolarAzimuthAngle     = NaN(9,30,nscanSC);
+  scGeo.SolarZenithAngle      = NaN(9,30,nscanSC);
+  scGeo.StartTime             = NaN(nscanSC);
+end
+
+% copy2sc - copies RDR ES, SP, and IT igm obs at Rbp and 
+% Geo ES obs at Gbp to the SC buffesr at Sbp
+%
 function copy2sc
   scMatch(Sbp) = true;
   scTimeOK(Sbp) = igmTimeOK(Rbp) & geoTimeOK(Gbp);
 
-  Sbr = mod(Sbp - 1, 34) + 1;
-  Sbc = floor((Sbp - 1) / 34) + 1;
+  Sbr = mod(Sbp - 1, 34) + 1;      % SC data row index
+  Sbc = floor((Sbp - 1) / 34) + 1; % SC data col index
 
   % FOR index sanity checks
   jFOR = igmFOR(Rbp);
@@ -249,9 +307,38 @@ function copy2sc
     if Sbr ~= 33 && Sbr ~= 34, error('FOR IT mismatch'), end
   end
 
+  % sweep direction sanity checks; note IT and SP flip vs ES
+  if (1 <= Sbr && Sbr <= 30 && mod(Sbr-1, 2) ~= igmSD(Rbp)) || ...
+     (31 <= Sbr && Sbr <= 34 && mod(Sbr, 2) ~= igmSD(Rbp))
+    error('bad sweep direction\n')
+  end
+
+  % copy RDR igm data to the SC buffer
   scLW(:, :, Sbr, Sbc) = igmLW(:, :, Rbp);
   scMW(:, :, Sbr, Sbc) = igmMW(:, :, Rbp);
   scSW(:, :, Sbr, Sbc) = igmSW(:, :, Rbp);
+
+  % copy Geo ES data to the SC buffer
+  Gbr = mod(Gbp - 1, 34) + 1;      % Geo data row index
+  Gbc = floor((Gbp - 1) / 34) + 1; % Geo data col index
+  if Gbr ~= Sbr
+    error('Geo/SC row index mismatch')
+  end
+  if 1 <= Gbr && Gbr <= 30  % test for ES obs
+    scGeo.FORTime(Sbr,Sbc)                 = geo.FORTime(Gbr,Gbc);
+    scGeo.Height(:,Sbr,Sbc)                = geo.Height(:,Gbr,Gbc);
+    scGeo.Latitude(:,Sbr,Sbc)              = geo.Latitude(:,Gbr,Gbc);
+    scGeo.Longitude(:,Sbr,Sbc)             = geo.Longitude(:,Gbr,Gbc);
+    scGeo.MidTime(Sbc)                     = geo.MidTime(Gbc);
+    scGeo.PadByte1(Sbc)                    = geo.PadByte1(Gbc);
+    scGeo.QF1_CRISSDRGEO(Sbc)              = geo.QF1_CRISSDRGEO(Gbc);
+    scGeo.SatelliteAzimuthAngle(:,Sbr,Sbc) = geo.SatelliteAzimuthAngle(:,Gbr,Gbc);
+    scGeo.SatelliteRange(:,Sbr,Sbc)        = geo.SatelliteRange(:,Gbr,Gbc);
+    scGeo.SatelliteZenithAngle(:,Sbr,Sbc)  = geo.SatelliteZenithAngle(:,Gbr,Gbc);
+    scGeo.SolarAzimuthAngle(:,Sbr,Sbc)     = geo.SolarAzimuthAngle(:,Gbr,Gbc);
+    scGeo.SolarZenithAngle(:,Sbr,Sbc)      = geo.SolarZenithAngle(:,Gbr,Gbc);
+    scGeo.StartTime(Sbc)                   = geo.StartTime(Gbc);
+  end
 end
 
 %---------------------------
@@ -297,13 +384,13 @@ function inc_Rbp
   Rbp = Rbp + 1;
   if Rbp > nobsRDR
     [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSD, ...
-      sci, eng, igmTimeOK, Rfp] = nextRDR(rlist, ctmp, eng, Rfp);
-    nobsRDR = length(igmTime);
+      sci1, eng, igmTimeOK, Rfp] = nextRDR(rlist, ctmp, eng, Rfp);
     if isempty(igmTime)
       Rbp = 0; 
     else 
       Rbp = 1; 
       nobsRDR = length(igmTime);
+      sci2 = [sci2, sci1];  % add sci1 at the tail of sci2
     end
   end
   rcount = rcount + 1;
