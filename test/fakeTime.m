@@ -1,23 +1,25 @@
 %
-% fakeTime - return fake granule obs times
+% fakeTime - return expected granule obs times
 %
 % synopsis
 %   [tf, ix] = fakeTime(t0, ns, gi, k)
 %
 % inputs
-%   t0 - sequence IET start time
+%   t0 - sequence start, IET time
 %   ns - number of scans per file
 %   gi - file index, 1 = first file
 %   k  - obs index shift, 0-34, 0 = no shift
 %
 % output
-%   tf - IET obs time frames for file gi
-%   ix - obs index for fake times
+%   tf - 34 * ns vector of IET obs time for file index gi
+%   ix - 34 * ns vector of obs FOR index for the tf times
 %
 % discussion
-%
 %   fakeTime builds a valid obs time sequence from start time,
 %   scans/file, file index, and obs index starting offset
+%
+%   the obs index shift is mainly intended for tests where fakeTime
+%   is used to simulate RDR times that can start with any obs
 %
 %   obs index: 1-30 ES FORs, 31-32 SP looks, 33-34 IT looks
 %
@@ -27,7 +29,7 @@
 %    1   2        29   30   31  32  33   34   35  36  37   38   39   40
 %
 % internal variables
-%   t1 - relative obs times in ms for an n-scan granule
+%   t1 - relative obs times in ms for an n+1 scan granule
 %
 
 function [tf, ix] = fakeTime(t0, ns, gi, k)
@@ -50,6 +52,6 @@ tf = t0 + 1000 * (t1 + (gi-1) * ns * 8000);
 ix = repmat(1:34, 1, ns+1);
 
 % obs times index shift
-tf = tf((k+1):(k+ns*34));
-ix = ix((k+1):(k+ns*34));
+tf = tf((k+1):(k+ns*34))';
+ix = ix((k+1):(k+ns*34))';
 

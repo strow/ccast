@@ -13,7 +13,7 @@ addpath ../readers/MITreader380b/CrIS
 
 btrim = 'btrim_cache.mat';
 ctmp = 'rdr_j1_packets.dat';
-rdir = '/asl/data/cris2/CRIS-SCIENCE-RDR_SPACECRAFT-DIARY-RDR/20171201';
+rdir = '/asl/data/cris2/CRIS-SCIENCE-RDR_SPACECRAFT-DIARY-RDR/20171225';
 % rgran = 'RCRIS-RNSCA_j01_d20171201_t1302558_e1303277_b00187_c20171201141021226519_nobu_ops.h5';
 % rgran = 'RCRIS-RNSCA_j01_d20171201_t0907451_e0908171_b00184_c20171201101038343110_nobu_ops.h5';
 

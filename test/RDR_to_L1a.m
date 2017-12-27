@@ -1,14 +1,14 @@
 %
-% RDR_to_L1a - take NOAA RDR and Geo to ccast L1a
+% RDR_to_L1a - take NOAA RDR and Geo to ccast L1a files
 %
 % SYNOPSIS
-%   RDR_to_L1a(rlist, glist, L1a_dir, opts)
+%   RDR_to_L1a(rlist, glist, Ldir, opts)
 %
 % INPUTS
-%   rlist    - NOAA RCRIS RDR file list, malab dir format
-%   glist    - NOAA GCRSO geo file list, malab dir format
-%   L1a_dir  - directory for the L1a output files
-%   opts     - options struct
+%   rlist  - NOAA RCRIS RDR file list, malab dir format
+%   glist  - NOAA GCRSO geo file list, malab dir format
+%   Ldir   - directory for the L1a output files
+%   opts   - options struct
 %
 % opts fields
 %   scans/file
@@ -54,15 +54,15 @@ nscanSC = 45;   % used to define the SC output format
 gdir = '/asl/data/cris/sdr60/2017/224';
 
 glist = dir2list(gdir, 'GCRSO', nscanGeo);
-  glist = glist(2:5);  % TEST TEST TEST
+  glist = glist(1:20);  % TEST TEST TEST
 
 % get a list of RCRIS RDR files
 rdir = '/asl/data/cris/rdr60/2017/224';
 rlist = dir2list(rdir, 'RCRIS', nscanRDR);
-  rlist = rlist(1:4);  % TEST TEST TEST
+  rlist = rlist(1:20);  % TEST TEST TEST
 
 % L1a output files
-L1a_dir = './L1a_2017_224';
+Ldir = './L1a_2017_224';
 
 % NOAA-style CrIS version
 % cvers = 'npp';
@@ -87,7 +87,7 @@ else
 end
 
 % create the output path, if needed
-unix(['mkdir -p ', L1a_dir]);
+unix(['mkdir -p ', Ldir]);
 
 % initial sci and eng data
 sci = struct([]);
@@ -259,7 +259,7 @@ function write_SC
   dvec(6) = round(dvec(6) * 10);
   stmp = sprintf('CrIS_L1a_%s_s%02d_d%04d%02d%02d_t%02d%02d%03d_%s', ...
     cvers, nscanSC, dvec, gitID);
-  save(fullfile(L1a_dir, stmp), ...
+  save(fullfile(Ldir, stmp), ...
     'scLW', 'scMW', 'scSW', 'scTime', 'scGeo', 'scMatch', 'sci', 'eng')
 end
 

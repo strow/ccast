@@ -2,7 +2,7 @@
 % check sci pack time range ve obs time
 %
 
-load cdr_2017_221/SDR_test_179.mat
+load L1a_2017_224/CrIS_L1a_j01_s45_d20170812_t0015520_c0a1bce.mat
 
 whos sci
 
