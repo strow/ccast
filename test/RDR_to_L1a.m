@@ -11,16 +11,15 @@
 %   opts   - options struct
 %
 % opts fields
-%   scans/file
+%   see defaults, below
 %   
 % OUTPUT
-%   ccast L1a (with Geo) mat files
+%   ccast L1a (plus Geo) mat files
 %
 % DISCUSSION
 %   RDR_to_L1a matches RDR and Geo obs (ES, SP, and IT FORs) with
 %   time slots in a regular L1b framework, taking into account the
-%   CrIS scan timing.  The L1a start time and scans/granule are
-%   parameters
+%   CrIS scan timing.
 %
 %   The L1a variables are scLW, scMW, scSW, scTime, scGeo, and
 %   scMatch.  "SC" is for scan-order, and as a group these are
@@ -32,62 +31,34 @@
 %  H. Motteler, 24 Nov 2017
 %
 
-%------------
-% test setup
-%------------
+function RDR_to_L1a(rlist, glist, Ldir, opts)
 
-% function RDR_to_L1a(rdir, gdir, cdir, opts);
-function RDR_to_L1a
+%--------------------
+% default parameters
+%--------------------
 
-addpath ../source
-addpath ../davet
-addpath ../motmsc/time
-addpath ../readers/MITreader380b
-addpath ../readers/MITreader380b/CrIS
+cvers = 'npp';              % for now, 'npp' or 'j01'
+gitID = 'xxxxxxx';          % this should be a function call
+btrim = 'btrim_cache.mat';  % should cache eng packet instead
+
+% MIT reader ccsds packet temp file
+ctmp = sprintf('ccsds_%04d.tmp', randi(9999));
 
 % scans per file
 nscanRDR = 60;  % used for initial file selection
 nscanGeo = 60;  % used for initial file selection
-nscanSC = 45;   % used to define the SC output format
+nscanSC = 45;   % used to define the SC granule format
 
-% get a list of GCRSO geo files
-gdir = '/asl/data/cris/sdr60/2017/224';
-
-glist = dir2list(gdir, 'GCRSO', nscanGeo);
-  glist = glist(1:20);  % TEST TEST TEST
-
-% get a list of RCRIS RDR files
-rdir = '/asl/data/cris/rdr60/2017/224';
-rlist = dir2list(rdir, 'RCRIS', nscanRDR);
-  rlist = rlist(1:20);  % TEST TEST TEST
-
-% L1a output files
-Ldir = './L1a_2017_224';
-
-% NOAA-style CrIS version
-% cvers = 'npp';
-  cvers = 'j01';
-
-% git hashtag; replace with function call
-gitID = 'c0a1bce';
-
-% moving average span is 2 * mvspan + 1
-% mvspan = opts.mvspan;
-mvspan = 4;
-
-btrim = 'btrim_cache.mat';
-
-% get a CCSDS temp filename
-jdir = getenv('JOB_SCRATCH_DIR');
-pstr = getenv('SLURM_PROCID');
-if ~isempty(jdir) && ~isempty(pstr)
-  ctmp = fullfile(jdir, sprintf('ccsds_%s.tmp', pstr));
-else
-  ctmp = sprintf('ccsds_%03d.tmp', randi(9999));
+% apply recognized input options
+if nargin == 4
+  if isfield(opts, 'cvers'), cvers = opts.cvers; end
+  if isfield(opts, 'gitID'), gitID = opts.gitID; end
+  if isfield(opts, 'btrim'), btrim = opts.btrim; end
+  if isfield(opts, 'ctmp'), ctmp = opts.ctmp; end
+  if isfield(opts, 'nscanRDR'), nscanRDR = opts.nscanRDR; end
+  if isfield(opts, 'nscanGeo'), nscanGeo = opts.nscanGeo; end
+  if isfield(opts, 'nscanSC'), nscanSC = opts.nscanSC; end
 end
-
-% create the output path, if needed
-unix(['mkdir -p ', Ldir]);
 
 % initial sci and eng data
 sci = struct([]);
@@ -133,13 +104,12 @@ next_Rbp
 Sbp = 1;     % SC buffer pointer
 Sfp = 1;     % SC file pointer
 scount = 0;  % count next_Sbp calls
-% set up scTime for the first buffer
-% fakeTime takes initial time, scans/file, file indes, and an
-% optional FOR offset and extrapolates obs times by file index
+% set up the SC granule framework
 % scT0 = dnum2iet(datenum('1 jan 2017 12:08:00'));
-  ix = find(igmFOR == 1, 1);
-  scT0 = igmTime(ix);
 % scT0 = geoTime(1);
+  ix = find(igmFOR == 1, 1);
+  tES1 = igmTime(ix);
+  [scT0, Sfp] = granule_t0(tES1, nscanSC);
 scTime = fakeTime(scT0, nscanSC, Sfp, 0);
 nobsSC = length(scTime);
 scTimeOK = false(nobsSC, 1);

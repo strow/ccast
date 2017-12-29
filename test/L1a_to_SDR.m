@@ -2,7 +2,7 @@
 % L1a_to_SDR -- take ccast L1a to L1b/SDR files
 %
 % SYNOPSIS
-%   rdr2sdr(flist, sdir, opts)
+%   L1a_to_SDR(flist, sdir, opts)
 %
 % INPUTS
 %   flist  - list of L1b mat files
@@ -10,7 +10,7 @@
 %   opts   - for now, everything else
 %
 % opts fields
-%  see driver scripts for examples
+%  see defaults, below
 %   
 % OUTPUT
 %   SDR mat files
@@ -22,42 +22,7 @@
 %  H. Motteler, 26 Dec 2017
 %
 
-% function L1a_to_SDR(flist, sdir, opts);
-function L1a_to_SDR
-
-addpath ../source
-addpath ../davet
-addpath ../motmsc/time
-
-opts = struct;            % initialize opts
-opts.cal_fun = 'e7';      % calibration function
-opts.version = 'snpp';    % current active CrIS
-opts.inst_res = 'hires3'; % high res #3 sensor grid
-opts.user_res = 'hires';  % high resolution user grid
-opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
-opts.resamp = 4;          % resampling algorithm
-
-% high-res SA inverse files
-opts.LW_sfile = '../inst_data/SAinv_HR3_Pn_LW.mat';
-opts.MW_sfile = '../inst_data/SAinv_HR3_Pn_MW.mat';
-opts.SW_sfile = '../inst_data/SAinv_HR3_Pn_SW.mat';
-
-% time-domain FIR filter 
-opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';
-
-% NEdN principal component filter
-opts.nedn_filt = '../inst_data/nedn_filt_HR.mat';
-
-% 2016 UMBC a2 values
-  opts.a2LW = [0.0175 0.0122 0.0137 0.0219 0.0114 0.0164 0.0124 0.0164 0.0305];
-  opts.a2MW = [0.0016 0.0173 0.0263 0.0079 0.0093 0.0015 0.0963 0.0410 0.0016];
-
-flist = dir('L1a_2017_224/CrIS_L1a_j01_s45_*.mat');
-
-sdir = 'sdr_test';
-
-% create the output path, if needed
-unix(['mkdir -p ', sdir]);
+function L1a_to_SDR(flist, sdir, opts);
 
 %----------------
 % initialization
@@ -69,7 +34,7 @@ nfile = length(flist);
 % moving average span is 2 * mvspan + 1
 mvspan = opts.mvspan;
 
-% ----------------------
+%-----------------------
 % loop on the L1b files
 % ----------------------
 for fi = 1 : nfile
@@ -80,7 +45,7 @@ for fi = 1 : nfile
   % matlab SDR output file
   ftmp = flist(fi).name;
   rid = ftmp(18:35);
-  stmp = strrep(ftmp, 'L1a', 'SDR')
+  stmp = strrep(ftmp, 'L1a', 'SDR');
   sfile = fullfile(sdir, stmp);
 
   % print a short status message
@@ -134,9 +99,9 @@ for fi = 1 : nfile
     fprintf(1, 'L1a_to_SDR: warning - flagging %d bad FORs, file %s\n', m, rid)
   end
 
-  % ------------------------
+  %--------------------------
   % get uncalibrated spectra
-  % -------------------------
+  %--------------------------
 
   % get instrument and user grid parameters
   [instLW, userLW] = inst_params('LW', wlaser, opts);
@@ -149,9 +114,9 @@ for fi = 1 : nfile
 
   clear scLW scMW scSW
 
-  % -------------------------------------
+  %--------------------------------------
   % radiometric and spectral calibration
-  % -------------------------------------
+  %--------------------------------------
   
   % get moving averages of SP and IT count spectra
   [avgLWSP, avgLWIT] = movavg_app(rcLW(:, :, 31:34, :), mvspan);
