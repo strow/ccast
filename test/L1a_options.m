@@ -52,27 +52,40 @@ opts.gitID = 'c0a1bce';
 opts.btrim = 'btrim_cache.mat';
 opts.ctmp = ctmp;
 
+%------------------
 % build file lists
-dstr = sprintf('%03d', doy);
-ystr = sprintf('%d', year);
+%------------------
+
+% get previous day
+[y0, d0] = prev_doy(year, doy);
+ys0 = sprintf('%d', y0);
+ds0 = sprintf('%03d', d0);
+ys1 = sprintf('%d', year);
+ds1 = sprintf('%03d', doy);
+
+% RDR file list
+rdir0 = fullfile(rhome, ys0, ds0);
+rdir1 = fullfile(rhome, ys1, ds1);
+rlist0 = dir2list(rdir0, 'RCRIS', nscanRDR);
+rlist1 = dir2list(rdir1, 'RCRIS', nscanRDR);
+rlist = [rlist0(end); rlist1];
+% rlist = rlist(41:50);  % TEST TEST TEST
+
+% Geo file list
+gdir0 = fullfile(ghome, ys0, ds0);
+gdir1 = fullfile(ghome, ys1, ds1);
+glist0 = dir2list(gdir0, 'GCRSO', nscanGeo);
+glist1 = dir2list(gdir1, 'GCRSO', nscanGeo);
+glist = [glist0(end); glist1];
+% glist = glist(41:50);  % TEST TEST TEST
 
 % L1a output home
 Lhome = '/asl/data/cris/ccast';
 Ldir = sprintf('L1a_%s_s%02d', opts.cvers, nscanSC);
-Lfull = fullfile(Lhome, Ldir, ystr, dstr);
-
-% RDR file list
-rdir = fullfile(rhome, ystr, dstr);
-rlist = dir2list(rdir, 'RCRIS', nscanRDR);
-  rlist = rlist(41:50);  % TEST TEST TEST
-
-% Geo file list
-gdir = fullfile(ghome, ystr, dstr);
-glist = dir2list(gdir, 'GCRSO', nscanGeo);
-  glist = glist(41:50);  % TEST TEST TEST
+Lfull = fullfile(Lhome, Ldir, ys1, ds1);
 
 % create the output path, if needed
-unix(['mkdir -p ', Ldir]);
+unix(['mkdir -p ', Lfull]);
 
 %-----------------------------------------
 % take RDR and Geo to ccast L1b/SDR files

@@ -107,9 +107,9 @@ scount = 0;  % count next_Sbp calls
 % set up the SC granule framework
 % scT0 = dnum2iet(datenum('1 jan 2017 12:08:00'));
 % scT0 = geoTime(1);
-  ix = find(igmFOR == 1, 1);
-  tES1 = igmTime(ix);
-  [scT0, Sfp] = granule_t0(tES1, nscanSC);
+ix = find(igmFOR == 1, 1);
+tES1 = igmTime(ix);
+[scT0, Sfp] = granule_t0(tES1, nscanSC);
 scTime = fakeTime(scT0, nscanSC, Sfp, 0);
 nobsSC = length(scTime);
 scTimeOK = false(nobsSC, 1);
