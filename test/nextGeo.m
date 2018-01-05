@@ -51,9 +51,11 @@ if false
     t0 = dnum2iet(datenum('1 jan 2017 12:00:00'));
 %   t0 = t0 + 3 * 8e6;   % 3 scans
 %   t0 = t0 + 2.1e3;     % timing error
-    ns = 60; % number of scans per file
+%   ns = 60; % number of scans per file
+    ns = 4; % number of scans per file
     k = 0;   % obs index shift, 0-34 
-    geoTime = fakeTime(t0, 60, gi, 0);
+    geoTime = fakeTime(t0, ns, gi, 0);
+    geo.FORtime = reshape(geoTime, 34, ns);
 %   timeOK = rand(1, length(geoTime)) > 0;
     timeOK = rand(1, length(geoTime)) > 0.05;
   end
