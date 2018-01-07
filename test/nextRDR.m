@@ -53,8 +53,9 @@ igmSW = [];   igmTime = [];
 igmFOR = [];  timeOK = [];
 igmSD = [];   sci = [];    
 
-% reader bit trim default
-btrim = 'btrim_cache.mat';
+% reader bit trim *** HACK ***
+[bpath, bname, ~] = fileparts(ctmp);
+btrim = fullfile(bpath, [bname, '.mat']);
 
 % edit for time tests, see fakeTime params
 if false

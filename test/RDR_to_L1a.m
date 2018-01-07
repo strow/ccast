@@ -37,9 +37,9 @@ function RDR_to_L1a(rlist, glist, Ldir, opts)
 % default parameters
 %--------------------
 
-cvers = 'npp';              % for now, 'npp' or 'j01'
-gitID = 'xxxxxxx';          % this should be a function call
-btrim = 'btrim_cache.mat';  % should cache eng packet instead
+cvers = 'npp';            % for now, 'npp' or 'j01'
+cctag = 'xxx';            % ccast version or run tag
+btrim = 'btrim_xxx.mat';  % should cache eng packet instead
 
 % MIT reader ccsds packet temp file
 ctmp = sprintf('ccsds_%04d.tmp', randi(9999));
@@ -52,7 +52,7 @@ nscanSC = 45;   % used to define the SC granule format
 % apply recognized input options
 if nargin == 4
   if isfield(opts, 'cvers'), cvers = opts.cvers; end
-  if isfield(opts, 'gitID'), gitID = opts.gitID; end
+  if isfield(opts, 'cctag'), cctag = opts.cctag; end
   if isfield(opts, 'btrim'), btrim = opts.btrim; end
   if isfield(opts, 'ctmp'), ctmp = opts.ctmp; end
   if isfield(opts, 'nscanRDR'), nscanRDR = opts.nscanRDR; end
@@ -105,6 +105,7 @@ Sbp = 1;     % SC buffer pointer
 Sfp = 1;     % SC file pointer
 scount = 0;  % count next_Sbp calls
 % set up the SC granule framework
+Sfp_max = ceil(10800 / nscanSC); % last granule
 % scT0 = dnum2iet(datenum('1 jan 2017 12:08:00'));
 % scT0 = geoTime(1);
 ix = find(igmFOR == 1, 1);
@@ -130,7 +131,7 @@ nskip = 0;   % Sbp catchup steps to RDR-Geo match
 % loop on RDR and Geo obs
 %-------------------------
 
-while ~isempty(geoTime) && ~isempty(igmTime)
+while ~isempty(geoTime) && ~isempty(igmTime) && Sfp <= Sfp_max
 
   tg = geoTime(Gbp);   % current Geo time
   tr = igmTime(Rbp);   % current RDR time
@@ -227,8 +228,8 @@ end
 function write_SC
   dvec = datevec(iet2dnum(scTime(1)));
   dvec(6) = round(dvec(6) * 10);
-  stmp = sprintf('CrIS_L1a_%s_s%02d_d%04d%02d%02d_t%02d%02d%03d_%s', ...
-    cvers, nscanSC, dvec, gitID);
+  sfmt = 'CrIS_L1a_%s_s%02d_d%04d%02d%02d_t%02d%02d%03d_g%03d_v%s';
+  stmp = sprintf(sfmt, cvers, nscanSC, dvec, Sfp, cctag);
   save(fullfile(Ldir, stmp), ...
     'scLW', 'scMW', 'scSW', 'scTime', 'scGeo', 'scMatch', 'sci', 'eng')
 end

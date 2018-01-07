@@ -53,7 +53,7 @@ unix(['mkdir -p ', Sfull]);
 %-------------------------------
 
 opts = struct;            % initialize opts
-opts.cal_fun = 'e7';      % calibration function
+opts.cal_fun = 'e8';      % calibration function
 opts.version = cvers;     % current active CrIS
 opts.inst_res = 'hires3'; % high res #3 sensor grid
 opts.user_res = 'hires';  % high resolution user grid

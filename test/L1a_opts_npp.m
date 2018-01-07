@@ -48,8 +48,8 @@ end
 % RDR_to_L1a options struct
 opts = struct;
 opts.cvers = 'npp';
-opts.gitID = 'c0a1bce';
-opts.btrim = 'btrim_cache.mat';
+opts.cctag = '20a';
+opts.btrim = 'btrim_npp.mat';
 opts.ctmp = ctmp;
 
 %------------------
