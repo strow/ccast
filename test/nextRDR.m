@@ -8,7 +8,7 @@
 % INPUTS
 %   rlist   - NOAA RCRIS RDR file list
 %   ctmp    - temp filename for packet data
-%   eng     - prev eng packet, empty if none
+%   eng     - previous or initial eng packet
 %   ri      - previous file index in rlist
 %
 % OUTPUTS
@@ -28,7 +28,7 @@
 %
 %   ri iszero initially, index of last valid read or end of list
 %
-%   eng input is current eng packet or empty for no data
+%   eng input is used to get an initial bit trim mask
 %   eng output is the current or most recent eng packt
 %
 %   igmTime is IET, translated with the ccast time lib
@@ -52,10 +52,6 @@ igmLW = [];   igmMW = [];
 igmSW = [];   igmTime = []; 
 igmFOR = [];  timeOK = [];
 igmSD = [];   sci = [];    
-
-% reader bit trim *** HACK ***
-[bpath, bname, ~] = fileparts(ctmp);
-btrim = fullfile(bpath, [bname, '.mat']);
 
 % edit for time tests, see fakeTime params
 if false
@@ -87,7 +83,7 @@ while no_data && ri < length(rlist)
   fprintf(1, 'nextRDR: reading RDR index %d file %s\n', ri, rid)
   rfile = fullfile(rlist(ri).folder, rlist(ri).name); 
   try
-    [d1, m1] = read_cris_hdf5_rdr(rfile, ctmp, btrim);
+    [d1, m1] = read_cris_hdf5_rdr(rfile, ctmp, eng);
   catch
     fprintf(1, 'nextRDR: error reading %s\n', rfile)
     fprintf(1, 'continuing with the next file...\n')

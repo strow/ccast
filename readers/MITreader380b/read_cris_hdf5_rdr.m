@@ -3,12 +3,12 @@
 %   read_cris_hdf5_rdr -- read a CrIS RDR file
 %
 % SYNOPSIS
-%   [DATA META] = read_cris_hdf5_rdr(h5Filename, saveFilename, btrimFile)
+%   [DATA META] = read_cris_hdf5_rdr(h5File, packetFile, btrimInit)
 %
 % INPUTS
-%   h5Filename    - CrIS RDR HDF5 input file
-%   saveFilename  - optional CCSDS packet file
-%   btrimFile     - optional named bit trim cache
+%   h5File      - CrIS RDR HDF5 source file
+%   packetFile  - CCSDS packet tempporary file
+%   btrimInit   - initial bit trim struct or file
 %   
 % OUTPUTS
 %   DATA   - CCSDS packet data
@@ -16,12 +16,8 @@
 %
 % DISCUSSION
 %   This is Dan's v380 reader modified to work with his general
-%   purpose interferogram unpacker bit_unpack_all.c and to cache
-%   the current bit trim mask.
-%
-%   btrimFile should be the full filename, including extension.
-%   Watch out for other files with the same name on the current
-%   search path
+%   purpose interferogram unpacker bit_unpack_all.c, and to use
+%   an intital bit trim mask
 %
 % AUTHOR
 %   Dan Mooney, post v380 mods by H. Motteler
@@ -42,29 +38,25 @@
 %  obligation to provide maintenance, support, updates, enhancements,
 %  or modifications.
 
-function [DATA META] = read_cris_hdf5_rdr(h5Filename, saveFilename, btrimFile)
+function [DATA META] = read_cris_hdf5_rdr(h5File, packetFile, btrimInit)
 
 global fid  VERBOSE timeval idata qdata data ...
   packet_counter packet header sweep_direction FOR diagint
 
 DATA = struct();
 
-% packet file default filename
-if nargin < 2
-    saveFilename = tempname;
-    deleteTemp = 1;
-else
-    deleteTemp = 0;
-end
-
-% bit trim cache default filename
-if nargin < 3
-  btrimFile = 'btrim_cache.mat';
-end
+% % packet file default filename
+% if nargin < 2
+%     packetFile = tempname;
+%     deleteTemp = 1;
+% else
+%     deleteTemp = 0;
+% end
 
 % Extract the Raw Application Packets from the hdf5 file
-saveFilename = extract_hdf5_rdr(h5Filename, saveFilename);
-if isempty(saveFilename),
+packetFile = extract_hdf5_rdr(h5File, packetFile);
+if isempty(packetFile),
+    fprintf(1, 'read_cris_hdf5_rdr: could not read %s\n', h5File)
     return
 end
 
@@ -76,23 +68,20 @@ timeval = 0;
 
 initialize_packet_structures;
 
-% set the initial bit trim mask
-if exist(btrimFile) == 2
-  % use the cached value
-  d1 = load(btrimFile);
-  packet.BitTrimMask = d1.BitTrimMask;
-  bittrim_update
-% fprintf(1, '%s: starting with cached bit trim mask\n', mfilename)
+% get an initial bit trim mask
+if isstruct(btrimInit) && isfield(btrimInit, 'Band')
+   packet.BitTrimMask = btrimInit;
+elseif isstruct(btrimInit) && isfield(btrimInit, 'BitTrimMask')    
+   packet.BitTrimMask = btrimInit.BitTrimMask;
+elseif exist(btrimInit) == 2
+   d1 = load(btrimFile);
+   packet.BitTrimMask = d1.BitTrimMask;
 else
-  % use a default 
-  [BitTrimBitsRetained, BitTrimIndex, BitTrimNpts] = btrim_lowres;
-  packet.BitTrimBitsRetained = BitTrimBitsRetained;
-  packet.BitTrimIndex = BitTrimIndex;
-  packet.BitTrimNpts = BitTrimNpts;
-  fprintf(1, '%s: starting with default bit trim mask\n', mfilename)
+   error('bad initial bit trim spec')
 end
+bittrim_update
 
-fid = fopen(saveFilename, 'rb', 'b');
+fid = fopen(packetFile, 'rb', 'b');
 if fid < 0
     error('Unable to open saveFile')
     return
@@ -133,13 +122,13 @@ if 0
 end
 
 % Delete the temp save file
-if deleteTemp,
-    delete(saveFilename);
-end
+% if deleteTemp,
+%     delete(packetFile);
+% end
 
 % save current bit trim struct
-BitTrimMask = packet.BitTrimMask;
-save(btrimFile, 'BitTrimMask');
+% BitTrimMask = packet.BitTrimMask;
+% save(btrimFile, 'BitTrimMask');
 
 DATA.idata = idata;
 DATA.qdata = qdata;
@@ -154,7 +143,7 @@ DATA.apid_counts=apid_counts;
 % DATA.SPflags=data.SPflags;
 DATA.sweep_dir = sweep_direction;
 
-[hdf5_data META filetype] = read_npp_hdf5_tdr_sdr_rsdr_geo(h5Filename);
+[hdf5_data META filetype] = read_npp_hdf5_tdr_sdr_rsdr_geo(h5File);
 
 end
 

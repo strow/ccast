@@ -37,9 +37,9 @@ function RDR_to_L1a(rlist, glist, Ldir, opts)
 % default parameters
 %--------------------
 
-cvers = 'npp';            % for now, 'npp' or 'j01'
-cctag = 'xxx';            % ccast version or run tag
-btrim = 'btrim_xxx.mat';  % should cache eng packet instead
+cvers = 'npp';  % for now, 'npp' or 'j01'
+cctag = 'xxx';  % ccast version or run tag
+eng = struct;   % *** this needs to be set in opts ***
 
 % MIT reader ccsds packet temp file
 ctmp = sprintf('ccsds_%04d.tmp', randi(9999));
@@ -53,16 +53,15 @@ nscanSC = 45;   % used to define the SC granule format
 if nargin == 4
   if isfield(opts, 'cvers'), cvers = opts.cvers; end
   if isfield(opts, 'cctag'), cctag = opts.cctag; end
-  if isfield(opts, 'btrim'), btrim = opts.btrim; end
   if isfield(opts, 'ctmp'), ctmp = opts.ctmp; end
   if isfield(opts, 'nscanRDR'), nscanRDR = opts.nscanRDR; end
   if isfield(opts, 'nscanGeo'), nscanGeo = opts.nscanGeo; end
   if isfield(opts, 'nscanSC'), nscanSC = opts.nscanSC; end
+  if isfield(opts, 'eng'), eng = opts.eng; end
 end
 
-% initial sci and eng data
+% initial sci array
 sci = struct([]);
-eng = struct;
 
 %-------------------------------
 % Geo and RDR read buffer setup
@@ -83,7 +82,6 @@ next_Gbp
 Rbp = 0;     % RDR buffer pointer
 Rfp = 0;     % RDR file pointer
 rcount = 0;  % count next_Rbp calls
-eng = struct([]);
 [igmLW, igmMW, igmSW, igmTime, igmFOR, igmSD, ...
   sci2, eng, igmTimeOK, Rfp] = nextRDR(rlist, ctmp, eng, Rfp);
 if isempty(igmTime)

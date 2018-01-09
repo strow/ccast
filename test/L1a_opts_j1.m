@@ -16,7 +16,7 @@
 %   this version is for early tests with 4-scan RDR and Geo 
 %
 
-% function L1a_options(doy, year)
+function L1a_options(doy, year)
 
 % search paths
 addpath ../source
@@ -35,8 +35,8 @@ nscanGeo = 4;   % used for initial file selection
 nscanSC = 45;   % used to define the SC granule format
 
 % NOAA RDR and GCRSO homes 
-ghome = '/asl/data/cris2/CrIS-SDR-GEO/20180105';
-rhome = '/asl/data/cris2/CRIS-SCIENCE-RDR_SPACECRAFT-DIARY-RDR/20180105';
+ghome = '/asl/data/cris2/CrIS-SDR-GEO';
+rhome = '/asl/data/cris2/CRIS-SCIENCE-RDR_SPACECRAFT-DIARY-RDR';
 
 % get a CCSDS temp filename
 jdir = getenv('JOB_SCRATCH_DIR');
@@ -50,45 +50,49 @@ end
 % RDR_to_L1a options struct
 opts = struct;
 opts.cvers = 'j01';
-opts.cctag = '2.1';
-opts.btrim = 'btrim_cache.mat';
+opts.cctag = '20a';
 opts.ctmp = ctmp;
+
+% load an initial eng packet 
+% *** this file should probably be in inst_data ***
+load('j1_eng')
+opts.eng = eng;
 
 %------------------
 % build file lists
 %------------------
 
-% % get previous day
-% [y0, d0] = prev_doy(year, doy);
-% ys0 = sprintf('%d', y0);
-% ds0 = sprintf('%03d', d0);
-% ys1 = sprintf('%d', year);
-% ds1 = sprintf('%03d', doy);
+% "gravite" style date strings for inputs
+[y0, d0] = prev_doy(year, doy);
+v0 = datevec(datenum([y0, 1, d0]));
+ds0 = sprintf('%02d%02d%02d', v0(1), v0(2), v0(3));
+v1 = datevec(datenum([year, 1, doy]));
+ds1 = sprintf('%02d%02d%02d', v1(1), v1(2), v1(3));
 
-% % RDR file list
-% rdir0 = fullfile(rhome, ys0, ds0);
-% rdir1 = fullfile(rhome, ys1, ds1);
-% rlist0 = dir2list(rdir0, 'RCRIS', nscanRDR);
-% rlist1 = dir2list(rdir1, 'RCRIS', nscanRDR);
-% rlist = [rlist0(end); rlist1];
-rlist = dir2list(rhome, 'RCRIS', nscanRDR);
-  rlist = rlist(820:end);  % TEST TEST TEST
+% year/doy style date strings for output
+ys2 = sprintf('%d', year);
+ds2 = sprintf('%03d', doy);
 
-% % Geo file list
-% gdir0 = fullfile(ghome, ys0, ds0);
-% gdir1 = fullfile(ghome, ys1, ds1);
-% glist0 = dir2list(gdir0, 'GCRSO', nscanGeo);
-% glist1 = dir2list(gdir1, 'GCRSO', nscanGeo);
-% glist = [glist0(end); glist1];
-glist = dir2list(ghome, 'GCRSO', nscanGeo);
-  glist = glist(820:end);  % TEST TEST TEST
+% RDR file list
+rdir0 = fullfile(rhome, ds0);
+rdir1 = fullfile(rhome, ds1);
+rlist0 = dir2list(rdir0, 'RCRIS', nscanRDR);
+rlist1 = dir2list(rdir1, 'RCRIS', nscanRDR);
+rlist = [rlist0(end-2:end); rlist1];  % end-2 for 4-scan files
+% rlist = rlist(820:end);  % TEST TEST TEST
+
+% Geo file list
+gdir0 = fullfile(ghome, ds0);
+gdir1 = fullfile(ghome, ds1);
+glist0 = dir2list(gdir0, 'GCRSO', nscanGeo);
+glist1 = dir2list(gdir1, 'GCRSO', nscanGeo);
+glist = [glist0(end-2:end); glist1];  % end-2 for 4-scan files
+% glist = glist(820:end);  % TEST TEST TEST
 
 % L1a output home
-% Lhome = '/asl/data/cris2/ccast';
-Lhome = './L1a_test';
+Lhome = '/asl/data/cris/ccast';
 Ldir = sprintf('L1a_%s_s%02d', opts.cvers, nscanSC);
-% Lfull = fullfile(Lhome, Ldir, ys1, ds1);
-  Lfull = fullfile(Lhome, Ldir);
+Lfull = fullfile(Lhome, Ldir, ys2, ds2);
 
 % create the output path, if needed
 unix(['mkdir -p ', Lfull]);

@@ -49,8 +49,12 @@ end
 opts = struct;
 opts.cvers = 'npp';
 opts.cctag = '20a';
-opts.btrim = 'btrim_npp.mat';
 opts.ctmp = ctmp;
+
+% load an initial eng packet 
+% *** this file should probably be in inst_data ***
+load('npp_eng')
+opts.eng = eng;
 
 %------------------
 % build file lists

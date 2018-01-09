@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# usage: sbatch --array=<array spec> L1a_j1B.sh <year>
+# usage: sbatch --array=<array spec> L1a_j1.sh <year>
 #
 # typical calls
-#   sbatch --array=306-365%20 L1a_npp.sh 2018
-#   sbatch --array=349,354,361 L1a_npp.sh 2018
+#   sbatch --array=306-365%20 L1a_j1.sh 2018
+#   sbatch --array=349,354,361 L1a_j1.sh 2018
 #
 
 # sbatch options
-#SBATCH --job-name=L1a_j1B
-#SBATCH --output=L1a_j1B_%A_%a.out
+#SBATCH --job-name=L1a_j1
+#SBATCH --output=L1a_j1_%A_%a.out
 #SBATCH --partition=batch
 #SBATCH --qos=medium_prod
 #SBATCH --account=pi_strow
@@ -22,5 +22,5 @@
 MATLAB=/usr/cluster/matlab/2016b/bin/matlab
 MATOPT='-nojvm -nodisplay -nosplash'
 
-srun $MATLAB $MATOPT -r "L1a_j1B($1); exit"
+srun $MATLAB $MATOPT -r "L1a_j1($1); exit"
 

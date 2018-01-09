@@ -1,0 +1,16 @@
+
+% TIME UNITS
+%   the ccsds packet times are represented as day, ms of day, and us
+%   of ms.  The us field may not be significant.  Dan's reader takes
+%   this to UTC fractional days since 1958.  checkRDR returns time as
+%   UTC ms since 1958.  This was convenient for working with internal
+%   times but isn't used anywhere else on the planet
+%
+%   geo.FORTime, geoTime, and scTime are all IET time.  sci.time is
+%   still UTC ms since 1958.  eng time fields may be in the original
+%   ccsds time format
+%
+%   This all needs to be cleaned up by switching to one time format,
+%   probably IET.  But for now the mix gives compatibility with the
+%   old ccast
+%

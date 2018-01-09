@@ -1,5 +1,5 @@
 %
-% mkSAumbc - make umbc SA matrices
+% mkSAtestX - make SA test matrices
 %
 
 addpath ../source

@@ -202,6 +202,7 @@ switch band
 end
 
 % instrument params
+inst.cvers   = cvers;
 inst.band    = band;
 inst.wlaser  = wlaser;
 inst.df      = df;
