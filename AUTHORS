@@ -5,31 +5,20 @@ AUTHORS
   L. Larrabee Strow
   David Tobin
   Dan Mooney
-  Joe Predina
 
 HISTORY
 
-  ccast started as a collaboration between UMBC and UW in fall 2010,
-  with major components from the 2007-2008 FM1 bench and TVAC tests.
-  H. Motteler wrote the L1a processing, starting with Dan Mooney's RDR
-  reader, and L. Strow, Dave Tobin, and H.~Motteler all collaborated
-  on the L1b.  This forked into a UW version with Fred Nagel's geo
-  that got first light, and a UMBC version with NOAA geo that got the
-  first high res obs a month later.  In the summer of 2012 H.~Motteler
-  updated the UW code to run in the UMBC environment, and for some
-  time maintained both versions while continuing to develop the UMBC
-  branch.  Major portions of the UW branch, including ICT modeling and
-  the non-linearity correction, were updated and merged into the UMBC
-  branch.
+  ccast started as a collaboration between UMBC and UW in fall 2011,
+  with major components from the 2007-2008 FM1 bench and TVAC tests,
+  and from Dan Mooney.  This forked early in 2012 into UMBC and UW
+  versions that are now entirely separate projects.
 
-  The UW branch was closer in some ways to the ATBD and the original
-  design.  The UMBC branch works for both regular and high resolution
-  modes, interpolates the ILS matrix as a function of the metrology
-  laser wavelength, uses slightly different forms of the calibration
-  equation, different bandpass filters, and uses a Matlab version of
-  Joe Predina's spreadsheet to calculate interferometric parameters.
-  The UMBC branch uses UW code for the ICT modeling, non-linearity
-  correction, and the metrology laser wavelength calculation.
+ACKNOWLEDGMENTS
 
-  H. Motteler, 15 March 2014
+  Thanks to Yong Han for the ILS discussions, NEdN comparisons,
+  organizing the extensive group algorithm comparison and testing,
+  and for managing a successful project; and to Joe Predina for
+  detailed discussions of spectral resampling, a very methodical
+  tabulation of the calibration equations, and spreadsheets for
+  calculating CrIS interferometric parameters.
 

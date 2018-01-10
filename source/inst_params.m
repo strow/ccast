@@ -11,8 +11,8 @@
 %   opts    - optional parameters
 % 
 % OPTS FIELDS
-%   version  - 'snpp' (default), 'jpss1', 'jpss2'
-%   inst_res - 'lowres' (default), 'hires1-3', 'hi3to2'
+%   cvers    - 'npp' (default), 'j01', 'j02', etc.
+%   inst_res - 'lowres' (default), 'hires1-4', 'hi3to2'
 %   user_res - 'lowres' (default), 'hires'
 %   foax     - focal plane FOV off-axis angles (default not set)
 %   frad     - focal plane FOV radii (default not set)
@@ -39,6 +39,7 @@
 %     hi3to2  - 866, 1052, 800
 %     hi3odd  - 873, 1051, 807
 %     hires3  - 874, 1052, 808
+%     hires4  - 876, 1052, 808
 %
 %   user grid resolution modes (user_res values)
 %     lowres  - opd 0.8 LW, 0.4 MW, 0.2 SW
@@ -60,7 +61,7 @@ band = upper(band);
 %----------
 % defaults
 %----------
-version = 'snpp';
+cvers = 'npp';
 inst_res = 'lowres';
 user_res = 'lowres';
 foax = [];
@@ -81,6 +82,7 @@ end
 % allow some old "resmode" style options
 if nargin == 3 && isfield(opts, 'resmode') 
   switch opts.resmode
+    case 'hires3', inst_res = 'hires3'; user_res = 'hires';
     case 'hires2', inst_res = 'hires2'; user_res = 'hires';
     case 'hi2low', inst_res = 'hires2'; user_res = 'lowres';
     case 'lowres', inst_res = 'lowres'; user_res = 'lowres';
@@ -89,7 +91,7 @@ end
 
 % apply recognized input options
 if nargin == 3
-  if isfield(opts, 'version'), version = opts.version; end
+  if isfield(opts, 'cvers'), cvers = opts.cvers; end
   if isfield(opts, 'inst_res'), inst_res = opts.inst_res; end
   if isfield(opts, 'user_res'), user_res = opts.user_res; end
   if isfield(opts, 'foax'), foax = opts.foax; end
@@ -101,6 +103,13 @@ if nargin == 3
   if isfield(opts, 'pH'), pH = opts.pH; end
   if isfield(opts, 'rL'), pL = opts.rL; end
   if isfield(opts, 'rH'), pH = opts.rH; end
+end
+
+% allow some alternate CrIS version names
+switch cvers
+  case 'snpp', cvers = 'npp';
+  case {'j1', 'j-1', 'jpss1', 'jpss-1'}, cvers = 'j01';
+  case {'j2', 'j-2', 'jpss2', 'jpss-2'}, cvers = 'j02';
 end
 
 %-----------
@@ -146,6 +155,7 @@ switch band
       case {'lowres', 'hires1', 'hires2', 'hi3to2'}, npts = 866;
       case 'hi3odd', npts = 873;
       case 'hires3', npts = 874;
+      case 'hires4', npts = 876;
     end
 
   case 'MW'
@@ -155,7 +165,7 @@ switch band
       case 'lowres', npts = 530;
       case 'hires1', npts = 1039;
       case 'hi3odd', npts = 1051;
-      case {'hires2', 'hires3', 'hi3to2'}, npts = 1052;
+      case {'hires2', 'hires3', 'hires4', 'hi3to2'}, npts = 1052;
     end
 
   case 'SW'
@@ -166,7 +176,7 @@ switch band
       case {'hires1', 'hires2'}, npts = 799;
       case 'hi3to2', npts = 800;
       case 'hi3odd', npts = 807;
-      case 'hires3', npts = 808;
+      case {'hires3', 'hires4'}, npts = 808;
     end
 end
 
@@ -192,6 +202,7 @@ switch band
 end
 
 % instrument params
+inst.cvers   = cvers;
 inst.band    = band;
 inst.wlaser  = wlaser;
 inst.df      = df;

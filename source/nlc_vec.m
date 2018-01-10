@@ -28,11 +28,15 @@ switch upper(inst.band)
   otherwise, error('bad band spec');
 end
 
-% normalize NF to match Dave's 2008 filter
-switch upper(inst.band)
-  case 'LW',  inst.sNF = 1.6047 * inst.sNF ./ max(inst.sNF);
-  case 'MW',  inst.sNF = 0.9826 * inst.sNF ./ max(inst.sNF);
-  case 'SW',  inst.sNF = 0.2046 * inst.sNF ./ max(inst.sNF);
+% normalize npp NF to match Dave's 2008 filter
+if strcmp(inst.cvers, 'npp')
+  switch upper(inst.band)
+    case 'LW',  inst.sNF = 1.6047 * inst.sNF ./ max(inst.sNF);
+    case 'MW',  inst.sNF = 0.9826 * inst.sNF ./ max(inst.sNF);
+    case 'SW',  inst.sNF = 0.2046 * inst.sNF ./ max(inst.sNF);
+  end
+elseif ~strcmp(inst.cvers, 'j01')
+  error(['bad value for inst.cvers ', inst.cvers])
 end
 
 % divide inputs by the numerical filter

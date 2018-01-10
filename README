@@ -1,130 +1,62 @@
 
-CCAST v 1.20
--------------
-
-H. Motteler, 14 Aug 2014
-
-
 Overview
 ---------
+  ccast is software to take level zero data from the Cross-track
+  Infrared Sounder (CrIS), a Fourier transform spectrometer on the
+  Suomi NPP and JPSS weather satellites, and produce high-quality
+  calibrated radiances.  It is written primarily in Matlab, allowing
+  for easy interaction, modification, and data visualization.  Input
+  is a CCSDS packet stream, typically with an HDF5 wrapper, and the
+  output is Matlab-format HDF5 SDR files.
 
-CCAST is software to take level zero data from the Cross-track
-Infrared Sounder (CrIS), a Fourier transform spectrometer on the
-Suomi NPP and JPSS weather satellites, and produce high-quality
-calibrated radiances.  It is written primarily in Matlab, allowing
-for easy interaction, modification, and data visualization.  Input
-is a CCSDS packet stream, typically with an HDF5 wrapper, and the
-output is Matlab-format HDF5.
+Features
+---------
+  Transparent reference truth.  The UMBC calibration algorithm uses
+  "flat" reference truth, with a simple sinc basis at the user-grid
+  OPD.  This gives residuals similar to the NOAA and UW algorithms
+  using reference truth convolved with instrument responsivity.  But
+  changing the definition of reference truth in this way amounts to
+  adjusting the ruler to fit the measured quantity.
+  
+  Processing at the full sensor-grid decimated OPD, the "extended
+  resolution" point set.  Points between the user- and sensor-grid
+  OPD are given a cosine apodization.  This in contrast with the UW
+  and NOAA algorithms, which approximate a circular shift followed
+  by truncation.
 
+  Spectral interpolation to the low (aka "standard") res user grid
+  vs truncating interferograms to the original low-res sensor grid
+  spec.  Interpolation is better for quality and consistency with
+  high res, while truncation may be slightly better for consistency
+  with obs before the switch to high res mode.
 
-Installation 
--------------
+  Cleaner and simpler resampling, from noticing that several of 
+  the proposed resampling algorithms converged as n -> inf and were
+  being evaluated at "large n" (the undecimated point set), a value
+  large enough that the differences were not significant.
 
- (1) get a new copy or update an existing repo
-      - new copy: "git clone https://github.com/strow/ccast.git"
-      - update an existing repo: "git pull origin master"
-
- (2) compile the interferogram reader
-      - start matlab 
-      - cd ccast/readers/MITreader380a/CrIS
-      - mex bit_unpack_all.c
-
- (3) download or rebuild the SRF tabulations.  source/mkSRFrun.m
-     gives an example of building these for regular res processing
-     with typical parameters.  This calculation is relatively slow,
-     and the resulting files need to be copied to ccast/inst_data.
-     To download a recent version of this data, go to
-
-       http://asl.umbc.edu/pub/data/ccast/inst_data/
-
-     For regular resolution, download
-
-       SRF_v33a_LR_Pn_LW.mat   v33a focal plane, psinc ILS, LW
-       SRF_v33a_LR_Pn_MW.mat   v33a focal plane, psinc ILS, MW
-       SRF_v33a_LR_Pn_SW.mat   v33a focal plane, psinc ILS, SW
-
-     and install these files in ccast/inst_data.  For high res get
-
-       SRF_v33a_HR2_Pn_LW.mat   v33a focal plane, psinc ILS, LW
-       SRF_v33a_HR2_Pn_MW.mat   v33a focal plane, psinc ILS, MW
-       SRF_v33a_HR2_Pn_SW.mat   v33a focal plane, psinc ILS, HW
-
- (4) edit paths in source/ccast_prepro.m and source/ccast_main.m
-     as needed for the local environment.  This step is not needed
-     if you just want to run the demo, described below.  For high
-     res processing the corresponding files are ccast_hires2.m and
-     hires_prepro.m
-     
-
-
-Testing
---------
-
-Before starting, read doc/ccast_intro.pdf to understand what the
-test is going to do.
-
-The versions of ccast_main and ccast_prepro in ccast/demo have paths
-set for the demo.  Sample NOAA RDR (level 0) and GCRSO (geo) files for
-1 Apr 2014 are available at
-
-  http://asl.umbc.edu/pub/data/ccast/demo/rdr60_hdf/2014/091/
-  http://asl.umbc.edu/pub/data/ccast/demo/sdr60_hdf/2014/091/   
-
-The RDR files are at the first URL and the geo files at the second.
-The files there should be copied to the corresponding directories in
-ccast/demo,
-
-  ccast/demo/rdr60_hdf/2014/091/
-  ccast/demo/sdr60_hdf/2014/091/
-
-To run the demo, start matlab and cd to ccast/demo.  To test the
-preprocessor for the 1 Apr 2014 sample data, give the commands
-
-  more off
-  ccast_prepro(91, 91, 2014)
-
-This will produce a lot of annoying status messages from the MIT
-reader, and if the run is successful will leave matlab-format RDR
-and summary data in
-
-  rdr60_mat/2014/091/
-  daily_mat/2014/
-
-Now you can run the main ccast processing for 1 Apr 2014,
-
-  ccast_main(91, 2014)
-
-This should produce a one-line status message per granule, and will
-leave data in
-
-  sdr60_mat/2014/091/
-
-
-Documentation
---------------
-
-  doc/ccast_intro.pdf  - an overview of design and project status
-  doc/ccast_eqns.pdf   - intro to the ILS and calibration equations
-  doc/matlab_sdr.txt   - the matlab SDR format field definitions
-  doc/finterp.pdf      - some notes on Fourier interpolation
-  doc/status.txt       - ccast status report as of 12 Dec 2013
-
-  source/README        - a list source functions and scripts
-  motmsc/README        - a list of test and development scripts
-
-There are also detailed comments at the start of most of the major
-and many of the minor procedures.
-
+  Simplicity and speed.  The package consists of less that 10,000
+  lines of code, with about 5,000 lines of that from the main source
+  directory.  Translation from RDR to L1a and from L1a to L1b/SDR
+  each take about 1 second/scan on a single core.
 
 Top level directories
 ----------------------
-
-  docs       - documentation
-  demo       - demo top level config
+  doc        - documentation
   source     - main source directory
+  test       - test and development 
+  motmsc     - a few assorted utilities
+  batch      - batch processing scripts
   davet      - Dave Tobin/UW components
-  motmsc     - test and development
-  runs       - batch processing scripts
   readers    - MIT reader with local mods
-  inst_data  - numeric filter and tabulated SRFs
+  inst_data  - instrument-specific data
+
+Documentation
+--------------
+  doc/sdr_format.txt   - ccast SDR field definitions
+  doc/ccast_eqns       - overview of ILS and calibration equations
+  doc/nonlin_notes     - notes on the ccast nonlinearity correction
+  doc/nedn_notes       - notes on the ccast NEdN measurement
+  doc/finterp          - notes on double-Fourier interpolation
+  source/README        - short descriptions of most functions
 

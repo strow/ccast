@@ -1,25 +1,24 @@
 
 top level wrappers
 -------------------
-L1a_opts_*  -  option wrapper to take RDR to L1a data
-SDR_opts_*  -  option wrapper take L1a to L1b/SDR data
+ccast_*       - drivers to take Matlab RDR to SDR data
+ccast_prepro  - driver to take NOAA HDF to Matlab RDR data
 
-RDR and Geo to L1a 
--------------------
-RDR_to_L1a  - take NOAA RDR and Geo to ccast L1a data
-nextGeo     - read successive NOAA HDF GCRSO geo files
-nextRDR     - read successive NOAA HDF RDR files
-granule_t0  - granule t0 and index from ES 1
-fakeTime    - return expected granule obs times
-checkRDR    - check and order RDR data from the MIT reader
-scipack     - process sci and eng packets
+ccast preprocessing
+--------------------
+rdr2mat    - process RDR HDF5 files to mat files
+geo_daily  - save a day of GCRSO data in a mat file
+sci_daily  - save sci and eng data from RDR mat files
 
-L1a to L1b/SDR
----------------
-L1a_to_SDR  - take ccast L1a to L1b/SDR files
-igm2spec    - take interferograms to uncalibrated spectra
-calmain     - main calibration procedure
-checkSDR    - SDR validation
+main processing loop
+---------------------
+rdr2sdr    - process RDR mat files to SDR mat files
+checkRDR   - check and order RDR data from the MIT reader
+scipack    - process sci and eng packets
+igm2spec   - take interferograms to uncalibrated spectra
+scanorder  - use FOR values to group data into scans
+geo_match  - match GCRSO and RDR scans
+calmain    - main calibration procedure
 
 current calmain versions
 -------------------------
@@ -38,32 +37,28 @@ utility functions
 ------------------
 bandpass    - raised cosine bandpass filter
 cris_ugrid  - return CrIS user grid with guard channels
-dir2list    - RCRIS or GCRSO directory to file list
 f_atbd      - return ATBD and related NOAA filters
 finterp     - double-transform fourier interpolation 
 fp_v33a     - SPNN focal plane values from Larrabee's v33a
 getSAinv    - load an SA inverse matrix
 igm_apod    - cosine apodization of interferogram wings
 inst_params - sensor and user-grid parameters
+movavg1     - vectorized moving average with NaNs
 movavg_app  - take moving average of SP and IT data
 newILS      - new cris ILS function
 nedn_filt   - principle component filter for NEdN data
 newILS      - CrIS ILS function
+nlc_new     - nonlineary correction with ATBD units
 nlc_vec     - vectorized nonlineary correction
-prev_doy    - previous day-of-year (for all dates)
+read_GCRSO  - read CrIS GCRSO geo data and attributes
 resamp      - CrIS resampling matrices
-rstr2tai    - NOAA filename time substring to TAI
 seq_match   - find the matching subsequence of two sequences
 specNF      - spectral space FIR filter at the sensor grid
 ztail       - find the nonzero end a vector or array
 
-readers
---------
-read_GCRSO         - read GCRSO data and attributes
-read_cris_hdf5_rdr - MIT reader for CrIS RDR HDF data
-
 test and support
 -----------------
-bt2rad   - translate brightness temperature to radiance
-rad2bt   - translate radiance to brightness temperature
-spec2igm - take uncalibrated spectra to interferograms
+bt2rad  - translate brightness temperature to radiance
+rad2bt  - translate radiance to brightness temperature
+pcorr2  - do a basic phase correction
+

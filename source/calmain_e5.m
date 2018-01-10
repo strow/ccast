@@ -90,13 +90,13 @@ pL = inst.pL; pH = inst.pH; rL = inst.rL; rH = inst.rH;
 
 for si = 1 : nscan 
  
-  % check that this row has some ES's
-  if isnan(max(stime(1:30, si)))
+  % check that this row has some ES's 
+  if isnan(max(geo.FORTime(1:30, si)))
     continue
   end
 
   % get index of the closest sci record
-  dt = abs(max(stime(:, si)) - [sci.time]);
+  dt = abs(max(geo.FORTime(:, si)) - tai2iet(utc2tai([sci.time]/1000)));
   ix = find(dt == min(dt));
 
   % get ICT temperature

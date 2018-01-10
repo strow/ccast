@@ -1,20 +1,14 @@
 %
-% NAME
-%   SDR_npp -- run ccast v20 on day-of-year from task ID
+% SDR_npp - ccast L1a to SDR with task ID as day-of-year
 %
 % SYNOPSIS
 %   SDR_npp(year)
-%
-% DISCUSSION
-%  uses job array task ID (SLURM_ARRAY_TASK_ID) to get day-of-year
 %
 
 function SDR_npp(year)
 
 more off
-addpath ../davet
 addpath ../source
-addpath ../test
 
 procid = str2num(getenv('SLURM_PROCID'));
 nprocs = str2num(getenv('SLURM_NPROCS'));

@@ -1,4 +1,4 @@
-function [metlaser,mtime] = metlaser(NeonCal, neonWL);
+function [metlaser,mtime] = metlaser(NeonCal);
 
 % Created 8-Dec-2011 by L. Strow
 
@@ -8,12 +8,7 @@ function [metlaser,mtime] = metlaser(NeonCal, neonWL);
 %  Uncertain if mtime should be returned, or a "raw" time
 
 % Fixed Neon wavelength, LLS Mn value
-% neonWL       =  703.44835;
-
-% option to use eng value for Neon wavelength
-if nargin == 1
-  neonWL = NeonCal.NeonGasWavelength;
-end
+neonl       =  703.44835;
 
 % Date start time
 dstart_1958 = datenum(1958,1,1,0,0,0);
@@ -26,7 +21,7 @@ NeonEndingPartialCount      = NeonCal.NeonEndingPartialCount(n);
 NeonStartingCount           = NeonCal.NeonStartingCount(n);
 NeonEndingCount             = NeonCal.NeonEndingCount(n);
 InterpolatedNeonFringeCount = NeonFringeCount + (NeonStartingPartialCount ./ NeonStartingCount) - (NeonEndingPartialCount ./ NeonEndingCount) ;
-metlaser                    = neonWL * InterpolatedNeonFringeCount ./ NeonCal.LaserFringeCount;
+metlaser                     = neonl * InterpolatedNeonFringeCount ./ NeonCal.LaserFringeCount;
 metlaser                    = mean(metlaser)/2;
 
 mtime                       = datenum(0,0,NeonCal.TimeStamp.Days+dstart_1958,0,0,NeonCal.TimeStamp.msec/1000);

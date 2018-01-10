@@ -1,0 +1,18 @@
+
+format changes
+  4 Dec 2014 (doy 338) change from lowres to hires2
+  2 Nov 2015 (doy 306) change from hires2 to hires3
+  
+proposed ccast v20b dir names:
+  SDR_j01_s45_rL1    j1/cris2 45-scan high res SDR data
+  SDR_npp_s45_rH1   npp/cris1 45-scan high res SDR data
+  L1a_j01_s45_rH4    j1/cris2 45-scan high res mode 4 SDR data
+  L1a_npp_s45_rH3   npp/cris1 45-scan high res mode 3 SDR data
+
+example runs
+  sbatch --array=306-365%20 L1a_npp.sh 2018
+  sbatch --array=349,354,361 SDR_j1.sh 2018
+
+sample search for old files
+  find /asl/data/cris/ccast/sdr60/2015 -depth -type f -mtime +70 -print | more
+
