@@ -14,40 +14,18 @@
 %   cvers    - 'npp' (default), 'j01', 'j02', etc.
 %   inst_res - 'lowres' (default), 'hires1-4', 'hi3to2'
 %   user_res - 'lowres' (default), 'hires'
-%   foax     - focal plane FOV off-axis angles (default not set)
-%   frad     - focal plane FOV radii (default not set)
-%   a2       - a2 nonlinearity weights (default UW SNPP values)
 %   pL, pH   - processing filter passband start and end freqs
 %   rL, rH   - processing filter out-of-band LHS and RHS rolloff
 %
 % OUTPUTS
-%   inst  - instrument parameters
+%   inst  - sensor grid parameters
 %   user  - user grid parameters
 %
 % DISCUSSION
-%   The main steps are (1) set default values, (2) allow overrides
-%   from opts, (3) set user grid parameters, and (4) set sensor grid
-%   parameters.  Focal plane parameters can be set in the opts struct 
-%   for convenience building new SA matrices, and are saved in those
-%   files
-%
-%   sensor grid resolution modes (inst_res values)
-%               LW    MW   SW
-%     lowres  - 866,  530, 202
-%     hires1  - 866, 1039, 799
-%     hires2  - 866, 1052, 799
-%     hi3to2  - 866, 1052, 800
-%     hi3odd  - 873, 1051, 807
-%     hires3  - 874, 1052, 808
-%     hires4  - 876, 1052, 808
-%
-%   user grid resolution modes (user_res values)
-%     lowres  - opd 0.8 LW, 0.4 MW, 0.2 SW
-%     hires   - opd 0.8 all bands
-%
-%  DEPRECATED OPTIONS AND FIELDS
-%    resmode 'lowres', 'hires2', and 'hi2low' work as before
-%    usr.vr is used for bandpass filtering by some non-ccast app's
+%   Sets user and sensor grid parameters.  Options include CrIS
+%   version, sensor and user grid resolution modes, and processing
+%   filter specs.  user.vr is used for bandpass filtering by some
+%   non-ccast app's
 %
 % AUTHOR
 %   H. Motteler, 4 Oct 2013
@@ -64,19 +42,12 @@ band = upper(band);
 cvers = 'npp';
 inst_res = 'lowres';
 user_res = 'lowres';
-foax = [];
-frad = [];
-
-% UW SNPP a2 weights
-a2LW = [0.0194 0.0143 0.0161 0.0219 0.0134 0.0164 0.0146 0.0173 0.0305];
-a2MW = [0.0053 0.0216 0.0292 0.0121 0.0143 0.0037 0.1070 0.0456 0.0026];
-a2SW = zeros(1, 9);
 
 % e5-e6 cal algo filters
 switch band
   case 'LW', pL =  650; pH = 1100; rL = 15; rH = 20; vr = 15;
   case 'MW', pL = 1200; pH = 1760; rL = 30; rH = 30; vr = 20;
-  case 'SW', pL = 2145; pH = 2560; rL = 30; rH = 30; vr = 22;
+  case 'SW', pL = 2145; pH = 2560; rL = 30; rH = 30; vr = 20;
 end
 
 % allow some old "resmode" style options
@@ -84,8 +55,8 @@ if nargin == 3 && isfield(opts, 'resmode')
   switch opts.resmode
     case 'hires3', inst_res = 'hires3'; user_res = 'hires';
     case 'hires2', inst_res = 'hires2'; user_res = 'hires';
-    case 'hi2low', inst_res = 'hires2'; user_res = 'lowres';
     case 'lowres', inst_res = 'lowres'; user_res = 'lowres';
+    otherwise, error(['bad resmode param ', opts.resmode]);
   end
 end
 
@@ -94,15 +65,10 @@ if nargin == 3
   if isfield(opts, 'cvers'), cvers = opts.cvers; end
   if isfield(opts, 'inst_res'), inst_res = opts.inst_res; end
   if isfield(opts, 'user_res'), user_res = opts.user_res; end
-  if isfield(opts, 'foax'), foax = opts.foax; end
-  if isfield(opts, 'frad'), frad = opts.frad; end
-  if isfield(opts, 'a2LW'), a2LW = opts.a2LW; end
-  if isfield(opts, 'a2MW'), a2MW = opts.a2MW; end
-  if isfield(opts, 'a2SW'), a2SW = opts.a2SW; end
   if isfield(opts, 'pL'), pL = opts.pL; end
   if isfield(opts, 'pH'), pH = opts.pH; end
-  if isfield(opts, 'rL'), pL = opts.rL; end
-  if isfield(opts, 'rH'), pH = opts.rH; end
+  if isfield(opts, 'rL'), rL = opts.rL; end
+  if isfield(opts, 'rH'), rH = opts.rH; end
 end
 
 % allow some alternate CrIS version names
@@ -194,13 +160,6 @@ cutpt = mod(round(vdfc/dv), npts);  % cut point (d9)
 cind = [(cutpt+1:npts)' ; (1:cutpt)'];
 freq = dv * (cutpt:cutpt+npts-1)' + awidth * vbase;
 
-% set the a2 weights
-switch band
-  case 'LW', a2 = a2LW;
-  case 'MW', a2 = a2MW;
-  case 'SW', a2 = a2SW;
-end
-
 % instrument params
 inst.cvers   = cvers;
 inst.band    = band;
@@ -213,12 +172,8 @@ inst.opd     = opd;
 inst.dv      = dv;
 inst.cind    = cind;
 inst.freq    = freq;
-inst.version = version;
 inst.inst_res = inst_res;
 inst.user_res = user_res;
-inst.foax    = foax(:);
-inst.frad    = frad(:);
-inst.a2      = a2(:);
 inst.pL      = pL;
 inst.pH      = pH;
 inst.rL      = rL;

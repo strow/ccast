@@ -1,18 +1,23 @@
-function [metlaser,mtime] = metlaser(NeonCal, neonWL);
 
-% Created 8-Dec-2011 by L. Strow
+function [wlaser, mtime] = metlaser(NeonCal, opts);
 
 %  Input:  An MIT "d1.packet.NeonCal" structure
 %  Output: Metrology laser wavelength
 %
 %  Uncertain if mtime should be returned, or a "raw" time
-
+%
+% Created 8-Dec-2011 by L. Strow
+%
 % Fixed Neon wavelength, LLS Mn value
 % neonWL       =  703.44835;
 
-% option to use eng value for Neon wavelength
-if nargin == 1
-  neonWL = NeonCal.NeonGasWavelength;
+% default Neon wavelength from eng
+neonWL = NeonCal.NeonGasWavelength;
+
+% option to override eng Neon value
+if nargin == 2 && isfield(opts, 'neonWL')
+% fprintf(1, 'metlaser: setting neonWL from opts\n')
+  neonLW = opts.neonWL;
 end
 
 % Date start time
@@ -26,8 +31,8 @@ NeonEndingPartialCount      = NeonCal.NeonEndingPartialCount(n);
 NeonStartingCount           = NeonCal.NeonStartingCount(n);
 NeonEndingCount             = NeonCal.NeonEndingCount(n);
 InterpolatedNeonFringeCount = NeonFringeCount + (NeonStartingPartialCount ./ NeonStartingCount) - (NeonEndingPartialCount ./ NeonEndingCount) ;
-metlaser                    = neonWL * InterpolatedNeonFringeCount ./ NeonCal.LaserFringeCount;
-metlaser                    = mean(metlaser)/2;
+wlaser                      = neonWL * InterpolatedNeonFringeCount ./ NeonCal.LaserFringeCount;
+wlaser                      = mean(wlaser)/2;
 
 mtime                       = datenum(0,0,NeonCal.TimeStamp.Days+dstart_1958,0,0,NeonCal.TimeStamp.msec/1000);
 

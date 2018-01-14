@@ -1,16 +1,16 @@
 %
 % NAME
-%   read_GCRSO - read CrIS GCRSO geo data and attributes
+%   read_SCRIS - read CrIS SCRIS SDR data and attributes
 %
 % SYNOPSIS
-%   [geo, agatt, attr4] = read_GCRSO(gfile, ndset)
+%   [sdr, agatt, attr4] = read_SCRIS(gfile, ndset)
 %
 % INPUT
-%   gfile    - h5 GCRSO (CrIS geo) filename
+%   gfile    - h5 SCRIS (CrIS SDR) filename
 %   ndset    - number of attr4 records, default is 15
 %
 % OUTPUTS
-%   geo      - struct with GCRSO data fields as arrays
+%   sdr      - struct with SCRIS data fields as arrays
 %   agatt    - aggregate attributes for the entire file
 %   attr4    - attributes for each 4-scan group
 %
@@ -23,10 +23,10 @@
 %   for 4-scan files.  The default value is 15 for 60-scan files.
 %
 % AUTHOR
-%   H. Motteler, 22 May 2012
+%   H. Motteler, 12 Jan 2018
 %
 
-function [geo, agatt, attr4] = read_GCRSO(gfile, ndset)
+function [sdr, agatt, attr4] = read_SCRIS(gfile, ndset)
 
 % ndset default is 15 for a 60-scan file
 if nargin < 2
@@ -34,33 +34,56 @@ if nargin < 2
 end
 
 % ---------------
-% return geo data
+% return sdr data
 % ---------------
-geo = struct;
-dpath = '/All_Data/CrIS-SDR-GEO_All';
+sdr = struct;
+dpath = '/All_Data/CrIS-SDR_All';
 
-dname{1} = 'FORTime';
-dname{2} = 'Height';
-dname{3} = 'Latitude';
-dname{4} = 'Longitude';
-dname{5} = 'MidTime';
-dname{6} = 'PadByte1';
-dname{7} = 'QF1_CRISSDRGEO';
-dname{8} = 'SCAttitude';
-dname{9} = 'SCPosition';
-dname{10} = 'SCVelocity';
-dname{11} = 'SatelliteAzimuthAngle';
-dname{12} = 'SatelliteRange';
-dname{13} = 'SatelliteZenithAngle';
-dname{14} = 'SolarAzimuthAngle';
-dname{15} = 'SolarZenithAngle';
-dname{16} = 'StartTime';
-nfields = 16;
+dname{1} = 'DS_SpectralStability';
+dname{2} = 'DS_Symmetry';
+dname{3} = 'DS_WindowSize';
+dname{4} = 'ES_ImaginaryLW';
+dname{5} = 'ES_ImaginaryMW';
+dname{6} = 'ES_ImaginarySW';
+dname{7} = 'ES_NEdNLW';
+dname{8} = 'ES_NEdNMW';
+dname{9} = 'ES_NEdNSW';
+dname{10} = 'ES_RDRImpulseNoise';
+dname{11} = 'ES_RealLW';
+dname{12} = 'ES_RealMW';
+dname{13} = 'ES_RealSW';
+dname{14} = 'ES_ZPDAmplitude';
+dname{15} = 'ES_ZPDFringeCount';
+dname{16} = 'ICT_SpectralStability';
+dname{17} = 'ICT_TemperatureConsistency';
+dname{18} = 'ICT_TemperatureStability';
+dname{19} = 'ICT_WindowSize';
+dname{20} = 'ES_NEdNSW';
+dname{21} = 'ES_RDRImpulseNoise';
+dname{22} = 'ES_RealLW';
+dname{23} = 'ES_RealMW';
+dname{24} = 'ES_RealSW';
+dname{25} = 'ES_ZPDAmplitude';
+dname{26} = 'ES_ZPDFringeCount';
+dname{27} = 'ICT_SpectralStability';
+dname{28} = 'ICT_TemperatureConsistency';
+dname{29} = 'ICT_TemperatureStability';
+dname{30} = 'ICT_WindowSize';
+dname{31} = 'MeasuredLaserWavelength';
+dname{32} = 'MonitoredLaserWavelength';
+dname{33} = 'NumberOfValidPRTTemps';
+dname{34} = 'QF1_SCAN_CRISSDR';
+dname{35} = 'QF2_CRISSDR';
+dname{36} = 'QF3_CRISSDR';
+dname{37} = 'QF4_CRISSDR';
+dname{38} = 'ResamplingLaserWavelength';
+dname{39} = 'SDRFringeCount';
+nfields = 39;
 
 % loop on fields, do the read
 for ix = 1 : nfields
   dval = h5read(gfile, [dpath, '/', dname{ix}]);
-  geo = setfield(geo, dname{ix}, dval);
+  sdr = setfield(sdr, dname{ix}, dval);
 end
 
 % quit if we're done
@@ -70,7 +93,7 @@ if nargout == 1, return, end
 % return aggregate attributes
 % ---------------------------
 agatt = struct;
-apath = '/Data_Products/CrIS-SDR-GEO/CrIS-SDR-GEO_Aggr';
+apath = '/Data_Products/CrIS-SDR/CrIS-SDR_Aggr';
 
 % selected attributes
 aname{1} = 'AggregateBeginningDate';
@@ -97,24 +120,24 @@ if nargout == 2, return, end
 % return 4-scan attributes
 % ------------------------
 attr4 = struct;
-apath = '/Data_Products/CrIS-SDR-GEO';
+apath = '/Data_Products/CrIS-SDR';
 
 % datasets in time order
-dset{1}  = 'CrIS-SDR-GEO_Gran_0';
-dset{2}  = 'CrIS-SDR-GEO_Gran_1';
-dset{3}  = 'CrIS-SDR-GEO_Gran_2';
-dset{4}  = 'CrIS-SDR-GEO_Gran_3';
-dset{5}  = 'CrIS-SDR-GEO_Gran_4';
-dset{6}  = 'CrIS-SDR-GEO_Gran_5';
-dset{7}  = 'CrIS-SDR-GEO_Gran_6';
-dset{8}  = 'CrIS-SDR-GEO_Gran_7';
-dset{9}  = 'CrIS-SDR-GEO_Gran_8';
-dset{10} = 'CrIS-SDR-GEO_Gran_9';
-dset{11} = 'CrIS-SDR-GEO_Gran_10';
-dset{12} = 'CrIS-SDR-GEO_Gran_11';
-dset{13} = 'CrIS-SDR-GEO_Gran_12';
-dset{14} = 'CrIS-SDR-GEO_Gran_13';
-dset{15} = 'CrIS-SDR-GEO_Gran_14';
+dset{1}  = 'CrIS-SDR_Gran_0';
+dset{2}  = 'CrIS-SDR_Gran_1';
+dset{3}  = 'CrIS-SDR_Gran_2';
+dset{4}  = 'CrIS-SDR_Gran_3';
+dset{5}  = 'CrIS-SDR_Gran_4';
+dset{6}  = 'CrIS-SDR_Gran_5';
+dset{7}  = 'CrIS-SDR_Gran_6';
+dset{8}  = 'CrIS-SDR_Gran_7';
+dset{9}  = 'CrIS-SDR_Gran_8';
+dset{10} = 'CrIS-SDR_Gran_9';
+dset{11} = 'CrIS-SDR_Gran_10';
+dset{12} = 'CrIS-SDR_Gran_11';
+dset{13} = 'CrIS-SDR_Gran_12';
+dset{14} = 'CrIS-SDR_Gran_13';
+dset{15} = 'CrIS-SDR_Gran_14';
 % ndset = 15;
 
 % selected attributes

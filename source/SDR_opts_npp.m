@@ -55,11 +55,12 @@ unix(['mkdir -p ', Sfull]);
 
 opts = struct;            % initialize opts
 opts.cal_fun = 'e7';      % calibration algorithm
-opts.version = cvers;     % current active CrIS
+opts.cvers = cvers;       % current active CrIS
 opts.inst_res = 'hires3'; % npp extended res mode
 opts.user_res = 'hires';  % high resolution user grid
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 opts.resamp = 4;          % resampling algorithm
+opts.neonWL = 703.44835;  % override eng Neon value
 
 % high-res SA inverse files
 opts.LW_sfile = '../inst_data/SAinv_HR3_Pn_LW.mat';

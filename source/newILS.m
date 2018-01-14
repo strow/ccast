@@ -39,8 +39,8 @@ if nargin == 5
 end
 
 % set integral parameters
-a  = inst.foax(ifov);   % FOV off-axis angle
-r2 = inst.frad(ifov);   % FOV radius
+a  = opts.foax(ifov);   % FOV off-axis angle
+r2 = opts.frad(ifov);   % FOV radius
 b = max(0, a - r2);     % min off-axis angle  
 d = a + r2 - b;         % integral angle span
 

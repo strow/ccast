@@ -27,10 +27,12 @@ switch srf_name
         fp.ppm = zeros(1,9);
       case 'MW'
         fp.s = sdef;
-        fp.d = [0 0];
+        fp.d = [0 0 0];
+        fp.ppm = zeros(1,9);
       case 'SW'
         fp.s = sdef;
         fp.d = [0 0 0];
+        fp.ppm = zeros(1,9);
     end
     fp = mod_fp(fp);
 %--------------------------------------------------------------  

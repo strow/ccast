@@ -48,9 +48,6 @@ function [rcal, vcal, nedn] = ...
 % calibration setup
 %-------------------
 
-% get the spectral space numeric filter
-inst.sNF = specNF(inst, opts.NF_file);
-
 % get key dimensions
 [nchan, n, k, nscan] = size(rcnt);
 
@@ -63,6 +60,9 @@ sp_nlc = ones(nchan, 9, 2) * NaN;
 it_nlc = ones(nchan, 9, 2) * NaN;
 es_sp = ones(nchan, 9, 30) * NaN;
 it_sp = ones(nchan, 9, 2) * NaN;
+
+% NLC setup
+nopt = nlc_opts(inst, eng, opts);
 
 % NEdN setup
 rICT = ones(nchan, 9, 2, nscan) * NaN;
@@ -121,8 +121,8 @@ for si = 1 : nscan
     j = mod(k, 2) + 1; % SP and IT index
 
     % do the SP and IT nonlinearity corrections
-    sp_nlc(:,:,j) = nlc_vec(inst, avgSP(:,:,j,si), avgSP(:,:,j,si), eng);
-    it_nlc(:,:,j) = nlc_vec(inst, avgIT(:,:,j,si), avgSP(:,:,j,si), eng);
+    sp_nlc(:,:,j) = nlc_vec(inst, avgSP(:,:,j,si), avgSP(:,:,j,si), nopt);
+    it_nlc(:,:,j) = nlc_vec(inst, avgIT(:,:,j,si), avgSP(:,:,j,si), nopt);
 
     % save the IT - SP difference
     it_sp(:, :, k) = it_nlc(:,:,j) - sp_nlc(:,:,j);
@@ -133,7 +133,7 @@ for si = 1 : nscan
     j = mod(iES, 2) + 1; % SP and IT index
 
     % do the ES nonlinearity correction
-    es_nlc = nlc_vec(inst, rcnt(:, :, iES, si), avgSP(:, :, j, si), eng);   
+    es_nlc = nlc_vec(inst, rcnt(:, :, iES, si), avgSP(:, :, j, si), nopt);   
 
     % save the ES - SP difference
     es_sp(:, :, iES) = es_nlc - sp_nlc(:, :, j);

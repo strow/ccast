@@ -54,7 +54,7 @@ opts.cctag = '20a';
 opts.ctmp = ctmp;
 
 % load an initial eng packet 
-load('../inst_data/j1_eng')
+load('../inst_data/j1_eng_v112')
 opts.eng = eng;
 
 %------------------

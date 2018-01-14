@@ -18,5 +18,8 @@ taskid = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 fprintf(1, 'SDR_j1: processing day %d, year %d, node %d\n', ...
             taskid, year, nodeid);
 
-SDR_opts_j1(taskid, year)
+% SDR_opts_j1(taskid, year)
+% SDR_default_j1(taskid, year)
+% SDR_testB_j1(taskid, year)
+  SDR_j1v2b_j1(taskid, year)
 

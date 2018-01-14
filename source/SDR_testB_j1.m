@@ -74,6 +74,17 @@ opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';
 % NEdN principal component filter
 opts.nedn_filt = '../inst_data/nedn_filt_HR.mat';
 
+if doy > 9
+  % use Harris v113 values
+  d1 = load('../inst_data/harris_v113')
+  opts.VinstLW = d1.VinstLW; 
+  opts.VinstMW = d1.VinstMW; 
+  opts.VinstSW = d1.VinstSW;
+  opts.cpLW = d1.cpLW;
+  opts.cpMW = d1.cpMW;
+  opts.cpSW = d1.cpSW;
+end
+
 %---------------------------------
 % take ccast L1a to L1b/SDR files
 %---------------------------------

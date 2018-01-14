@@ -10,7 +10,7 @@
 %   opts   - for now, everything else
 %
 % opts fields
-%  see defaults, below
+%  opts for metlaser, inst_params, calmain, checkSDR, and mvspan
 %   
 % OUTPUT
 %   SDR mat files
@@ -67,7 +67,7 @@ for fi = 1 : nfile
   end
 
   % get the current wlaser from the eng packet data
-  wlaser = metlaser(eng.NeonCal);
+  wlaser = metlaser(eng.NeonCal, opts);
   if isnan(wlaser)
     fprintf(1, 'rdr2sdr: no valid wlaser value, skipping file %s\n', rid)
     continue

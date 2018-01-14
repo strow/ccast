@@ -7,11 +7,9 @@ addpath ../source
 
 % inst_params options
 opts = struct;
-opts.version = 'snpp';
+opts.cvers  = 'npp';
 opts.user_res = 'hires';
-opts.inst_res = 'hi3odd';
-
-% newILS options
+opts.inst_res = 'hires3';
 opts.wrap = 'psinc n';
 
 % nominal wlaser value
@@ -19,16 +17,16 @@ wlaser = 773.1307;
 
 [foax, frad] = fp_v33a('LW');
 opts.foax = foax; opts.frad = frad;
-sfile = 'SAinv_HR3odd_Pn_LW.mat';
+sfile = 'SAinv_HR3_test_LW.mat';
 mkSAinv('LW', wlaser, sfile, opts);
 
 [foax, frad] = fp_v33a('MW');
 opts.foax = foax; opts.frad = frad;
-sfile = 'SAinv_HR3odd_Pn_MW.mat';
+sfile = 'SAinv_HR3_test_MW.mat';
 mkSAinv('MW', wlaser, sfile, opts);
 
 [foax, frad] = fp_v33a('SW');
 opts.foax = foax; opts.frad = frad;
-sfile = 'SAinv_HR3odd_Pn_SW.mat';
+sfile = 'SAinv_HR3_test_SW.mat';
 mkSAinv('SW', wlaser, sfile, opts);
 
