@@ -33,8 +33,8 @@ Lhome = '/asl/data/cris/ccast';  % L1a data
 Shome = '/asl/data/cris/ccast';  % SDR data
 
 % L1a and SDR directory names
-Ldir = sprintf('L1a_%s_s%02d', cvers, nscanSC);
-Sdir = sprintf('SDR_%s_s%02d', cvers, nscanSC);
+Ldir = sprintf('L1a%02d_%s_H4', nscanSC, cvers);
+Sdir = sprintf('sdr%02d_%s_HR', nscanSC, cvers);
 
 % full L1a and SDR paths
 dstr = sprintf('%03d', doy);

@@ -3,12 +3,16 @@ format changes
   4 Dec 2014 (doy 338) change from lowres to hires2
   2 Nov 2015 (doy 306) change from hires2 to hires3
   
-proposed ccast v20b dir names:
-  SDR_j01_s45_rL1    j1/cris2 45-scan high res SDR data
-  SDR_npp_s45_rH1   npp/cris1 45-scan high res SDR data
-  L1a_j01_s45_rH4    j1/cris2 45-scan high res mode 4 SDR data
-  L1a_npp_s45_rH3   npp/cris1 45-scan high res mode 3 SDR data
+ccast v20b directories
+  L1a45_j01_H4    j1/cris2 L1a 45-scan inst high res 4
+  L1a45_npp_H3   npp/cris1 L1a 45-scan inst high res 3
 
+  sdr45_j01_HR    j1/cris2 sdr 45-scan user high res
+  sdr45_npp_HR   npp/cris1 sdr 45-scan user high res
+
+  sdr45_j01_LR    j1/cris2 sdr 45-scan user low res
+  sdr45_npp_LR   npp/cris1 sdr 45-scan user low res
+    
 example runs
   sbatch --array=306-365%20 L1a_npp.sh 2018
   sbatch --array=349,354,361 SDR_j1.sh 2018

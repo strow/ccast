@@ -90,7 +90,7 @@ glist = [glist0(end-2:end); glist1];  % end-2 for 4-scan files
 
 % L1a output home
 Lhome = '/asl/data/cris/ccast';
-Ldir = sprintf('L1a_%s_s%02d', opts.cvers, nscanSC);
+Ldir = sprintf('L1a%02d_%s_H4', nscanSC, cvers);
 Lfull = fullfile(Lhome, Ldir, ys2, ds2);
 
 % create the output path, if needed

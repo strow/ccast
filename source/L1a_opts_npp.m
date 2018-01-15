@@ -33,8 +33,8 @@ nscanGeo = 60;  % used for initial file selection
 nscanSC = 45;   % used to define the SC granule format
 
 % NOAA RDR and GCRSO homes
-ghome = '/asl/data/cris/sdr60';
-rhome = '/asl/data/cris/rdr60';
+ghome = '/asl/data/cris/geo60_npp';
+rhome = '/asl/data/cris/rdr60_npp';
 
 % get a CCSDS temp filename
 jdir = getenv('JOB_SCRATCH_DIR');
@@ -84,7 +84,7 @@ glist = [glist0(end); glist1];
 
 % L1a output home
 Lhome = '/asl/data/cris/ccast';
-Ldir = sprintf('L1a_%s_s%02d', opts.cvers, nscanSC);
+Ldir = sprintf('L1a%02d_%s_H3', nscanSC, opts.cvers);
 Lfull = fullfile(Lhome, Ldir, ys1, ds1);
 
 % create the output path, if needed
