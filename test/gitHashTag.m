@@ -1,5 +1,5 @@
 % 
-% gitHashTag - return hash tag for the latest ccast repo
+% gitHashTag - latest hash tag from the current git repo
 %
 
 % some notes:

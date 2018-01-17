@@ -50,5 +50,5 @@ end
 fprintf(1, '\n')
 
 % save the SA inverse
-save(sfile, 'SAinv', 'inst');
+save(sfile, 'SAinv', 'inst', 'opts');
 

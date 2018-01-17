@@ -14,7 +14,7 @@
 %   to change options and paths.
 %
 
-function L1a_options(doy, year)
+function SDR_options(doy, year)
 
 % search paths
 addpath ../source
@@ -33,8 +33,8 @@ Lhome = '/asl/data/cris/ccast';  % L1a data
 Shome = '/asl/data/cris/ccast';  % SDR data
 
 % L1a and SDR directory names
-Ldir = sprintf('L1a%02d_%s_H4', nscanSC, cvers);
-Sdir = sprintf('sdr%02d_%s_HR', nscanSC, cvers);
+Ldir = sprintf('L1a%02d_%s_H3', nscanSC, cvers);
+Sdir = sprintf('sdr%02d_%s_H3', nscanSC, cvers);
 
 % full L1a and SDR paths
 dstr = sprintf('%03d', doy);

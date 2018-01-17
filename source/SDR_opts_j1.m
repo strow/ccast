@@ -45,7 +45,6 @@ Sfull = fullfile(Shome, Sdir, ystr, dstr);
 % L1a file list
 s1 = sprintf('CrIS_L1a_%s_s%02d_*.mat', cvers, nscanSC);
 flist = dir(fullfile(Lfull, s1));
-% flist = flist(53:end);    % *** TEST TEST TEST ***
 
 % create the output path, if needed
 unix(['mkdir -p ', Sfull]);
