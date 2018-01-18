@@ -11,15 +11,17 @@
 %   opts   - options struct
 %
 % opts fields
-%   see defaults, below
+%   see defaults, below.  ops.eng needs to something valid to get
+%   the initial bit trim mask
 %   
 % OUTPUT
 %   ccast L1a (plus Geo) mat files
 %
 % DISCUSSION
 %   RDR_to_L1a matches RDR and Geo obs (ES, SP, and IT FORs) with
-%   time slots in a regular L1b framework, taking into account the
-%   CrIS scan timing.
+%   the times of an L1b granule framework.  The granule frames start
+%   with the first full scan (ES 1) of the day and each granule has
+%   nscanSC scans.
 %
 %   The L1a variables are scLW, scMW, scSW, scTime, scGeo, and
 %   scMatch.  "SC" is for scan-order, and as a group these are
@@ -39,7 +41,6 @@ function RDR_to_L1a(rlist, glist, Ldir, opts)
 
 cvers = 'npp';  % for now, 'npp' or 'j01'
 cctag = 'xxx';  % ccast version or run tag
-eng = struct;   % *** this needs to be set in opts ***
 
 % MIT reader ccsds packet temp file
 ctmp = sprintf('ccsds_%04d.tmp', randi(9999));

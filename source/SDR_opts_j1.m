@@ -73,7 +73,7 @@ opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';
 % NEdN principal component filter
 opts.nedn_filt = '../inst_data/nedn_filt_HR.mat';
 
-if doy > 9
+if 10 <= doy && doy <= 17
   % use Harris v113 values
   d1 = load('../inst_data/harris_v113')
   opts.VinstLW = d1.VinstLW; 

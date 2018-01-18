@@ -4,7 +4,6 @@ ccast SDR format
 
 H. Motteler, 1 Mar 2015
 
-
 The ccast SDR files are saved in HDF 5 format with the Matlab
 "-v7.3" option, with HDF groups implementing the Matlab structs.
 Matlab users can access these with a simple "load" and HDF users
@@ -12,8 +11,8 @@ with standard tools and libs.  See the CrIS User's Guide [1] for
 background and details on the geo fields.
 
 
-Variables and structs
-----------------------
+Variable Summary
+-----------------
 
   rLW        nchan x 9 x 30 x nscan       LW radiance data
   rMW        nchan x 9 x 30 x nscan       MW radiance data
@@ -32,8 +31,9 @@ Variables and structs
   nSW            nchan x 9 x 2            SW NEdN estimate
 
   geo              structure              GCRSO geo values
-  scTime           34 x nscan             instrument time
   L1a_err          30 x nscan             L1a error flag
+  L1b_err        9 x 30 x nscan           L1b error flag
+  L1b_stat         structure              L1b status details
 
   userLW           structure              LW user params
   userMW           structure              MW user params
@@ -43,37 +43,37 @@ Variables and structs
   instMW           structure              MW sensor params
   instSW           structure              SW sensor params
 
-  sci              structure array        8-sec sci packets
-  eng              structure              4-min eng packet
+  sci              struct array           8-sec sci data
+  eng              structure              4-min eng data
   rid              string                 date/time string
+
+  scTime          34*nscan x 1            granule frame time
 
 
 Field definitions
 ------------------
 
 rLW, rMW, rSW - nchan x 9 x 30 x nscan arrays of calibrated
-radiances.  The second dimension is FOV index, and the third FOR
-index.  nchan is the CrIS user grid plus two "guard channels" at 
-the edges of each band.  nscan is typically 60 but can be less if
-there are gaps in the data.
+radiances.  The second dimension is FOV index and the third FOR
+index.  nchan is the CrIS user grid plus two guard channels at the
+edge of each band.  nscan is a configurable parameter, set to 45 
+for recent ccast data.
 
 cLW, cMW, cSW - nchan x 9 x 30 x nscan arrays of complex residuals.
-The interpretation may depend on the form of the calibration equation
 
 nLW, nMW, nSW - nchan x 9 x 2 NEdN estimates.  The last dimension is
-sweep direction.  These are computed once per granule, for both sweep  
-directions, and separately for each FOV.
+sweep direction.  These are computed once per granule, for each FOV.
 
-geo - geolocation data.  See [1] and the geo subsection, below.
+geo - geolocation data.  See the geo info below, and reference [1]
+for more detail.
 
 L1a_err - 30 x nscan array of L1a processing flags, 1 = bad, 0 = OK.
-If all the L1a_err flags from an RDR file are set, L1b processing is
-skipped and the L1a processing continues with the next file.
+This is currently simply copied from scMatch, from the L1a processing
 
-scTime - 34 x nscan array of instrument internal time, currently
-around 35 seconds behind real time.  This is IET time but returned
-here as milliseconds since 1958.  For most applications users will
-want geo.FORtime.
+L1b_err - 9 x 30 x nscan array of L1b/SDR processing flags, 1 = bad,
+0 = OK.
+
+L1b_stat - structure with a detailed breakout of L1b/SDR QC info.
 
 userLW, userMW, userSW - the user grid parameters, for each band.
 The sensor grid is translated to these specs.  The fields are
@@ -98,83 +98,53 @@ The derived parameters include
     freq    - instrument frequency grid
 
 sci - an array of structs with selected values from the 8-second
-"science" packets.  Mainly used for ICT modeling.
+(aka science) packets.  Mainly used for ICT modeling.
 
-eng - the most recent 4-minute "engineering" packet.  This includes
-instrument parameters and status--in total, more than 3000 values.
+eng - the most recent 4-minute (aka engineering) packet.  This
+includes instrument parameters and status--in total, more than 3000
+values.
 
-rid - a date and time string of the form dYYYYMMDD_tHHMMSSS taken
-from the RDR filename and used in the SDR filename.
+scTime - 34*nscan x 1 array of granule frame times.  Users should
+use the 30 x nscan array geo.FORTime for most applications.
+
+rid - a date and time string of the form dYYYYMMDD_tHHMMSSS, the
+start time of the L1a and SDR granules
 
 
 Geo fields
 -----------
 
-The ccast geo fields are as follows.  Field names and data types 
-are from the NOAA GCRSO format described in [1].  FORTime is field
-of regard (FOR) obs time, IET time in microseconds since 1958.
+The ccast geo field names and data types are from the NOAA GCRSO
+format described in [1].  Times are IET, microseconds since 1958.
 
-                  FORTime: [30x60 double]
-                   Height: [9x30x60 double]
-                 Latitude: [9x30x60 double]
-                Longitude: [9x30x60 double]
-                  MidTime: [60x1 double]
-                 PadByte1: [60x1 double]
-           QF1_CRISSDRGEO: [60x1 double]
-               SCAttitude: [3x60 double]
-               SCPosition: [3x60 double]
-               SCVelocity: [3x60 double]
-    SatelliteAzimuthAngle: [9x30x60 double]
-           SatelliteRange: [9x30x60 double]
-     SatelliteZenithAngle: [9x30x60 double]
-        SolarAzimuthAngle: [9x30x60 double]
-         SolarZenithAngle: [9x30x60 double]
-                StartTime: [60x1 double]
-
-The following are selected GCRSO attribute or attribute-derived
-fields
-            Asc_Desc_Flag: [60x1 double]
-             Orbit_Number: [60x1 double]
-               Granule_ID: [60x16 char]
-         Orbit_Start_Time: [60x1 double]
-
-The following are locally defined
-
-                  sdr_gid: [60x18 char]
-                  sdr_ind: [60x1 double]
-
-sdr_gid is a date and time string from the GCRSO file from which we
-found this scan, and sdr_ind is the scan index for that file.  These
-are mainly intended to make matchups with NOAA IDPS SDR data easy.
+               FORTime: [30 x nscan double]
+                Height: [9 x 30 x nscan single]
+              Latitude: [9 x 30 x nscan single]
+             Longitude: [9 x 30 x nscan single]
+               MidTime: [nscan x 1 double]
+              PadByte1: [nscan x 1 single]
+        QF1_CRISSDRGEO: [nscan x 1 single]
+            SCAttitude: [3 x nscan single]
+            SCPosition: [3 x nscan single]
+            SCVelocity: [3 x nscan single]
+ SatelliteAzimuthAngle: [9 x 30 x nscan single]
+        SatelliteRange: [9 x 30 x nscan single]
+  SatelliteZenithAngle: [9 x 30 x nscan single]
+     SolarAzimuthAngle: [9 x 30 x nscan single]
+      SolarZenithAngle: [9 x 30 x nscan single]
+             StartTime: [nscan x 1 double]
+         Asc_Desc_Flag: [nscan x 1 single] (GCRSO attribute)
+          Orbit_Number: [nscan x 1 single] (GCRSO attribute)
 
 
 Note on radiance data
 ----------------------
 
-Radiance data is at the user grid dv but includes two "guard
-channels" at the start and end of each CrIS band that extend the
-user grid.  These are included for compatibility with the NOAA 
-SDR format, fast models, and convolution codes, but are not really
-valid data because they are outside the passbands used for CrIS
-processing.
-
-
-Note on time fields
---------------------
-
-geo.FORTime is IET time for each FOR, from the NOAA GCRSO files.  
-scTime is instrument time.  This is from the CCSDS packet secondary
-headers (from the RDR files) where it is saved as days, ms/day, and
-us/ms.  The CCSDS/RDR to GCRSO time offset is currently
-
-  dtRDR  =  34817  =  34 * 1000 + 817  =  2817 + 4 * 8000 ms
-
-That is, we can represent it as 34 leap seconds plus an 817 ms
-offset, or as four scans plus an arbitrary shift of less than a
-scan.  To verify this I look at the phase of the RDR scan times.
-These make a distinct pattern--30 obs, slew, space look, slew, 
-ICT look, slew.  I used this to match times mod the scan number.
-Matching entire GCRSO/SDR and RDR scans is then relatively easy.
+Radiance data includes two "guard channels" at the start and end of
+each CrIS band that extend the user grid.  These are included for
+compatibility with the NOAA SDR format, fast models, and convolution
+codes, but are not really valid data because they may be outside the
+passbands used for CrIS processing.
 
 
 References

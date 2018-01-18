@@ -17,7 +17,7 @@ neonWL = NeonCal.NeonGasWavelength;
 % option to override eng Neon value
 if nargin == 2 && isfield(opts, 'neonWL')
 % fprintf(1, 'metlaser: setting neonWL from opts\n')
-  neonLW = opts.neonWL;
+  neonWL = opts.neonWL;
 end
 
 % Date start time
