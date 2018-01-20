@@ -10,16 +10,18 @@ g60dat = 'GCRSO_npp_d20180102_t1248319_e1256297_b32037_c20180102185629592831_noa
 g4file = fullfile(g4dir, g4dat);
 g60file = fullfile(g60dir, g60dat);
 
-[g4, a4, b4] = read_GCRSO(g4file, 1);
-Orbit_Number = ones(4, 1) * double([b4(:).N_Beginning_Orbit_Number]);
-Orbit_Number = Orbit_Number(:);
-Asc_Desc_Flag = ones(4, 1) * double([b4(:).Ascending_Descending_Indicator]);
-Asc_Desc_Flag = logical(Asc_Desc_Flag(:));
-whos Asc_Desc_Flag Orbit_Number
+[g4, a4, b4] = read_GCRSO(g4file);
 
-[g60, a60, b60] = read_GCRSO(g60file, 15);
-Orbit_Number = ones(4, 1) * double([b60(:).N_Beginning_Orbit_Number]);
-Orbit_Number = Orbit_Number(:);
-Asc_Desc_Flag = ones(4, 1) * double([b60(:).Ascending_Descending_Indicator]);
-Asc_Desc_Flag = logical(Asc_Desc_Flag(:));
-whos Asc_Desc_Flag Orbit_Number
+[g60, a60, b60] = read_GCRSO(g60file);
+
+attr4 = b60;
+attr4 = b4;
+
+atmp = ones(4,1) * single([attr4(:).N_Beginning_Orbit_Number]);
+Orbit_Number = atmp(:);
+
+atmp = ones(4,1) * single([attr4(:).Ascending_Descending_Indicator]);
+Asc_Desc_Flag = atmp(:);
+
+whos Orbit_Number Asc_Desc_Flag
+

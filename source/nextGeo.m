@@ -72,12 +72,18 @@ while no_data && gi < length(glist)
   fprintf(1, 'nextGeo: reading geo index %d file %s\n', gi, gid)
   gfile = fullfile(glist(gi).folder, glist(gi).name); 
   try 
-    geo = read_GCRSO(gfile);
+    [geo, agatt, attr4] = read_GCRSO(gfile);
   catch
     fprintf(1, 'nextGeo: error reading %s\n', gfile)
     fprintf(1, 'continuing with the next file...\n')
     continue
   end
+
+  % add selected attributes to the geo struct
+  atmp = ones(4,1) * single([attr4(:).N_Beginning_Orbit_Number]);
+  geo.Orbit_Number = atmp(:);
+  atmp = ones(4,1) * single([attr4(:).Ascending_Descending_Indicator]);
+  geo.Asc_Desc_Flag = atmp(:);
 
   % geoTime extends geo.FORTime ES times with IT and SP times
   [~, nscanGeo] = size(geo.FORTime);

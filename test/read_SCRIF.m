@@ -3,11 +3,10 @@
 %   read_SCRIS - read CrIS SCRIS SDR data and attributes
 %
 % SYNOPSIS
-%   [sdr, agatt, attr4] = read_SCRIS(gfile, ndset)
+%   [sdr, agatt, attr4] = read_SCRIS(gfile)
 %
 % INPUT
 %   gfile    - h5 SCRIS (CrIS SDR) filename
-%   ndset    - number of attr4 records, default is 15
 %
 % OUTPUTS
 %   sdr      - struct with SCRIS data fields as arrays
@@ -15,23 +14,14 @@
 %   attr4    - attributes for each 4-scan group
 %
 % DISCUSSION
-%   if attr4 or agattr are not needed, the function is much faster
-%   if they are not included in the output parameter list.  attr4 is
-%   particularly slow because it loops on attributes and h5 groups.
-%
-%   the ndset parameter should be set to 1 to read attr4 attributes
-%   for 4-scan files.  The default value is 15 for 60-scan files.
+%   if agatt or attr4 are not needed the function is faster if they
+%   are dropped from the output parameter list.
 %
 % AUTHOR
 %   H. Motteler, 12 Jan 2018
 %
 
-function [sdr, agatt, attr4] = read_SCRIS(gfile, ndset)
-
-% ndset default is 15 for a 60-scan file
-if nargin < 2
-  ndset = 15;
-end
+function [sdr, agatt, attr4] = read_SCRIS(gfile)
 
 % ---------------
 % return sdr data
@@ -138,7 +128,6 @@ dset{12} = 'CrIS-FS-SDR_Gran_11';
 dset{13} = 'CrIS-FS-SDR_Gran_12';
 dset{14} = 'CrIS-FS-SDR_Gran_13';
 dset{15} = 'CrIS-FS-SDR_Gran_14';
-% ndset = 15;
 
 % selected attributes
 aname{1} = 'Ascending/Descending_Indicator';
@@ -165,6 +154,9 @@ nfields = 19;
 % fix any non-matlab compatible field names
 bname = aname;
 bname{1} = 'Ascending_Descending_Indicator';
+
+% get the number of 4-scan granules
+ndset = agatt.AggregateNumberGranules;
 
 % loop on datasets and fields, do the reads
 for j = 1 : ndset

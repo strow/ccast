@@ -3,11 +3,10 @@
 %   read_GCRSO - read CrIS GCRSO geo data and attributes
 %
 % SYNOPSIS
-%   [geo, agatt, attr4] = read_GCRSO(gfile, ndset)
+%   [geo, agatt, attr4] = read_GCRSO(gfile)
 %
 % INPUT
 %   gfile    - h5 GCRSO (CrIS geo) filename
-%   ndset    - number of attr4 records, default is 15
 %
 % OUTPUTS
 %   geo      - struct with GCRSO data fields as arrays
@@ -15,23 +14,14 @@
 %   attr4    - attributes for each 4-scan group
 %
 % DISCUSSION
-%   if attr4 or agattr are not needed, the function is much faster
-%   if they are not included in the output parameter list.  attr4 is
-%   particularly slow because it loops on attributes and h5 groups.
-%
-%   the ndset parameter should be set to 1 to read attr4 attributes
-%   for 4-scan files.  The default value is 15 for 60-scan files.
+%   if agatt or attr4 are not needed the function is faster if they
+%   are dropped from the output parameter list.
 %
 % AUTHOR
 %   H. Motteler, 22 May 2012
 %
 
-function [geo, agatt, attr4] = read_GCRSO(gfile, ndset)
-
-% ndset default is 15 for a 60-scan file
-if nargin < 2
-  ndset = 15;
-end
+function [geo, agatt, attr4] = read_GCRSO(gfile)
 
 % ---------------
 % return geo data
@@ -142,6 +132,9 @@ nfields = 19;
 % fix any non-matlab compatible field names
 bname = aname;
 bname{1} = 'Ascending_Descending_Indicator';
+
+% get the number of 4-scan granules
+ndset = agatt.AggregateNumberGranules;
 
 % loop on datasets and fields, do the reads
 for j = 1 : ndset

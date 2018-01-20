@@ -11,8 +11,8 @@
 %   opts   - options struct
 %
 % opts fields
-%   see defaults, below.  ops.eng needs to something valid to get
-%   the initial bit trim mask
+%   see defaults, below.  ops.eng needs to be set and should be a
+%   valid eng struct, or at least have valid bit trim mask fields.
 %   
 % OUTPUT
 %   ccast L1a (plus Geo) mat files
@@ -242,19 +242,21 @@ function init_SC
   scSW = NaN(nchanSW, 9, 34, nscanSC);
 
   % set the SC geo buffer to undefined
-  scGeo.FORTime               = NaN(30,nscanSC);
-  scGeo.Height                = NaN(9,30,nscanSC);
-  scGeo.Latitude              = NaN(9,30,nscanSC);
-  scGeo.Longitude             = NaN(9,30,nscanSC);
-  scGeo.MidTime               = NaN(nscanSC);
-  scGeo.PadByte1              = NaN(nscanSC);
-  scGeo.QF1_CRISSDRGEO        = NaN(nscanSC);
-  scGeo.SatelliteAzimuthAngle = NaN(9,30,nscanSC);
-  scGeo.SatelliteRange        = NaN(9,30,nscanSC);
-  scGeo.SatelliteZenithAngle  = NaN(9,30,nscanSC);
-  scGeo.SolarAzimuthAngle     = NaN(9,30,nscanSC);
-  scGeo.SolarZenithAngle      = NaN(9,30,nscanSC);
-  scGeo.StartTime             = NaN(nscanSC);
+  scGeo.FORTime               = double(NaN(30,nscanSC));
+  scGeo.Height                = single(NaN(9,30,nscanSC));
+  scGeo.Latitude              = single(NaN(9,30,nscanSC));
+  scGeo.Longitude             = single(NaN(9,30,nscanSC));
+  scGeo.MidTime               = double(NaN(nscanSC,1));
+  scGeo.PadByte1              = single(NaN(nscanSC,1));
+  scGeo.QF1_CRISSDRGEO        = single(NaN(nscanSC,1));
+  scGeo.SatelliteAzimuthAngle = single(NaN(9,30,nscanSC));
+  scGeo.SatelliteRange        = single(NaN(9,30,nscanSC));
+  scGeo.SatelliteZenithAngle  = single(NaN(9,30,nscanSC));
+  scGeo.SolarAzimuthAngle     = single(NaN(9,30,nscanSC));
+  scGeo.SolarZenithAngle      = single(NaN(9,30,nscanSC));
+  scGeo.StartTime             = double(NaN(nscanSC,1));
+  scGeo.Asc_Desc_Flag         = single(NaN(nscanSC,1));
+  scGeo.Orbit_Number          = single(NaN(nscanSC,1));
 end
 
 % copy2sc - copies RDR ES, SP, and IT igm obs at Rbp and 
@@ -299,15 +301,17 @@ function copy2sc
     scGeo.Height(:,Sbr,Sbc)                = geo.Height(:,Gbr,Gbc);
     scGeo.Latitude(:,Sbr,Sbc)              = geo.Latitude(:,Gbr,Gbc);
     scGeo.Longitude(:,Sbr,Sbc)             = geo.Longitude(:,Gbr,Gbc);
-    scGeo.MidTime(Sbc)                     = geo.MidTime(Gbc);
-    scGeo.PadByte1(Sbc)                    = geo.PadByte1(Gbc);
-    scGeo.QF1_CRISSDRGEO(Sbc)              = geo.QF1_CRISSDRGEO(Gbc);
+    scGeo.MidTime(Sbc,1)                   = geo.MidTime(Gbc,1);
+    scGeo.PadByte1(Sbc,1)                  = geo.PadByte1(Gbc,1);
+    scGeo.QF1_CRISSDRGEO(Sbc)              = geo.QF1_CRISSDRGEO(Gbc,1);
     scGeo.SatelliteAzimuthAngle(:,Sbr,Sbc) = geo.SatelliteAzimuthAngle(:,Gbr,Gbc);
     scGeo.SatelliteRange(:,Sbr,Sbc)        = geo.SatelliteRange(:,Gbr,Gbc);
     scGeo.SatelliteZenithAngle(:,Sbr,Sbc)  = geo.SatelliteZenithAngle(:,Gbr,Gbc);
     scGeo.SolarAzimuthAngle(:,Sbr,Sbc)     = geo.SolarAzimuthAngle(:,Gbr,Gbc);
     scGeo.SolarZenithAngle(:,Sbr,Sbc)      = geo.SolarZenithAngle(:,Gbr,Gbc);
-    scGeo.StartTime(Sbc)                   = geo.StartTime(Gbc);
+    scGeo.StartTime(Sbc,1)                 = geo.StartTime(Gbc,1);
+    scGeo.Asc_Desc_Flag(Sbc,1)             = geo.Asc_Desc_Flag(Gbc,1);
+    scGeo.Orbit_Number(Sbc,1)              = geo.Orbit_Number(Gbc,1);
   end
 end
 
