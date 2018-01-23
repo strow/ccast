@@ -1,8 +1,8 @@
 
 top level wrappers
 -------------------
-L1a_opts_*  -  option wrapper to take RDR to L1a data
-SDR_opts_*  -  option wrapper take L1a to L1b/SDR data
+opts_L1a_*  -  option wrapper for RDR to L1a data
+opts_SDR_*  -  option wrapper for L1a to L1b/SDR data
 
 RDR and Geo to L1a 
 -------------------
@@ -23,11 +23,10 @@ checkSDR    - SDR validation
 
 current calmain versions
 -------------------------
-calmain_d2  - NOAA algorithm A4
-calmain_e5  - ccast ref algo 1, rIT after SA-1
-calmain_e6  - ccast ref algo 2, rIT before SA-1
-calmain_e7  - ccast ref algo 1 with resampling
-calmain_e8  - ccast ref algo 1 with resampling and new nlc
+calmain_a4  - NOAA algorithm A4, double FFT
+calmain_c5  - ccast ref algo 1, rIT after SA-1, double FFT
+calmain_c6  - ccast ref algo 2, rIT before SA-1, double FFT
+calmain_c7  - ccast ref algo 1, rIT after SA-1, resampling
 
 SRF tabulation
 ---------------

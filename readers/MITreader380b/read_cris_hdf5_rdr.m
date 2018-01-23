@@ -121,6 +121,9 @@ if 0
   DATA.diary_data=diary_data;
 end
 
+% close the packet file
+fclose(fid);
+
 % Delete the temp save file
 % if deleteTemp,
 %     delete(packetFile);

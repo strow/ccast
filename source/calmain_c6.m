@@ -1,16 +1,15 @@
 %
 % NAME
-%   calmain - main calibration procedure
+%   calmain_c6 - ccast ref algo 2, rIT before SA-1, double FFT
 %
 % SYNOPSIS
 %   [rcal, vcal, nedn] = ...
-%      calmain(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts);
+%     calmain_c6(inst, user, rcnt, avgIT, avgSP, sci, eng, geo, opts);
 %
 % INPUTS
 %   inst    - instrument params struct
 %   user    - user grid params struct
 %   rcnt    - nchan x 9 x 34 x nscan, rad counts
-%   stime   - 34 x nscan, rad count times
 %   avgIT   - nchan x 9 x 2 x nscan, moving avg IT rad count
 %   avgSP   - nchan x 9 x 2 x nscan, moving avg SP rad count
 %   sci     - struct array, data from 8-sec science packets
@@ -42,7 +41,7 @@
 %
 
 function [rcal, vcal, nedn] = ...
-     calmain(inst, user, rcnt, stime, avgIT, avgSP, sci, eng, geo, opts)
+  calmain_c6(inst, user, rcnt, avgIT, avgSP, sci, eng, geo, opts)
 
 %-------------------
 % calibration setup
@@ -81,6 +80,13 @@ end
 % get the SA inverse matrix
 Sinv = getSAinv(sfile, inst);
 
+% get the SA forward matrix
+[m, n, k] = size(Sinv);
+Sfwd = zeros(m, n, k);
+for i = 1 : 9
+  Sfwd(:, :, i) = inv(Sinv(:, :, i));
+end
+
 % get processing filter specs
 pL = inst.pL; pH = inst.pH; rL = inst.rL; rH = inst.rH;
 
@@ -90,13 +96,13 @@ pL = inst.pL; pH = inst.pH; rL = inst.rL; rH = inst.rH;
 
 for si = 1 : nscan 
  
-  % check that this row has some ES's 
-  if isnan(max(geo.FORTime(1:30, si)))
+  % check that this row has some ES's
+  if isnan(max(stime(1:30, si)))
     continue
   end
 
   % get index of the closest sci record
-  dt = abs(max(geo.FORTime(:, si)) - tai2iet(utc2tai([sci.time]/1000)));
+  dt = abs(max(stime(:, si)) - [sci.time]);
   ix = find(dt == min(dt));
 
   % get ICT temperature
@@ -139,15 +145,19 @@ for si = 1 : nscan
   % loop on FOVs
   for fi = 1 : 9
 
+    % unapodized expected radiance
+    rFOV = (Sfwd(:, :, fi) * B.total(:)) * ones(1, 30);
+
     % apply the bandpass and SA-1 transform
     t3 = squeeze(es_sp(:, fi, :));
     t4 = squeeze(it_sp(:, fi, :));
     t4 = reshape(t4(:) * ones(1, 15), nchan, 30);
     t3 = t3 ./ t4;
+    t3 = rFOV .* t3;
     t3 = bandpass(inst.freq, t3, pL, pH, rL, rH);
     t3 = Sinv(:,:,fi) * t3;
     t3 = bandpass(inst.freq, t3, pL, pH, rL, rH);
-    t3 = rIT .* t3;
+%   t3 = rIT .* t3;
     [t3, vcal] = finterp(t3, inst.freq, user.dv);
 
     % save the current nchan x 30 chunk

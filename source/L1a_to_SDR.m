@@ -123,14 +123,14 @@ for fi = 1 : nfile
   [avgMWSP, avgMWIT] = movavg_app(rcMW(:, :, 31:34, :), mvspan);
   [avgSWSP, avgSWIT] = movavg_app(rcSW(:, :, 31:34, :), mvspan);
 
-  [rLW, vLW, nLW] = calmain(instLW, userLW, rcLW, scTime, ...
-                            avgLWIT, avgLWSP, sci, eng, geo, opts);
+  [rLW, vLW, nLW] = ...
+    calmain(instLW, userLW, rcLW, avgLWIT, avgLWSP, sci, eng, geo, opts);
 
-  [rMW, vMW, nMW] = calmain(instMW, userMW, rcMW, scTime, ...
-                            avgMWIT, avgMWSP, sci, eng, geo, opts);
+  [rMW, vMW, nMW] = ...
+    calmain(instMW, userMW, rcMW, avgMWIT, avgMWSP, sci, eng, geo, opts);
 
-  [rSW, vSW, nSW] = calmain(instSW, userSW, rcSW, scTime, ...
-                            avgSWIT, avgSWSP, sci, eng, geo, opts);
+  [rSW, vSW, nSW] = ...
+    calmain(instSW, userSW, rcSW, avgSWIT, avgSWSP, sci, eng, geo, opts);
 
   clear rcLW rcMW rcSW
 

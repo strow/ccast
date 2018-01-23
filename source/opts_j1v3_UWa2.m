@@ -30,7 +30,7 @@ nscanSC = 45;   % scans per file
 
 % data home directories
 Lhome = '/asl/data/cris/ccast';  % L1a data
-Shome = '/asl/data/cris/ccast';  % SDR data
+Shome = '/asl/data/cris/ccast/j1v3_UWa2';  % SDR data
 
 % L1a and SDR directory names
 Ldir = sprintf('L1a%02d_%s_H4', nscanSC, cvers);
@@ -54,18 +54,18 @@ unix(['mkdir -p ', Sfull]);
 %-------------------------------
 
 opts = struct;            % initialize opts
-opts.cal_fun = 'e7';      % calibration algorithm
+opts.cal_fun = 'c7';      % calibration algorithm
 opts.cvers = cvers;       % current active CrIS
 opts.inst_res = 'hires4'; % j1 extended res mode
 opts.user_res = 'hires';  % high resolution user grid
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 opts.resamp = 4;          % resampling algorithm
-opts.neonWL = 703.44835;  % override eng Neon value
+opts.neonWL = 703.44835 * (1 - 1e-6);  % npp minus 1 ppm
 
 % high-res SA inverse files
-opts.LW_sfile = '../inst_data/SAinv_testB_HR4_LW.mat';
-opts.MW_sfile = '../inst_data/SAinv_testB_HR4_MW.mat';
-opts.SW_sfile = '../inst_data/SAinv_testB_HR4_SW.mat';
+opts.LW_sfile = '../inst_data/SAinv_j1v3_LW.mat';
+opts.MW_sfile = '../inst_data/SAinv_j1v3_MW.mat';
+opts.SW_sfile = '../inst_data/SAinv_j1v3_SW.mat';
 
 % time-domain FIR filter 
 opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';
@@ -83,6 +83,21 @@ if 10 <= doy && doy <= 17
   opts.cpMW = d1.cpMW;
   opts.cpSW = d1.cpSW;
 end
+
+% new UW a2 values
+a2tmp = [
+    0.0189   -0.0027    0.0012
+    0.0232    0.0018   -0.0015
+    0.0198   -0.0032   -0.0008
+    0.0173   -0.0022    0.0024
+    0.0310   -0.0009    0.0001
+    0.0113   -0.0008    0.0008
+    0.0108   -0.0028   -0.0025
+    0.0209   -0.0044   -0.0005
+    0.0107    0.1451    0.0048
+];
+opts.a2LW = a2tmp(:, 1)';
+opts.a2MW = a2tmp(:, 2)';
 
 %---------------------------------
 % take ccast L1a to L1b/SDR files

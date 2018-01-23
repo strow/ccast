@@ -54,7 +54,7 @@ unix(['mkdir -p ', Sfull]);
 %-------------------------------
 
 opts = struct;            % initialize opts
-opts.cal_fun = 'e7';      % calibration algorithm
+opts.cal_fun = 'c7';      % calibration algorithm
 opts.cvers = cvers;       % current active CrIS
 opts.inst_res = 'hires4'; % j1 extended res mode
 opts.user_res = 'hires';  % high resolution user grid
