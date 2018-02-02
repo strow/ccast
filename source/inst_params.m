@@ -11,7 +11,6 @@
 %   opts    - optional parameters
 % 
 % OPTS FIELDS
-%   cvers    - 'npp' (default), 'j01', 'j02', etc.
 %   inst_res - 'lowres' (default), 'hires1-4', 'hi3to2'
 %   user_res - 'lowres' (default), 'hires'
 %   pL, pH   - processing filter passband start and end freqs
@@ -39,7 +38,6 @@ band = upper(band);
 %----------
 % defaults
 %----------
-cvers = 'npp';
 inst_res = 'lowres';
 user_res = 'lowres';
 
@@ -62,20 +60,12 @@ end
 
 % apply recognized input options
 if nargin == 3
-  if isfield(opts, 'cvers'), cvers = opts.cvers; end
   if isfield(opts, 'inst_res'), inst_res = opts.inst_res; end
   if isfield(opts, 'user_res'), user_res = opts.user_res; end
   if isfield(opts, 'pL'), pL = opts.pL; end
   if isfield(opts, 'pH'), pH = opts.pH; end
   if isfield(opts, 'rL'), rL = opts.rL; end
   if isfield(opts, 'rH'), rH = opts.rH; end
-end
-
-% allow some alternate CrIS version names
-switch cvers
-  case 'snpp', cvers = 'npp';
-  case {'j1', 'j-1', 'jpss1', 'jpss-1'}, cvers = 'j01';
-  case {'j2', 'j-2', 'jpss2', 'jpss-2'}, cvers = 'j02';
 end
 
 %-----------
@@ -161,7 +151,6 @@ cind = [(cutpt+1:npts)' ; (1:cutpt)'];
 freq = dv * (cutpt:cutpt+npts-1)' + awidth * vbase;
 
 % instrument params
-inst.cvers   = cvers;
 inst.band    = band;
 inst.wlaser  = wlaser;
 inst.df      = df;

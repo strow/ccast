@@ -1,20 +1,20 @@
 %
-% SDR_options -- wrapper to process L1a to SDR data
+% opts_npp_LR - wrapper to process ccast L1a to SDR files
 %
 % SYNOPSIS
-%   SDR_options(doy, year)
+%   opts_npp_LR(year, doy)
 %
 % INPUTS
-%   day   - integer day of year
-%   year  - integer year, default is 2013
+%   year  - integer year
+%   doy   - integer day of year
 %
 % DISCUSSION
-%   wrapper script to set paths, files, and options for L1a_to_SDR,
-%   to process ccast L1a to SDR files.  It can be edited as needed
-%   to change options and paths.
+%   wrapper to set paths, files, and options to process ccast L1a
+%   to SDR files.  It can be edited as needed to change options and
+%   paths.  Processing is done by L1a_to_SDR.
 %
 
-function SDR_options(doy, year)
+function opts_npp_LR(year, doy)
 
 % search paths
 addpath ../source
@@ -54,8 +54,9 @@ unix(['mkdir -p ', Sfull]);
 %-------------------------------
 
 opts = struct;            % initialize opts
-opts.cal_fun = 'c5';      % calibration algorithm
 opts.cvers = cvers;       % current active CrIS
+opts.cal_fun = 'c5';      % calibration algorithm
+opts.nlc_alg = 'NPP';     % UW NPP nonlin corr alg
 opts.inst_res = 'hires3'; % npp extended res mode
 opts.user_res = 'lowres'; % low resolution user grid
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
@@ -73,7 +74,7 @@ opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';
 % NEdN principal component filter
 opts.nedn_filt = '../inst_data/nedn_filt_LR.mat';
 
-% 2016 UMBC a2 values
+% UMBC 2016 NPP a2 values
 opts.a2LW = [0.0175 0.0122 0.0137 0.0219 0.0114 0.0164 0.0124 0.0164 0.0305];
 opts.a2MW = [0.0016 0.0173 0.0263 0.0079 0.0093 0.0015 0.0963 0.0410 0.0016];
 

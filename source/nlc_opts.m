@@ -1,5 +1,5 @@
 %
-% nlc options from eng and opts structs, by band
+% nlc options from inst, eng, and opts structs, by band
 %
 
 function nopt = nlc_opts(inst, eng, opts)
@@ -19,14 +19,14 @@ end
 nopt.sNF = specNF(inst, opts.NF_file);
 
 % normalize NPP numeric filter to match UW-SSEC 2008 values
-if strcmp(inst.cvers, 'npp')
+if strcmp(opts.nlc_alg, 'NPP')
   switch upper(inst.band)
     case 'LW',  nopt.sNF = 1.6047 * nopt.sNF ./ max(nopt.sNF);
     case 'MW',  nopt.sNF = 0.9826 * nopt.sNF ./ max(nopt.sNF);
     case 'SW',  nopt.sNF = 0.2046 * nopt.sNF ./ max(nopt.sNF);
   end
-elseif ~strcmp(inst.cvers, 'j01')
-  error(['bad value for inst.cvers ', inst.cvers])
+elseif ~strcmp(opts.nlc_alg, 'ATBD')
+  error(['bad value for nlc_alg ', opts.nlc_alg])
 end
 
 % nlc params from eng
