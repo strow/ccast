@@ -1,10 +1,12 @@
 %
-% compare UW NPP (old) and ATBD (new) nonlinearity algorithms using
-% the same set of UW weights
+% compare UW NPP and UMBC ATBD nonlinearity correction algorithms
 %
 
-d1 = load('a2_algo_3/a2v4_old');
-d2 = load('a2_algo_3/a2v4_new');
+addpath ../motmsc/utils
+addpath ../source
+
+d1 = load('a2v4_set_3/a2v4_ref');
+d2 = load('atbd_set_3/atbd_ref');
 
 vLW = d1.vLW;
 vMW = d1.vMW;
@@ -36,11 +38,13 @@ grid on; zoom on
 subplot(2,1,2)
 plot(vLW, bLW2 - refLW2)
 axis([650, 1100, -s, s])
-title('LW all FOVs minus ref, ATBD, a2v4 weights')
+title('LW all FOVs minus ref, ATBD, UMBC v1 weights')
 legend(fovnames, 'location', 'south', 'orientation', 'horizontal')
 xlabel('wavenumber')
 ylabel('dTb, K')
 grid on; zoom on
+
+saveas(gcf, 'nonlin_cmp_LW_2', 'fig')
 
 % --- MW comparison plot ---
 figure(2); clf
@@ -48,7 +52,8 @@ set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 set(gcf, 'DefaultAxesColorOrder', fovcolors);
 subplot(2,1,1)
 plot(vMW, bMW1 - refMW1)
-axis([1200, 1760, -0.6, 1.2])
+s = 0.3;
+axis([1200, 1760, -s, s])
 title('MW all FOVs minus ref, UW NPP, a2v4 weights')
 legend(fovnames, 'location', 'south', 'orientation', 'horizontal')
 xlabel('wavenumber')
@@ -57,10 +62,12 @@ grid on; zoom on
 
 subplot(2,1,2)
 plot(vMW, bMW2 - refMW2)
-axis([1200, 1760, -0.6, 1.2])
-title('MW all FOVs minus ref, ATBD, a2v4 weights')
+axis([1200, 1760, -s, s])
+title('MW all FOVs minus ref, ATBD, UMBC v1 weights')
 legend(fovnames, 'location', 'south', 'orientation', 'horizontal')
 xlabel('wavenumber')
 ylabel('dTb, K')
 grid on; zoom on
+
+saveas(gcf, 'nonlin_cmp_MW_2', 'fig')
 

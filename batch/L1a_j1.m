@@ -18,5 +18,5 @@ taskid = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 fprintf(1, 'L1a_npp: processing day %d, year %d, node %d\n', ...
             taskid, year, nodeid);
 
-opts_L1a_j1(taskid, year)
+opts_j1_L1a(year, taskid)
 

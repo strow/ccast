@@ -1,0 +1,20 @@
+
+nonlinearity tests and fitting
+-------------------------------
+
+atbd.m - UMBC ATBD v1 a2 values
+a2v4.m - UW NPP a2v4 a2 values
+
+cris_fov_means - mean and std Tb of CrIS obs, by FOV
+do_fov_means - driver for cris_fov_means
+
+a2v4_a2_mins - find UW NPP a2 values to minimize residuals vs ref
+atbd_a2_mins - find UMBC ATBD a2 values to minimize residuals vs ref
+cmp_a2_algos - compare UW NPP and UMBC ATBD nonlinearity corrections
+cmp_a2v4_MW  - compare a2 values for the MW FOV 9 UW NPP correction
+cmp_atbd_MW  - compare a2 values for the MW FOV 9 ATBD correction
+
+cmp_a2_refs  - compare LW reference values for an a2 test set 
+nonlin_da_dt - get and apply da2/dTb to adjust a2 weights
+regr_corr    - try applying a regression corr to nonlinear FOVs
+

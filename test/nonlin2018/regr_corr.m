@@ -1,3 +1,6 @@
+%
+% quick test of applying a regression corrections to nonlinear FOVs
+%
 
 addpath ../motmsc/utils
 
