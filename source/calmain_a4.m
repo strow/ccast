@@ -1,54 +1,41 @@
 %
 % NAME
-%   calmain_a4 - NOAA algorithm A4 with double FFT
+%   calmain_a4 - NOAA algorithm A4 with resampling
 %
 % SYNOPSIS
 %   [rcal, vcal, nedn] = ...
-%     calmain(inst, user, rcnt, avgIT, avgSP, sci, eng, geo, opts);
+%     calmain_a4(inst, user, rcnt, avgIT, avgSP, sci, eng, geo, opts);
 %
 % INPUTS
 %   inst    - instrument params struct
 %   user    - user grid params struct
-%   rcnt    - nchan x 9 x 34 x nscan, rad counts
-%   avgIT   - nchan x 9 x 2 x nscan, moving avg IT rad count
-%   avgSP   - nchan x 9 x 2 x nscan, moving avg SP rad count
+%   rcnt    - n x 9 x 34 x nscan, ES rad count
+%   avgIT   - n x 9 x 2 x nscan, moving avg IT rad count
+%   avgSP   - n x 9 x 2 x nscan, moving avg SP rad count
 %   sci     - struct array, data from 8-sec science packets
 %   eng     - struct, most recent engineering packet
-%   geo     - struct, GCRSO fields from geo_match
+%   geo     - struct, GCRSO geo fields from ccast L1a
 %   opts    - for now, everything else
 %
 % OUTPUTS
-%   rcal    - nchan x 9 x 30 x nscan, calibrated radiance
-%   vcal    - nchan x 1 frequency grid
-%   nedn    - nchan x 2 NEdN estimates
+%   rcal    - m x 9 x 30 x nscan, calibrated radiance
+%   vcal    - m x 1 frequency grid
+%   nedn    - m x 2 NEdN estimates
 %
 % DISCUSSION
-%   The calibration equation is
-%
-%     r_obs = F * r_ict * f * SA-1 * f * (ES-SP)/(ICT-SP)
-%
-%   r_obs - calibrated radiance at the user grid
-%   F     - fourier interpolation to the user grid
-%   r_ict - expected ICT radiance at the sensor grid
-%   f     - raised-cosine bandpass filter
-%   SA-1  - inverse of the ILS matrix
-%   ES    - earth-scene count spectra
-%   IT    - calibration target count spectra
-%   SP    - space-look count spectra
+%   see ccast/doc/ccast_eqns for an overview of different forms of
+%   the calibration equations.
 %
 % AUTHOR
 %   H. Motteler, 26 Apr 2012
 %
 
 function [rcal, vcal, nedn] = ...
-  calmain(inst, user, rcnt, avgIT, avgSP, sci, eng, geo, opts)
+  calmain_a4(inst, user, rcnt, avgIT, avgSP, sci, eng, geo, opts)
 
 %-------------------
 % calibration setup
 %-------------------
-
-% get the spectral space numeric filter
-inst.sNF = specNF(inst, opts.NF_file);
 
 % get key dimensions
 [nchan, n, k, nscan] = size(rcnt);
@@ -63,6 +50,9 @@ it_nlc = ones(nchan, 9, 2) * NaN;
 es_sp = ones(nchan, 9, 30) * NaN;
 it_sp = ones(nchan, 9, 2) * NaN;
 
+% NLC setup
+nopt = nlc_opts(inst, eng, opts);
+
 % NEdN setup
 rICT = ones(nchan, 9, 2, nscan) * NaN;
 sp_all = rcnt(:, :, 31:32, :);
@@ -70,20 +60,16 @@ it_all = rcnt(:, :, 33:34, :);
 sp_mean = nanmean(sp_all, 4);
 it_mean = nanmean(it_all, 4);
 
-% select band-specific options
-switch inst.band
-  case 'LW', sfile = opts.LW_sfile; bi = 1;
-  case 'MW', sfile = opts.MW_sfile; bi = 2;
-  case 'SW', sfile = opts.SW_sfile; bi = 3;
-end
+% get the SA inverse matrix
+Sinv = getSAinv(inst, opts);
 
-% NOAA processing filters
-pfilt = f_atbd(bi, 1:inst.npts, 'noaa3');
+% NOAA processing filter
+pfilt = f_atbd(inst);
 pfilt2 = pfilt(:) * ones(1, 2);
 pfilt30 = pfilt(:) * ones(1, 30);
 
-% get the SA inverse matrix
-Sinv = getSAinv(sfile, inst);
+% build the resampling matrix
+[R, vcal] = resamp(inst, user, opts.resamp);
 
 %---------------
 % loop on scans
@@ -91,22 +77,21 @@ Sinv = getSAinv(sfile, inst);
 
 for si = 1 : nscan 
  
-  % check that this row has some ES's
-  if isnan(max(stime(1:30, si)))
+  % check that this row has some ES's 
+  if isnan(max(geo.FORTime(1:30, si)))
     continue
   end
 
   % get index of the closest sci record
-  dt = abs(max(stime(:, si)) - [sci.time]);
-  ix = find(dt == min(dt));
-  sci_ICT = sci(ix);
+  dt = abs(max(geo.FORTime(:, si)) - tai2iet(utc2tai([sci.time]/1000)));
+  ic = find(dt == min(dt));
 
   % get ICT temperature
-  T_ICT = (sci(ix).T_PRT1 + sci(ix).T_PRT2) / 2;
+  T_ICT = (sci(ic).T_PRT1 + sci(ic).T_PRT2) / 2;
 
   % get expected ICT radiance at the user grid
   ugrid = cris_ugrid(user, 4);
-  B = ICTradModel(inst.band, ugrid, T_ICT, sci_ICT, eng.ICT_Param, ...
+  B = ICTradModel(inst.band, ugrid, T_ICT, sci(ic), eng.ICT_Param, ...
                   1, NaN, 1, NaN);
 
   % copy rIT across 30 columns
@@ -121,8 +106,8 @@ for si = 1 : nscan
     j = mod(k, 2) + 1; % SP and IT index
 
     % do the SP and IT nonlinearity corrections
-    sp_nlc(:,:,j) = nlc_vec(inst, avgSP(:,:,j,si), avgSP(:,:,j,si), eng);
-    it_nlc(:,:,j) = nlc_vec(inst, avgIT(:,:,j,si), avgSP(:,:,j,si), eng);
+    sp_nlc(:,:,j) = nlc_vec(inst, avgSP(:,:,j,si), avgSP(:,:,j,si), nopt);
+    it_nlc(:,:,j) = nlc_vec(inst, avgIT(:,:,j,si), avgSP(:,:,j,si), nopt);
 
     % save the IT - SP difference
     it_sp(:, :, k) = it_nlc(:,:,j) - sp_nlc(:,:,j);
@@ -133,7 +118,7 @@ for si = 1 : nscan
     j = mod(iES, 2) + 1; % SP and IT index
 
     % do the ES nonlinearity correction
-    es_nlc = nlc_vec(inst, rcnt(:, :, iES, si), avgSP(:, :, j, si), eng);   
+    es_nlc = nlc_vec(inst, rcnt(:, :, iES, si), avgSP(:, :, j, si), nopt);   
 
     % save the ES - SP difference
     es_sp(:, :, iES) = es_nlc - sp_nlc(:, :, j);
@@ -148,7 +133,8 @@ for si = 1 : nscan
     t4 = m2 .* pfilt2;
     t4 = Sinv(:,:,fi) * t4;
     t4 = t4 .* pfilt2;
-    [t4, vcal] = finterp(t4, inst.freq, user.dv);
+%   [t4, vcal] = finterp(t4, inst.freq, user.dv);
+    t4 = R * t4;
     t4 = reshape(t4(:) * ones(1, 15), length(vcal), 30);
 
     % process ES - SP
@@ -159,15 +145,18 @@ for si = 1 : nscan
     t3 = t3 .* pfilt30;
     t3 = Sinv(:,:,fi) * t3;
     t3 = t3 .* pfilt30;
-    [t3, vcal] = finterp(t3, inst.freq, user.dv);
+%   [t3, vcal] = finterp(t3, inst.freq, user.dv);
+    t3 = R * t3;
 
+    % take the overall ratio
     t3 = t3 ./ t4;
 
+    % scale the ratio by rIT
     [ix, jx] = seq_match(ugrid, vcal);
     t3 = rIT(ix, :) .* t3(jx, :);
-    vcal = vcal(jx);
+    vusr = vcal(jx);
 
-    % save the current nchan x 30 chunk
+    % save the current mchan x 30 chunk
     [n, k] = size(t3);
     mchan = min(n, nchan);
     rcal(1:mchan, fi, :, si) = t3(1:mchan, :);
@@ -178,8 +167,8 @@ for si = 1 : nscan
   % IT calibration (for NEdN)
   %---------------------------
 
-  % compute predicted radiance from ICT
-  B = ICTradModel(inst.band, inst.freq, T_ICT, sci_ICT, eng.ICT_Param, ...
+  % get expected ICT radiance at the sensor grid
+  B = ICTradModel(inst.band, inst.freq, T_ICT, sci(ic), eng.ICT_Param, ...
                   1, NaN, 1, NaN);
   
   % copy rIT across 2 columns
@@ -196,10 +185,11 @@ for si = 1 : nscan
     rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
     rtmp = rIT(:, 1:2) .* (Sinv(:,:,fi) * rtmp);
     rtmp = bandpass(inst.freq, rtmp, user.v1, user.v2, user.vr);
-    [rtmp, it_vcal] = finterp(rtmp, inst.freq, user.dv);
+%   [rtmp, it_vcal] = finterp(rtmp, inst.freq, user.dv);
+    rtmp = R * rtmp;
 
     % save the current nchan x 2 chunk
-    rICT(1:mchan, fi, :, si) = rtmp(1:mchan, :);
+    rICT(1:mchan, fi, :, si) = rtmp(jx, :);
 
   end
 end
@@ -209,7 +199,7 @@ end
 %-----------
 
 % trim outputs to interpolated channel set
-vcal = vcal(1:mchan);
+vcal = vusr(1:mchan);
 rcal = rcal(1:mchan, :, :, :);
 rICT = rICT(1:mchan, :, :, :);
 

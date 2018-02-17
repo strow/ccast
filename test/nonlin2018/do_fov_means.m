@@ -5,15 +5,12 @@
 addpath ../source
 addpath ../motmsc/utils
 
-dout = 'a2v4_set_3';
-
-% tlist = {'atbd_m05', 'atbd_m10', 'atbd_m15', 'atbd_m20', ...
-%          'atbd_p05', 'atbd_p10', 'atbd_p15', 'atbd_p20', 'atbd_ref'};
-
-  tlist = {'a2v4_m10', 'a2v4_m20', ...
-           'a2v4_p05', 'a2v4_p10', 'a2v4_p20'};
+dout = 'a2v4_set_5';
 
 % tlist = {'a2v4_ref'};
+
+  tlist = {'a2v4_m05', 'a2v4_m10', 'a2v4_m15', 'a2v4_m20', ...
+           'a2v4_p05', 'a2v4_p10', 'a2v4_p15', 'a2v4_p20', 'a2v4_ref'};
 
 tdir2 = 'sdr45_j01_HR';
 chome = '/asl/data/cris/ccast';

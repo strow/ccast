@@ -4,7 +4,7 @@
 
 addpath ../motmsc/utils
 
-tdir = 'a2v4_set_1';
+tdir = 'a2v4_set_2';
 
 % list of test runs
 tlist = {
@@ -50,8 +50,8 @@ k = iref;
 brefMW = sum(btabMW(:,1:8,k),2) / 8;
 
 % frequency fit interval
-% ixLW =  700 <= vLW & vLW <= 1000;
-  ixLW =  690 <= vLW & vLW <= 730;
+% ixLW =  690 <= vLW & vLW <= 730;
+  ixLW =  700 <= vLW & vLW <= 1000;
   ixMW = 1250 <= vMW & vMW <= 1700;
 
 % search setup
@@ -108,15 +108,15 @@ a2tmp = [
 a2LW = a2tmp(:, 1);
 a2MW = a2tmp(:, 2);
 a2tmpLW = a2tmp(:, 1) .* wlist(iminLW);
-a2tmpMW = a2tmp(:, 2) .* wlist(iminMW)
+a2tmpMW = a2tmp(:, 2) .* wlist(iminMW);
 
 % old value btab at iref
 boldLW = btabLW(:,:,iref);
 boldMW = btabMW(:,:,iref);
 
-% save(fullfile(tdir, 'a2vals'), 'a2tmpLW', 'a2tmpMW');
+save(fullfile(tdir, 'a2vals'), 'a2tmpLW', 'a2tmpMW');
 
-% ---- plot ATBD a2 weights ----
+% ---- plot a2v4 and new weights ----
 figure(1); clf
 subplot(2,1,1)
 bar([a2LW, a2tmpLW])
@@ -138,7 +138,7 @@ grid on; zoom on
 
 % --- LW current and test comparison
 figure(2); clf
-set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 set(gcf, 'DefaultAxesColorOrder', fovcolors);
 s = 0.2; % y-axis scale
 subplot(2,1,1)
@@ -161,7 +161,7 @@ grid on; zoom on
 
 % --- MW current and test comparison
 figure(3); clf
-set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
+% set(gcf, 'Units','centimeters', 'Position', [4, 10, 24, 16])
 set(gcf, 'DefaultAxesColorOrder', fovcolors);
 s = 0.2; % y-axis scale
 subplot(2,1,1)

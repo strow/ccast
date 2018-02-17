@@ -1,6 +1,6 @@
 %
 % NAME
-%   calmain_c5 - ccast ref algo 1, rIT after SA-1, double FFT
+%   calmain_c5 - ccast algorithm 1 with double Fourier interpolation
 %
 % SYNOPSIS
 %   [rcal, vcal, nedn] = ...
@@ -9,32 +9,22 @@
 % INPUTS
 %   inst    - instrument params struct
 %   user    - user grid params struct
-%   rcnt    - nchan x 9 x 34 x nscan, rad counts
-%   avgIT   - nchan x 9 x 2 x nscan, moving avg IT rad count
-%   avgSP   - nchan x 9 x 2 x nscan, moving avg SP rad count
+%   rcnt    - n x 9 x 34 x nscan, rad counts
+%   avgIT   - n x 9 x 2 x nscan, moving avg IT rad count
+%   avgSP   - n x 9 x 2 x nscan, moving avg SP rad count
 %   sci     - struct array, data from 8-sec science packets
 %   eng     - struct, most recent engineering packet
-%   geo     - struct, GCRSO fields from geo_match
+%   geo     - struct, GCRSO geo fields from ccast L1a
 %   opts    - for now, everything else
 %
 % OUTPUTS
-%   rcal    - nchan x 9 x 30 x nscan, calibrated radiance
-%   vcal    - nchan x 1 frequency grid
-%   nedn    - nchan x 2 NEdN estimates
+%   rcal    - m x 9 x 30 x nscan, calibrated radiance
+%   vcal    - m x 1 frequency grid
+%   nedn    - m x 2 NEdN estimates
 %
 % DISCUSSION
-%   The calibration equation is
-%
-%     r_obs = F * r_ict * f * SA-1 * f * (ES-SP)/(ICT-SP)
-%
-%   r_obs - calibrated radiance at the user grid
-%   F     - fourier interpolation to the user grid
-%   r_ict - expected ICT radiance at the sensor grid
-%   f     - raised-cosine bandpass filter
-%   SA-1  - inverse of the ILS matrix
-%   ES    - earth-scene count spectra
-%   IT    - calibration target count spectra
-%   SP    - space-look count spectra
+%   see ccast/doc/ccast_eqns for an overview of different forms of
+%   the calibration equations.
 %
 % AUTHOR
 %   H. Motteler, 26 Apr 2012
@@ -70,15 +60,8 @@ it_all = rcnt(:, :, 33:34, :);
 sp_mean = nanmean(sp_all, 4);
 it_mean = nanmean(it_all, 4);
 
-% select band-specific options
-switch inst.band
-  case 'LW', sfile = opts.LW_sfile;
-  case 'MW', sfile = opts.MW_sfile;
-  case 'SW', sfile = opts.SW_sfile;
-end
-
 % get the SA inverse matrix
-Sinv = getSAinv(sfile, inst);
+Sinv = getSAinv(inst, opts);
 
 % get processing filter specs
 pL = inst.pL; pH = inst.pH; rL = inst.rL; rH = inst.rH;
@@ -96,13 +79,13 @@ for si = 1 : nscan
 
   % get index of the closest sci record
   dt = abs(max(geo.FORTime(:, si)) - tai2iet(utc2tai([sci.time]/1000)));
-  ix = find(dt == min(dt));
+  ic = find(dt == min(dt));
 
   % get ICT temperature
-  T_ICT = (sci(ix).T_PRT1 + sci(ix).T_PRT2) / 2;
+  T_ICT = (sci(ic).T_PRT1 + sci(ic).T_PRT2) / 2;
 
   % get expected ICT radiance at the sensor grid
-  B = ICTradModel(inst.band, inst.freq, T_ICT, sci(ix), eng.ICT_Param, ...
+  B = ICTradModel(inst.band, inst.freq, T_ICT, sci(ic), eng.ICT_Param, ...
                   1, NaN, 1, NaN);
 
   % copy rIT across 30 columns

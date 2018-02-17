@@ -70,15 +70,8 @@ it_all = rcnt(:, :, 33:34, :);
 sp_mean = nanmean(sp_all, 4);
 it_mean = nanmean(it_all, 4);
 
-% select band-specific options
-switch inst.band
-  case 'LW', sfile = opts.LW_sfile;
-  case 'MW', sfile = opts.MW_sfile;
-  case 'SW', sfile = opts.SW_sfile;
-end
-
 % get the SA inverse matrix
-Sinv = getSAinv(sfile, inst);
+Sinv = getSAinv(inst, opts);
 
 % get the SA forward matrix
 [m, n, k] = size(Sinv);
@@ -100,7 +93,8 @@ rcal = NaN(m,9,30,nscan);
 nedn = NaN(m,9,2);
 
 % pick a band for tests
-if ~strcmp(inst.band, 'LW'), return, end;
+% if ~strcmp(inst.band, 'LW'), return, end;
+  if ~strcmp(inst.band, 'SW'), return, end;
 display([inst.band, ' ', datestr(iet2dnum(geo.FORTime(1)))])
 
 % loop on sweep directions
@@ -136,17 +130,30 @@ for k = 1 : 2
     rcor(:, fi) = Sinv(:,:,fi) * rdif(:,fi);
   end
 
-  % normalize the corrected difference
-  rcor = rcor ./ mean(abs(rcor));
+  % divide out by Planck function
+  r280K = bt2rad(inst.freq, 280) * ones(1,9);
+  rcor = rcor ./ r280K;
 
-  plot(inst.freq, abs(rcor))
-% plot(inst.freq, abs(rin - rsp))
-  legend(fovnames, 'location', 'northeast')
+  % normalize the corrected difference
+  rcor = rcor ./ max(abs(rcor));
+
+  figure(1); clf
   set(gcf, 'DefaultAxesColorOrder', fovcolors);
-  title('IT - SP mean over 1 granule')
+  plot(inst.freq, abs(rcor))
+% axis([600, 1160, 0, 1.1])
+  axis([2100, 2600, 0, 1.1])
+  title([opts.cvers, ' ', inst.band, ' optical responsivity'])
+  legend(fovnames, 'location', 'south')
   xlabel('wavenumber')
-  ylabel('volts')
+  ylabel('weight')
   grid on
+
+% d2 = load('/home/motteler/cris/cris_test/resp_filt.mat');
+% hold on
+% plot(d2.freq_lw, d2.filt_lw / max(d2.filt_lw), 'linewidth', 2)
+% axis([600, 1160, 0, 1.1])
+% hold off
+
 % saveas(gcf, 'IT_minus_SP_SA_norm', 'png')
 
   keyboard

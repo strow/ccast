@@ -4,7 +4,7 @@
 
 addpath ../motmsc/utils
 
-tdir = 'atbd_set_3';
+tdir = 'atbd_set_1';
 
 % list of test runs
 tlist = {
@@ -50,8 +50,8 @@ k = iref;
 brefMW = sum(btabMW(:,1:8,k),2) / 8;
 
 % frequency fit interval
+% ixLW =  690 <= vLW & vLW <= 730;
   ixLW =  700 <= vLW & vLW <= 1000;
-% ixLW =  700 <= vLW & vLW <= 800;
   ixMW = 1250 <= vMW & vMW <= 1700;
 
 % search setup
