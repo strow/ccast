@@ -18,8 +18,7 @@ taskid = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 fprintf(1, 'SDR_j1: processing day %d, year %d, node %d\n', ...
             taskid, year, nodeid);
 
-% opts_j1_HR(year, taskid)
-% opts_atbd_ref(year, taskid)
-  opts_a2v4_ref(year, taskid)
-% opts_noaa_a4(year, taskid)
+% opts_j1v4_HR(year, taskid)
+% opts_j1_LR(year, taskid)
+  opts_j1_HR(year, taskid)
 

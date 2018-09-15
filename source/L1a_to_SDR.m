@@ -7,7 +7,7 @@
 % INPUTS
 %   flist  - list of L1b mat files
 %   sdir   - directory for SDR output files
-%   opts   - for now, everything else
+%   opts   - everything else
 %
 % opts fields
 %  opts for metlaser, inst_params, calmain, checkSDR, and mvspan
@@ -73,20 +73,18 @@ for fi = 1 : nfile
     continue
   end
 
-  % for now, just copy scGeo
-  geo = scGeo;
-
-  % for now, set L1a_err from scMatch
+  % initialize L1a_err from scMatch
   [~, ~, ~, nscan] = size(scLW);
   L1a_err = reshape(~scMatch, 34, nscan);
   L1a_err = L1a_err(1:30, :);
 
-% % set the L1a error flag
-% [m, nscan] = size(scTime);
-% L1a_err = isnan(geo.FORTime) | geo.FORTime < 0 | isnan(scTime(1:30, :)) ...
-%           | cOR(geo.Latitude < -90 | 90 < geo.Latitude) ...
-%           | cOR(geo.Longitude < -180 | 180 < geo.Longitude) ...
-%           | abs(geo.FORTime ./ 1000 - (scTime(1:30, :) + geo.dtRDR)) > 1;
+  % add some basic geo sanity checks
+  geo = scGeo;
+  geo_err = isnan(geo.FORTime) | geo.FORTime < 0 ...
+            | cOR(geo.Latitude < -90 | 90 < geo.Latitude) ...
+            | cOR(geo.Longitude < -180 | 180 < geo.Longitude);
+
+  L1a_err = L1a_err | geo_err;
 
   if isempty(find(~L1a_err))
     fprintf(1, 'L1a_to_SDR: no valid L1a values, skipping file %s\n', rid)

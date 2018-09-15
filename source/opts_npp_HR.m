@@ -6,7 +6,7 @@
 %
 % INPUTS
 %   year  - integer year
-%   day   - integer day of year
+%   doy   - integer day of year
 %
 % DISCUSSION
 %   wrapper to set paths, files, and options to process ccast L1a

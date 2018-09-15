@@ -1,0 +1,21 @@
+Date: Tue, 02 Jan 2018 17:40:59 -0500
+From: "L. Larrabee Strow" <strow@umbc.edu>
+To: "Howard E. Motteler" <motteler@gmail.com>
+Subject: Fwd: Re: L0
+
+L0!
+David Tobin writes:
+
+> You would get that via ftp from sips.ssec.wisc.edu/cris/jpss1/L0/.  S-NPP
+> is the same except “snpp” instead of jpss1.
+>
+> Under there there is a “-S” folder which is a session/overpass based set
+> of data (with lower latency) and a “-T” folder which is slower but chucked
+> y exactly 2 hours I think.
+>
+> There are also L1A and L1B folders.
+>
+> The spacecraft diary data is on the same site but under
+> /ancillary/jpss1/P157001-S (or T)
+>
+>

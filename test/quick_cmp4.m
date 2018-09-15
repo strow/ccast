@@ -6,16 +6,27 @@ addpath ../source
 addpath ../motmsc/time
 addpath /home/motteler/cris/cris_test/focal_fit
 
-p1 = '/asl/s1/strow/ADL';
-g1 = 'GCRSO_j01_d20180108_t1527129_e1527427_b00728_c20180112032711274647_ADu_ops.h5';
-f1 = 'SCRIF_j01_d20180108_t1527129_e1527427_b00728_c20180112032711196399_ADu_ops.h5';
+% p1 = '/asl/s1/strow/ADL';
+% g1 = 'GCRSO_j01_d20180108_t1527129_e1527427_b00728_c20180112032711274647_ADu_ops.h5';
+% f1 = 'SCRIF_j01_d20180108_t1527129_e1527427_b00728_c20180112032711196399_ADu_ops.h5';
+
+  p1 = '/asl/s1/strow/ADL_feb7_v114';
+% g1 = 'GCRSO_j01_d20180207_t1243119_e1243417_b01152_c20180209024454261414_ADu_ops.h5';
+% f1 = 'SCRIF_j01_d20180207_t1243119_e1243417_b01152_c20180209024454152008_ADu_ops.h5';
+  g1 = 'GCRSO_j01_d20180207_t1245519_e1246217_b01152_c20180209024731223602_ADu_ops.h5';
+  f1 = 'SCRIF_j01_d20180207_t1245519_e1246217_b01152_c20180209024731143902_ADu_ops.h5';
+
 f1 = fullfile(p1, f1);
 g1 = fullfile(p1, g1);
 d1 = read_SCRIF(f1);
 gx = read_GCRSO(g1);
 
-p2 = '/asl/data/cris/ccast/sdr45_j01_HR/2018/008';
-g2 = 'CrIS_SDR_j01_s45_d20180108_t1524010_g155_v20a.mat';
+% p2 = '/asl/data/cris/ccast/sdr45_j01_HR/2018/008';
+% g2 = 'CrIS_SDR_j01_s45_d20180108_t1524010_g155_v20a.mat';
+
+  p2 = '/asl/data/cris/ccast/sdr45_j01_HR/2018/038';
+  g2 = 'CrIS_SDR_j01_s45_d20180207_t1242080_g128_v20a.mat';
+
 f2 = fullfile(p2, g2);
 d2 = load(f2);
 

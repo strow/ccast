@@ -13,6 +13,8 @@ a2tabMW = [d1.a2tmpMW, d2.a2tmpMW, d3.a2tmpMW, d4.a2tmpMW, d5.a2tmpMW];
 a2newLW = mean(a2tabLW, 2);
 a2newMW = mean(a2tabMW, 2);
 
+save a2_test1 a2newLW a2newMW
+
 % UW a2v4 values
 a2v4tmp = [
    0.0119     0       0
@@ -33,18 +35,21 @@ figure(1); clf
 subplot(2,1,1)
 bar([a2v4LW, a2newLW])
 axis([0, 10, 0, 0.04])
-title('LW a2v4 and mean adjusted weights')
+title('LW v114 and mean adjusted weights')
 legend('current', 'test', 'location', 'northwest')
 % xlabel('FOV')
-ylabel('a2 weight, 1/V')
+ylabel('a2 weight')
 grid on; zoom on
 
 subplot(2,1,2)
 bar([a2v4MW, a2newMW])
 axis([0, 10, 0, 0.1])
-title('MW a2v4 and mean adjusted weights')
+title('MW v114 and mean adjusted weights')
 legend('current', 'test', 'location', 'northwest')
 xlabel('FOV')
-ylabel('a2 weight, 1/V')
+ylabel('a2 weight')
 grid on; zoom on
+
+saveas(gcf, 'a2_adjust', 'png')
+saveas(gcf, 'a2_adjust', 'fig')
 

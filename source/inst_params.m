@@ -12,7 +12,7 @@
 % 
 % OPTS FIELDS
 %   inst_res - 'lowres' (default), 'hires1-4', 'hi3to2'
-%   user_res - 'lowres' (default), 'hires'
+%   user_res - 'lowres' (default), 'hires', 'midres'
 %   pL, pH   - processing filter passband start and end freqs
 %   rL, rH   - processing filter out-of-band LHS and RHS rolloff
 %
@@ -73,26 +73,32 @@ end
 %-----------
 switch band
   case 'LW'
-    user.v1 = 650;    % first channel
-    user.v2 = 1095;   % last channel
-    user.opd = 0.8;   % user grid OPD
+    user.v1 = 650;    % first channel, cm-1
+    user.v2 = 1095;   % last channel, cm-1
+    opd_LR = 0.8;     % low res OPD, cm
+    opd_MR = 0.8;     % mid res OPD, cm
+    opd_HR = 0.8;     % high res OPD, cm
 
   case 'MW'  
     user.v1 = 1210;
     user.v2 = 1750;
-    user.opd = 0.4;
+    opd_LR = 0.4;
+    opd_MR = 0.6;
+    opd_HR = 0.8;    
 
   case 'SW'  
     user.v1 = 2155;
     user.v2 = 2550;
-    user.opd = 0.2;
+    opd_LR = 0.2;
+    opd_MR = 0.4;
+    opd_HR = 0.8;    
 end
 
-% user OPD is 0.8 for high res
 switch user_res
-  case 'lowres'
-  case 'hires', user.opd = 0.8;
-  otherwise, error(['bad user res value ', user_res])
+  case 'lowres', user.opd = opd_LR;
+  case 'midres', user.opd = opd_MR;
+  case 'hires',  user.opd = opd_HR;
+  otherwise, error(['bad user_res spec ', user_res])
 end
 
 % derived parameters
@@ -107,7 +113,7 @@ switch band
   case 'LW'
     df = 24;          % decimation factor
     vbase = 1;        % alias offset
-    switch inst_res   % interferogram size
+    switch inst_res
       case {'lowres', 'hires1', 'hires2', 'hi3to2'}, npts = 866;
       case 'hi3odd', npts = 873;
       case 'hires3', npts = 874;

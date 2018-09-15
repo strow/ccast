@@ -13,6 +13,8 @@
 %   ccast L1a files.  It can be edited as needed to change options
 %   and paths.  Processing is done by RDR_to_L1a.
 %
+%   this version is for early mission runs with 4-scan RDR and Geo.
+%
 
 function ops_j1_L1a(year, doy)
 
@@ -28,13 +30,13 @@ addpath ../readers/MITreader380b/CrIS
 %------------------------
 
 % scans per file
-nscanRDR = 60;  % used for initial file selection
-nscanGeo = 60;  % used for initial file selection
+nscanRDR = 4;   % used for initial file selection
+nscanGeo = 4;   % used for initial file selection
 nscanSC = 45;   % used to define the SC granule format
 
-% NOAA RDR and GCRSO homes
-ghome = '/asl/data/cris/geo60_j01';
-rhome = '/asl/data/cris/rdr60_j01';
+% NOAA RDR and GCRSO homes 
+ghome = '/asl/data/cris2/CrIS-SDR-GEO';
+rhome = '/asl/data/cris2/CRIS-SCIENCE-RDR_SPACECRAFT-DIARY-RDR';
 
 % get a CCSDS temp filename
 jdir = getenv('JOB_SCRATCH_DIR');
@@ -59,33 +61,37 @@ opts.eng = eng;
 % build file lists
 %------------------
 
-% get previous day
+% "gravite" style date strings for inputs
 [y0, d0] = prev_doy(year, doy);
-ys0 = sprintf('%d', y0);
-ds0 = sprintf('%03d', d0);
-ys1 = sprintf('%d', year);
-ds1 = sprintf('%03d', doy);
+v0 = datevec(datenum([y0, 1, d0]));
+ds0 = sprintf('%02d%02d%02d', v0(1), v0(2), v0(3));
+v1 = datevec(datenum([year, 1, doy]));
+ds1 = sprintf('%02d%02d%02d', v1(1), v1(2), v1(3));
+
+% year/doy style date strings for output
+ys2 = sprintf('%d', year);
+ds2 = sprintf('%03d', doy);
 
 % RDR file list
-rdir0 = fullfile(rhome, ys0, ds0);
-rdir1 = fullfile(rhome, ys1, ds1);
+rdir0 = fullfile(rhome, ds0);
+rdir1 = fullfile(rhome, ds1);
 rlist0 = dir2list(rdir0, 'RCRIS', nscanRDR);
 rlist1 = dir2list(rdir1, 'RCRIS', nscanRDR);
-rlist = [rlist0(end); rlist1];
-% rlist = rlist(41:50);  % TEST TEST TEST
+rlist = [rlist0(end-2:end); rlist1];  % end-2 for 4-scan files
+% rlist = rlist(820:end);  % TEST TEST TEST
 
 % Geo file list
-gdir0 = fullfile(ghome, ys0, ds0);
-gdir1 = fullfile(ghome, ys1, ds1);
+gdir0 = fullfile(ghome, ds0);
+gdir1 = fullfile(ghome, ds1);
 glist0 = dir2list(gdir0, 'GCRSO', nscanGeo);
 glist1 = dir2list(gdir1, 'GCRSO', nscanGeo);
-glist = [glist0(end); glist1];
-% glist = glist(41:50);  % TEST TEST TEST
+glist = [glist0(end-2:end); glist1];  % end-2 for 4-scan files
+% glist = glist(820:end);  % TEST TEST TEST
 
 % L1a output home
 Lhome = '/asl/data/cris/ccast';
 Ldir = sprintf('L1a%02d_%s_H4', nscanSC, opts.cvers);
-Lfull = fullfile(Lhome, Ldir, ys1, ds1);
+Lfull = fullfile(Lhome, Ldir, ys2, ds2);
 
 % create the output path, if needed
 unix(['mkdir -p ', Lfull]);

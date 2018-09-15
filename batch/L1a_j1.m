@@ -15,8 +15,9 @@ nprocs = str2num(getenv('SLURM_NPROCS'));
 nodeid = sscanf(getenv('SLURMD_NODENAME'), 'n%d');
 taskid = str2num(getenv('SLURM_ARRAY_TASK_ID'));
 
-fprintf(1, 'L1a_npp: processing day %d, year %d, node %d\n', ...
+fprintf(1, 'L1a_j1: processing day %d, year %d, node %d\n', ...
             taskid, year, nodeid);
 
-opts_j1_L1a(year, taskid)
+% opts_j1r4_L1a(year, taskid)
+  opts_j1_L1a(year, taskid)
 

@@ -1,8 +1,8 @@
 %
-% opts_j1_HR - wrapper to process ccast L1a to SDR files
+% opts_j1_LR - wrapper to process ccast L1a to SDR files
 %
 % SYNOPSIS
-%   opts_j1_HR(year, doy)
+%   opts_j1_LR(year, doy)
 %
 % INPUTS
 %   year  - integer year
@@ -14,7 +14,7 @@
 %   paths.  Processing is done by L1a_to_SDR.
 %
 
-function ops_j1_HR(year, doy)
+function ops_j1_LR(year, doy)
 
 % search paths
 addpath ../source
@@ -30,11 +30,11 @@ nscanSC = 45;   % scans per file
 
 % data home directories
 Lhome = '/asl/data/cris/ccast';  % L1a data
-Shome = '/asl/data/cris/ccast/a2v4_ref';  % SDR data
+Shome = '/asl/data/cris/ccast';  % SDR data
 
 % L1a and SDR directory names
 Ldir = sprintf('L1a%02d_%s_H4', nscanSC, cvers);
-Sdir = sprintf('sdr%02d_%s_HR', nscanSC, cvers);
+Sdir = sprintf('sdr%02d_%s_LR', nscanSC, cvers);
 
 % full L1a and SDR paths
 dstr = sprintf('%03d', doy);
@@ -55,10 +55,10 @@ unix(['mkdir -p ', Sfull]);
 
 opts = struct;            % initialize opts
 opts.cvers = cvers;       % current active CrIS
-opts.cal_fun = 'c7';      % calibration algorithm
+opts.cal_fun = 'c5';      % calibration algorithm
 opts.nlc_alg = 'NPP';     % UW NPP nonlin corr alg
 opts.inst_res = 'hires4'; % j1 extended res mode
-opts.user_res = 'hires';  % high resolution user grid
+opts.user_res = 'lowres'; % low resolution user grid
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 opts.resamp = 4;          % resampling algorithm
 opts.neonWL = 703.44765;  % override eng Neon value
@@ -72,7 +72,7 @@ opts.SW_sfile = '../inst_data/SAinv_j1v3_SW.mat';
 opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';
 
 % NEdN principal component filter
-opts.nedn_filt = '../inst_data/nedn_filt_HR.mat';
+opts.nedn_filt = '../inst_data/nedn_filt_LR.mat';
 
 % override some early mission eng values 
 if year == 2018 && 10 <= doy && doy <= 17

@@ -1,0 +1,10 @@
+
+quick_look - look at one ccast granule
+quick_cmp1 - comparison of old and new ccast, loop on matches
+quick_cmp2 - comparison of two new ccast runs
+quick_cmp3 - comparison of ccast and ADL data
+quick_cmp4 - comparison of ccast vs ADL frequency
+
+SDR_loop   - prototype j1/cris2 SDR read loop
+sw_anomaly - j1 vs npp 7-day comparison plot
+

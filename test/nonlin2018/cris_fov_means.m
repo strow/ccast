@@ -82,14 +82,17 @@ for di = dlist
 
        tLW = squeeze(rLW(:,i,:,:));
        tLW = tLW(:,ix);
+       tLW = hamm_app(double(tLW));
        bLW = real(rad2bt(vLW, tLW));
 
        tMW = squeeze(rMW(:,i,:,:));
        tMW = tMW(:,ix);
+       tMW = hamm_app(double(tMW));
        bMW = real(rad2bt(vMW, tMW));
 
        tSW = squeeze(rSW(:,i,:,:));
        tSW = tSW(:,ix);
+       tSW = hamm_app(double(tSW));
        bSW = real(rad2bt(vSW, tSW));
 
        % loop on obs
