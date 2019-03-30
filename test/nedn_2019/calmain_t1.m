@@ -174,12 +174,6 @@ vcal = vcal(1:mchan);
 rcal = rcal(1:mchan, :, :, :);
 rICT = rICT(1:mchan, :, :, :);
 
-% NEdN is the standard deviation of rICT
-% nedn = nanstd(real(rICT), 0, 4);
-
-% apply principal component filter to NEdN 
-% nedn = nedn_filt(user, opts.nedn_filt, vcal, nedn);
-
 % unapodized NEdN
 nedn1 = nanstd(real(rICT(:,:,:)), 0, 3);  
 
@@ -189,5 +183,36 @@ ntmp = hamm_app(ntmp);
 ntmp = reshape(ntmp, mchan, 9, 2*nscan);
 nedn2 = nanstd(ntmp, 0, 3);
 
-% return both without filtering
 nedn = cat(3, nedn1, nedn2);
+
+% i = 5; w = 0.63;
+% i = 9; w = reduce_c;
+% i = 4; w = reduce_s;
+% plot(vcal, w.*nedn(:,i,1), vcal, nedn(:,i,2))
+% legend('w*nedn1', 'nedn2')
+
+% figure(1); clf
+% plot(vcal, nedn1(:,:))
+% title('unapodized measured NEdN')
+% legend(fovnames)
+% set(gcf, 'DefaultAxesColorOrder', fovcolors);
+% xlabel('wavenumber, cm-1')
+% ylabel('NEdN, mw sr-1 m-2')
+% grid on
+% 
+% figure(2); clf
+% plot(vcal, nedn2(:,:))
+% axis([2150,2550, 2e-3, 6e-3])
+% title('apodized measured NEdN')
+% legend(fovnames)
+% set(gcf, 'DefaultAxesColorOrder', fovcolors);
+% xlabel('wavenumber, cm-1')
+% ylabel('NEdN, mw sr-1 m-2')
+% grid on
+
+% NEdN is the standard deviation of rICT
+% nedn = nanstd(real(rICT), 0, 4);
+
+% apply principal component filter to NEdN 
+% nedn = nedn_filt(user, opts.nedn_filt, vcal, nedn);
+

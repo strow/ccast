@@ -10,16 +10,18 @@
 # sbatch options
 #SBATCH --job-name=L1a_npp
 #SBATCH --output=L1a_npp_%A_%a.out
-#SBATCH --partition=batch
-#SBATCH --qos=medium_prod
+# #SBATCH --partition=batch
+#SBATCH --partition=high_mem
+#SBATCH --qos=normal+
 #SBATCH --account=pi_strow
 #SBATCH --mem-per-cpu=16000
+#SBATCH --share
 
-# new bad node list
-# #SBATCH --exclude=n71
+# exclude list
+#SBATCH --exclude=cnode[101-134]
 
 # matlab options
-MATLAB=/usr/cluster/matlab/2016b/bin/matlab
+MATLAB=/usr/ebuild/software/MATLAB/2018b/bin/matlab
 MATOPT='-nojvm -nodisplay -nosplash'
 
 srun $MATLAB $MATOPT -r "L1a_npp($1); exit"

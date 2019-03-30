@@ -6,31 +6,35 @@
 %   [sci, eng] = scipack(d1, engp)
 %
 % INPUTS
-%   d1   - output structure from MIT reader
-%   engp - previous eng packet
+%   d1    - output from MIT reader
+%   engp  - previous eng packet
 %
 % OUTPUTS
-%   sci  - calculated and saved sci packet data
-%   eng  - up to date eng packet
+%   sci   - selected sci packet data
+%   eng   - up-to-date full eng packet
 %
 % DISCUSSION
-%   the prev eng packet is passed in because some RDR reads may 
-%   not include any eng data
+%   the prev eng packet is passed in because some RDR reads may not
+%   include any eng data
+%
+%   sci.time and eng.four_min_eng.time are returned as UTC ms since
+%   1958, as used by checkRDR.  sci.dnum is matlab datenums for the
+%   same times
 %
 
 function [sci, eng] = scipack(d1, engp)
 
-% factor to convert MIT time to IET, t_mit * mwt = t_ngas
+% ms/day, to convert UTC 1958 datenums to ms
 mwt = 8.64e7;
 
 % field names for eng packet cleanup.  These are igm time fields
 % added by the MIT reader, not part of the actual eng packet data
-ftmp = ['LWES';'MWES';'SWES';'LWIT';'MWIT';'SWIT';'LWSP';'MWSP';'SWSP'];
+fdel = ['LWES';'MWES';'SWES';'LWIT';'MWIT';'SWIT';'LWSP';'MWSP';'SWSP'];
 
-% if we have good eng (4-min) data remove non eng packet fields 
-% and convert time back to IET
+% if we have good eng (4-min) data, remove non eng fields and
+% convert time to UTC ms since 1958
 if d1.packet.read_four_min_packet && ~d1.packet.error
-  eng = rmfield(d1.packet, ftmp);
+  eng = rmfield(d1.packet, fdel);
   eng.four_min_eng.time = eng.four_min_eng.time * mwt;
 else
   eng = engp;

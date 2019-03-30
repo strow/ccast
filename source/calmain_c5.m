@@ -172,8 +172,20 @@ rcal = rcal(1:mchan, :, :, :);
 rICT = rICT(1:mchan, :, :, :);
 
 % NEdN is the standard deviation of rICT
-nedn = nanstd(real(rICT), 0, 4);
+% nedn = nanstd(real(rICT), 0, 4);
 
 % apply principal component filter to NEdN 
-nedn = nedn_filt(user, opts.nedn_filt, vcal, nedn);
+% nedn = nedn_filt(user, opts.nedn_filt, vcal, nedn);
+
+% unapodized NEdN
+nedn1 = nanstd(real(rICT(:,:,:)), 0, 3);  
+
+% apodized NEdN
+ntmp = real(rICT(:,:));
+ntmp = hamm_app(ntmp);
+ntmp = reshape(ntmp, mchan, 9, 2*nscan);
+nedn2 = nanstd(ntmp, 0, 3);
+
+% return both without filtering
+nedn = cat(3, nedn1, nedn2);
 

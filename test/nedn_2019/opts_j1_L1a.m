@@ -1,8 +1,8 @@
 %
-% opts_npp_L1a - wrapper to process NOAA RDR to ccast L1a files
+% opts_j1_L1a - wrapper to process NOAA RDR to ccast L1a files
 %
 % SYNOPSIS
-%   opts_npp_L1a(year, doy)
+%   opts_j1_L1a(year, doy)
 %
 % INPUTS
 %   year  - integer year
@@ -14,7 +14,7 @@
 %   and paths.  Processing is done by RDR_to_L1a.
 %
 
-function ops_npp_L1a(year, doy)
+function ops_j1_L1a(year, doy)
 
 % search paths
 addpath ../source
@@ -33,8 +33,8 @@ nscanGeo = 60;  % used for initial file selection
 nscanSC = 45;   % used to define the SC granule format
 
 % NOAA RDR and GCRSO homes
-ghome = '/asl/data/cris/geo60_npp';
-rhome = '/asl/data/cris/rdr60_npp';
+ghome = '/asl/cris/geo60_j01';
+rhome = '/asl/cris/rdr60_j01';
 
 % get a CCSDS temp filename
 jdir = getenv('JOB_SCRATCH_DIR');
@@ -47,12 +47,12 @@ end
 
 % RDR_to_L1a options struct
 opts = struct;
-opts.cvers = 'npp';
+opts.cvers = 'j01';
 opts.cctag = '20a';
 opts.ctmp = ctmp;
 
 % load an initial eng packet 
-load('../inst_data/npp_eng')
+load('../inst_data/j1_eng_v112')
 opts.eng = eng;
 
 %------------------
@@ -83,8 +83,9 @@ glist = [glist0(end); glist1];
 % glist = glist(41:50);  % TEST TEST TEST
 
 % L1a output home
-Lhome = '/asl/data/cris/ccast';
-Ldir = sprintf('L1a%02d_%s_H3', nscanSC, opts.cvers);
+% Lhome = '/asl/cris/ccast';
+Lhome = '.';
+Ldir = sprintf('L1a%02d_%s_H4', nscanSC, opts.cvers);
 Lfull = fullfile(Lhome, Ldir, ys1, ds1);
 
 % create the output path, if needed

@@ -1,8 +1,8 @@
 %
-% opts_j1_L1a - wrapper to process NOAA RDR to ccast L1a files
+% opts_L1a_npp_H2 - wrapper to process NOAA RDR to ccast L1a files
 %
 % SYNOPSIS
-%   opts_j1_L1a(year, doy)
+%   opts_L1a_npp_H2(year, doy)
 %
 % INPUTS
 %   year  - integer year
@@ -14,7 +14,7 @@
 %   and paths.  Processing is done by RDR_to_L1a.
 %
 
-function ops_j1_L1a(year, doy)
+function opts_L1a_npp_H2(year, doy)
 
 % search paths
 addpath ../source
@@ -33,26 +33,30 @@ nscanGeo = 60;  % used for initial file selection
 nscanSC = 45;   % used to define the SC granule format
 
 % NOAA RDR and GCRSO homes
-ghome = '/asl/data/cris/geo60_j01';
-rhome = '/asl/data/cris/rdr60_j01';
+ghome = '/asl/cris/geo60_npp';
+rhome = '/asl/cris/rdr60_npp';
 
 % get a CCSDS temp filename
-jdir = getenv('JOB_SCRATCH_DIR');
-pstr = getenv('SLURM_PROCID');
-if ~isempty(jdir) && ~isempty(pstr)
-  ctmp = fullfile(jdir, sprintf('ccsds_%s.tmp', pstr));
-else
+jobid = str2num(getenv('SLURM_JOB_ID'));         % job ID
+jarid = str2num(getenv('SLURM_ARRAY_TASK_ID'));  % job array ID
+procid = str2num(getenv('SLURM_PROCID'));        % relative process ID
+if isempty(jobid) || isempty(jarid) || isempty(procid) ...
+    || exist(sprintf('/scratch/%d', jobid), 'dir') == 0
+  fprintf(1, 'warning: using current directory for CCSDS temp file\n')
+  rng('shuffle');
   ctmp = sprintf('ccsds_%05d.tmp', randi(99999));
+else
+  ctmp = sprintf('/scratch/%d/ccsds_%03d_%03d.tmp', jobid, jarid, procid);
 end
 
 % RDR_to_L1a options struct
 opts = struct;
-opts.cvers = 'j01';
+opts.cvers = 'npp';
 opts.cctag = '20a';
 opts.ctmp = ctmp;
 
 % load an initial eng packet 
-load('../inst_data/j1_eng_v112')
+load('../inst_data/npp_eng_v36_H2')
 opts.eng = eng;
 
 %------------------
@@ -83,12 +87,13 @@ glist = [glist0(end); glist1];
 % glist = glist(41:50);  % TEST TEST TEST
 
 % L1a output home
-Lhome = '/asl/data/cris/ccast';
-Ldir = sprintf('L1a%02d_%s_H4', nscanSC, opts.cvers);
+Lhome = '/asl/cris/ccast';
+Ldir = sprintf('L1a%02d_%s_H2', nscanSC, opts.cvers);
 Lfull = fullfile(Lhome, Ldir, ys1, ds1);
 
 % create the output path, if needed
-unix(['mkdir -p ', Lfull]);
+% unix(['mkdir -p ', Lfull]);
+if exist(Lfull) ~= 7, mkdir(Lfull), end
 
 %-----------------------------------------
 % take RDR and Geo to ccast L1b/SDR files

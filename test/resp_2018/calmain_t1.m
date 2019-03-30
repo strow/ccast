@@ -93,8 +93,8 @@ rcal = NaN(m,9,30,nscan);
 nedn = NaN(m,9,2);
 
 % pick a band for tests
-% if ~strcmp(inst.band, 'LW'), return, end;
-  if ~strcmp(inst.band, 'SW'), return, end;
+  if ~strcmp(inst.band, 'LW'), return, end;
+% if ~strcmp(inst.band, 'SW'), return, end;
 display([inst.band, ' ', datestr(iet2dnum(geo.FORTime(1)))])
 
 % loop on sweep directions
@@ -140,8 +140,8 @@ for k = 1 : 2
   figure(1); clf
   set(gcf, 'DefaultAxesColorOrder', fovcolors);
   plot(inst.freq, abs(rcor))
-% axis([600, 1160, 0, 1.1])
-  axis([2100, 2600, 0, 1.1])
+  axis([600, 1160, 0, 1.1])
+% axis([2100, 2600, 0, 1.1])
   title([opts.cvers, ' ', inst.band, ' optical responsivity'])
   legend(fovnames, 'location', 'south')
   xlabel('wavenumber')

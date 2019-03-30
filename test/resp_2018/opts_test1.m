@@ -30,8 +30,8 @@ cvers = 'j01';  % CrIS version
 nscanSC = 45;   % scans per file
 
 % data home directories
-Lhome = '/asl/data/cris/ccast';  % L1a data
-Shome = '/asl/data/cris/ccast/test1XX';  % SDR data
+Lhome = '/asl/cris/ccast';  % L1a data
+Shome = '/asl/cris/ccast/test1XX';  % SDR data
 
 % L1a and SDR directory names
 Ldir = sprintf('L1a%02d_%s_H4', nscanSC, cvers);
