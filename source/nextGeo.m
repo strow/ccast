@@ -126,12 +126,18 @@ while no_data && gi < length(glist)
 
   % Geo time QC
   timeOK = ~isnan(geoTime) & tmin <= geoTime & geoTime <= tmax;
-  if sum(timeOK) == 0 || ~isequal(geoTime, unique(geoTime))
-    fprintf(1, 'nextGeo: bad geo time values, skipping geo file %d\n', gi)
+  if sum(timeOK) == 0 || ~isequal(geoTime(timeOK), unique(geoTime(timeOK)))
+    fprintf(1, 'nextGeo: unfixable time errors, skipping file %d\n', gi)
     geo = struct([]);
     geoTime = [];
     geoTimeOK = [];
     continue
+  end
+
+  % bad value count as a warning
+  nbad = length(timeOK) - sum(timeOK);
+  if nbad > 0
+    fprintf(1, 'nextGeo: skipping %d bad geo values, file %d\n', nbad, gi)
   end
 
   % we got someting

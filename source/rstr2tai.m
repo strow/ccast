@@ -30,7 +30,7 @@ function [t1, t2] = rstr2tai(rstr)
 % time; probably OK because the pevious and following start time
 % tenths position was always '9' or another 'x'
 if rstr(18) == 'x'
-  fprintf(1, 'rstr2tai: fixing bad start time %s\n', rstr)
+  fprintf(1, 'rstr2tai: fixing bad filename start time %s\n', rstr)
   rstr(18) = '9';
 end
 
