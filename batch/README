@@ -1,11 +1,17 @@
 
+batch scripts
+  job_array -- run ccast on doy = job array ID
+  task_sets -- run ccast on doy = job array ID + process ID
+
 format changes
   4 Dec 2014 (doy 338) change from lowres to hires2
   2 Nov 2015 (doy 306) change from hires2 to hires3
   
-ccast v20b directories
+ccast directories
   L1a45_j01_H4    j1/cris2 L1a 45-scan inst high res 4
   L1a45_npp_H3   npp/cris1 L1a 45-scan inst high res 3
+  L1a45_npp_H2   npp/cris1 L1a 45-scan inst high res 2
+  L1a45_npp_LR   npp/cris1 L1a 45-scan inst low res
 
   sdr45_j01_HR    j1/cris2 sdr 45-scan user high res
   sdr45_npp_HR   npp/cris1 sdr 45-scan user high res
@@ -13,10 +19,10 @@ ccast v20b directories
   sdr45_j01_LR    j1/cris2 sdr 45-scan user low res
   sdr45_npp_LR   npp/cris1 sdr 45-scan user low res
     
-example runs
-  sbatch --array=306-365%20 L1a_npp.sh 2018
-  sbatch --array=349,354,361 SDR_j1.sh 2018
-
 sample search for old files
   find /asl/data/cris/ccast/sdr60/2015 -depth -type f -mtime +70 -print | more
+
+check on job status
+  sacct -X -j <job num>
+  sacct -X --format='jobid,jobname,state,nodelist' -j <job num>
 

@@ -25,9 +25,8 @@
 %
 %   The L1a variables are scLW, scMW, scSW, scTime, scGeo, and
 %   scMatch.  "SC" is for scan-order, and as a group these are
-%   sometimes called the SC buffer.  The names were chosen for
-%   backwards compatibility with the calibration and other ccast
-%   functions
+%   sometimes called the SC buffer.  This is the output buffer for
+%   the L1a granules.
 %
 % AUTHOR
 %  H. Motteler, 24 Nov 2017
@@ -43,12 +42,14 @@ cvers = 'npp';  % for now, 'npp' or 'j01'
 cctag = 'xxx';  % ccast version or run tag
 
 % MIT reader ccsds packet temp file
-ctmp = sprintf('ccsds_%04d.tmp', randi(9999));
+ctmp = sprintf('ccsds_%05d.tmp', randi(99999));
 
 % scans per file
 nscanRDR = 60;  % used for initial file selection
 nscanGeo = 60;  % used for initial file selection
 nscanSC = 45;   % used to define the SC granule format
+
+eng = struct;   % needs to be set in opts
 
 % apply recognized input options
 if nargin == 4
@@ -110,6 +111,7 @@ Sfp_max = ceil(10800 / nscanSC); % last granule
 ix = find(igmFOR == 1, 1);
 tES1 = igmTime(ix);
 [scT0, Sfp] = granule_t0(tES1, nscanSC);
+fprintf(1, 'granule 1 FOR 1 time %s\n', datestr(iet2dnum(scT0)));
 scTime = fakeTime(scT0, nscanSC, Sfp, 0);
 nobsSC = length(scTime);
 scTimeOK = false(nobsSC, 1);
@@ -120,17 +122,22 @@ scSW = [];
 scGeo = struct;
 init_SC
 
-% initialize test counters
-nloop = 0;   % count main loop iterations
-nmatch = 0;  % count RDR-Geo time matchups
-ncopy = 0;   % count RDR and Geo copies to SC
-nskip = 0;   % Sbp catchup steps to RDR-Geo match 
+% granule counters and flags (reset after writes)
+nloop = 0;         % count main loop iterations
+nmatch = 0;        % count RDR-Geo time matchups
+ncopy = 0;         % count successful calls of copy2sc
+copy_err = false;  % true after first copy2sc error
 
 %-------------------------
 % loop on RDR and Geo obs
 %-------------------------
 
 while ~isempty(geoTime) && ~isempty(igmTime) && Sfp <= Sfp_max
+
+  % next_Gbp and next_Rbp advance their pointers until they are
+  % at valid times, so this should never happen:
+  if ~geoTimeOK(Gbp), error('invalid Gbp time in matching loop'), end
+  if ~igmTimeOK(Rbp), error('invalid Rbp time in matching loop'), end
 
   tg = geoTime(Gbp);   % current Geo time
   tr = igmTime(Rbp);   % current RDR time
@@ -141,14 +148,15 @@ while ~isempty(geoTime) && ~isempty(igmTime) && Sfp <= Sfp_max
      nmatch = nmatch + 1;   % increment the match count
      while ts < tg - 2e3;   % while SC is behind Geo
        next_Sbp             % increment the SC pointer
-       nskip = nskip + 1;   % increment SC skip count
        ts = scTime(Sbp);    % get current SC time
      end  
      if abs(ts - tg) < 2e3  % test for an SC-Geo match
        copy2sc              % copy data on a 3-way match
-       ncopy = ncopy + 1;   % increment the copy count
        next_Sbp             % increment the SC pointer
      end
+
+     % at this point either we had a 3-way match or ts > tg + 2e3
+     % in either case we want to advance the Geo and Rdr pointers
      next_Gbp      % get next Geo pointer
      next_Rbp      % get next RDR pointer
 
@@ -164,20 +172,25 @@ while ~isempty(geoTime) && ~isempty(igmTime) && Sfp <= Sfp_max
   elseif tr > tg,  % if RDR is ahead of Geo
     next_Gbp;      % get next Geo pointer
 
-  else, error('cosmic meltdown'), end
+  else, error('cosmic meltdown in matching loop'), end
   nloop = nloop + 1;
 end
 
 % write out any remaining data
 close_SC
 
-fprintf(1, 'nloop = %d\n', nloop)
-fprintf(1, 'nmatch = %d\n', nmatch)
-fprintf(1, 'ncopy  = %d\n', ncopy)
-fprintf(1, 'scount - nskip = %d\n', scount - nskip)
-fprintf(1, 'gcount - 1 = %d\n', gcount - 1);
-fprintf(1, 'rcount - 1 = %d\n', rcount - 1);
-if ~isequal(scTimeOK, scMatch), fprintf(1, 'scTimeOK != scMatch\n'), end
+% total call counts
+% fprintf(1, 'scount - 1 = %d\n', scount - 1)
+% fprintf(1, 'gcount - 1 = %d\n', gcount - 1);
+% fprintf(1, 'rcount - 1 = %d\n', rcount - 1);
+
+% matchup sanity check
+if ~isequal(scTimeOK, scMatch)
+  fprintf(1, 'RDR_to_L1a: warning scTimeOK != scMatch\n')
+end
+
+% all done
+fprintf(1, 'RDR_to_L1a: all done\n')
 
 %---------------------------
 % SC write buffer functions
@@ -197,8 +210,12 @@ function next_Sbp
     sci = sci2(ix);   % sci2 before the SC buffer end + 4 sec
     sci2 = sci2(~ix); % sci2 after the SC buffer end + 4 sec
 
+    % granule stats
+    fprintf(1, 'writing L1a file %d, %d values, ', Sfp, nobsSC)
+    fprintf(1, 'nloop=%d nmatch=%d ncopy=%d\n', nloop, nmatch, ncopy)
+    nloop = 0; nmatch = 0; ncopy = 0; copy_err = false;
+
     % write and reset the SC buffer
-    fprintf(1, 'writing L1a file %d, %d values\n', Sfp, nobsSC)
     write_SC;
     init_SC;
 
@@ -216,8 +233,8 @@ end
 %
 function close_SC
   if Sbp > 1
-%   datestr(iet2dnum(scTime(1)))
-    fprintf(1, 'writing L1a file %d, %d values\n', Sfp, Sbp - 1)
+    fprintf(1, 'closing L1a file %d, %d values, ', Sfp, Sbp - 1)
+    fprintf(1, 'nloop=%d nmatch=%d ncopy=%d\n', nloop, nmatch, ncopy)
     write_SC
   end
 end
@@ -263,26 +280,49 @@ end
 % Geo ES obs at Gbp to the SC buffesr at Sbp
 %
 function copy2sc
-  scMatch(Sbp) = true;
-  scTimeOK(Sbp) = igmTimeOK(Rbp) & geoTimeOK(Gbp);
-
-  Sbr = mod(Sbp - 1, 34) + 1;      % SC data row index
-  Sbc = floor((Sbp - 1) / 34) + 1; % SC data col index
+  Sbr = mod(Sbp - 1, 34) + 1;       % SC buffer row index
+  Sbc = floor((Sbp - 1) / 34) + 1;  % SC buffer col index
 
   % FOR index sanity checks
   jFOR = igmFOR(Rbp);
   if 1 <= jFOR && jFOR <= 30
-    if jFOR ~= Sbr, error('FOR ES mismatch'), end
+    if jFOR ~= Sbr
+      if ~copy_err
+        fprintf(1, 'copy2sc: FOR ES mismatch, skipping copy\n')
+        fprintf(1, '  Rfp=%d Sfp=%d jFOR=%d, Sbr=%d\n', Rfp, Sfp, jFOR, Sbr)
+        copy_err = true;
+      end     
+      return
+    end
   elseif jFOR == 31
-    if Sbr ~= 31 && Sbr ~= 32, error('FOR SP mismatch'), end
+    if Sbr ~= 31 && Sbr ~= 32
+      if ~copy_err
+        fprintf(1, 'copy2sc: FOR SP mismatch, skipping copy\n')
+        fprintf(1, '  Rfp=%d Sfp=%d jFOR=%d, Sbr=%d\n', Rfp, Sfp, jFOR, Sbr)
+        copy_err = true;
+      end
+      return
+    end
   elseif jFOR == 0
-    if Sbr ~= 33 && Sbr ~= 34, error('FOR IT mismatch'), end
+    if Sbr ~= 33 && Sbr ~= 34, 
+      if ~copy_err
+        fprintf(1, 'copy2sc: FOR IT mismatch, skipping copy\n')
+        fprintf(1, '  Rfp=%d Sfp=%d jFOR=%d, Sbr=%d\n', Rfp, Sfp, jFOR, Sbr)
+        copy_err = true;
+      end
+      return
+    end
   end
 
   % sweep direction sanity checks; note IT and SP flip vs ES
   if (1 <= Sbr && Sbr <= 30 && mod(Sbr-1, 2) ~= igmSD(Rbp)) || ...
      (31 <= Sbr && Sbr <= 34 && mod(Sbr, 2) ~= igmSD(Rbp))
-    error('bad sweep direction\n')
+    if ~copy_err
+      fprintf(1, 'copy2sc: bad sweep direction, skipping copy\n')
+      fprintf(1, '  Rfp=%d Sfp=%d Rbp=%d Sbr=%d\n', Rfp, Sfp, Rbp, Sbr)
+      copy_err = true;
+    end
+    return
   end
 
   % copy RDR igm data to the SC buffer
@@ -294,7 +334,13 @@ function copy2sc
   Gbr = mod(Gbp - 1, 34) + 1;      % Geo data row index
   Gbc = floor((Gbp - 1) / 34) + 1; % Geo data col index
   if Gbr ~= Sbr
-    error('Geo/SC row index mismatch')
+    if ~copy_err
+      fprintf(1, 'copy2sc: Geo/SC row index mismatch, skipping copy\n')
+      fprintf(1, '  Rfp=%d Gfp=%d Sfp=%d ', Rfp, Gfp, Sfp)
+      fprintf(1, 'Gbr=%d Sbr=%d nloop=%d nmatch=%d\n', Gbr, Sbr, nloop, nmatch)
+      copy_err = true;
+    end
+  return
   end
   if 1 <= Gbr && Gbr <= 30  % test for ES obs
     scGeo.FORTime(Sbr,Sbc)                 = geo.FORTime(Gbr,Gbc);
@@ -313,6 +359,10 @@ function copy2sc
     scGeo.Asc_Desc_Flag(Sbc,1)             = geo.Asc_Desc_Flag(Gbc,1);
     scGeo.Orbit_Number(Sbc,1)              = geo.Orbit_Number(Gbc,1);
   end
+
+  scMatch(Sbp) = true;
+  scTimeOK(Sbp) = igmTimeOK(Rbp) & geoTimeOK(Gbp);
+  ncopy = ncopy + 1;
 end
 
 %---------------------------
@@ -330,6 +380,7 @@ function inc_Gbp
     [geo, geoTime, geoTimeOK, Gfp] = nextGeo(glist, Gfp);
     if isempty(geoTime), 
       Gbp = 0; 
+      nobsGeo = 0;
     else 
       Gbp = 1; 
       nobsGeo = length(geoTime);
@@ -361,6 +412,7 @@ function inc_Rbp
       sci1, eng, igmTimeOK, Rfp] = nextRDR(rlist, ctmp, eng, Rfp);
     if isempty(igmTime)
       Rbp = 0; 
+      nobsRDR = 0;
     else 
       Rbp = 1; 
       nobsRDR = length(igmTime);

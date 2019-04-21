@@ -14,12 +14,25 @@
 % DISCUSSION
 %   not vectorized
 %
+%   sample rstr date and times
 %   d20170401_t0005487_e0013487
 %   123456789012345678901234567
 %   0        1         2
 %
+%   sample 2012 start time error
+%   d20120511_t095058x_e0958567
+%   123456789012345678901234567
+%   0        1         2
 
 function [t1, t2] = rstr2tai(rstr)
+
+% work-around for 2012 geo filename bug with 'x' in tenths start
+% time; probably OK because the pevious and following start time
+% tenths position was always '9' or another 'x'
+if rstr(18) == 'x'
+  fprintf(1, 'rstr2tai: fixing bad start time %s\n', rstr)
+  rstr(18) = '9';
+end
 
 [t,n,e] = sscanf(rstr, 'd%4d%2d%2d_t%2d%2d%3d_e%2d%2d%3d');
 

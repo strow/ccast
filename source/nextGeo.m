@@ -19,15 +19,38 @@
 %   geoTime is geo.FORTime extended with SP and IT times
 %
 % scan times
-% 200 200 ...  200  200  200 200 200  200  200 200 200  200  200  200
-% ES1 ES2 ... ES29 ES30 slew SP1 SP2 slew slew IT1 IT2 slew slew slew
-%  1   2        29   30   31  32  33   34   35  36  37   38   39   40
+%   200 200 ...  200  200  200 200 200  200  200 200 200  200  200  200
+%   ES1 ES2 ... ES29 ES30 slew SP1 SP2 slew slew IT1 IT2 slew slew slew
+%    1   2        29   30   31  32  33   34   35  36  37   38   39   40
 %
 % sweep times in ms
-%   tx = (0:39) * 200;
-%   tES = tx(1:30);
-%   tSP = tx(32:33);
-%   tIT = tx(36:37);
+%   ts = (0:39) * 200;
+%   tES = ts(1:30);
+%   tSP = ts(32:33);
+%   tIT = ts(36:37);
+%
+% extension of geo.FORTime row 30 to include ES and IT times using
+% offsets tcal = [400, 600, 1200, 1400] * 1e3;
+%
+%     1  2 ... n-1  n
+%   1 ---- ... ------ 
+%   2 |             |
+%   : :     tx      :   tx = double(geo.FORTime); 
+%  29 |             |
+%  30 ---- ... ------
+%   1 ---- ... ------
+%   : :     ty      :   ty = ones(4,1) * tx(30,:) + tcal' * ones(1,n);
+%   4 ---- ... ------ 
+%
+%   geoTime = [tx; ty];
+%   geoTime = geoTime(:);
+%
+% QC for individual obs 
+%   timeOK = ~isnan(geoTime) & tmin <= geoTime & geoTime <= tmax; 
+%
+% QC for the current file
+%   if sum(timeOK) == 0 or geoTime != unique(geoTime)), skip this
+%   file and continue
 %
 
 function [geo, geoTime, timeOK, gi] = nextGeo(glist, gi)
@@ -44,7 +67,8 @@ geo = struct([]);
 geoTime = [];
 timeOK = [];
 
-% edit for time tests, see fakeTime params
+% the following is for timing tests, "if false" skips.  See fakeTime
+% parameters and edit as needed.
 if false
   if gi < length(glist), 
     gi = gi + 1;
@@ -62,7 +86,7 @@ if false
   return % skip the regular nextGeo code
 end
 
-% loop on file list
+% loop on geo file list
 no_data = true;
 while no_data && gi < length(glist)
 
@@ -79,6 +103,14 @@ while no_data && gi < length(glist)
     continue
   end
 
+  % fix geo data missing 1 Jul 2012 leap second for 3 days
+  tref = geo.FORTime(1);
+  ht0 = dnum2iet(datenum('1 Jul 2012 00:00:00'));
+  ht1 = dnum2iet(datenum('3 Jul 2012 18:00:00'));
+  if ht0 <= tref & tref < ht1
+    geo.FORTime = geo.FORTime + 1e6;
+  end
+
   % add selected attributes to the geo struct
   atmp = ones(4,1) * single([attr4(:).N_Beginning_Orbit_Number]);
   geo.Orbit_Number = atmp(:);
@@ -88,14 +120,14 @@ while no_data && gi < length(glist)
   % geoTime extends geo.FORTime ES times with IT and SP times
   [~, nscanGeo] = size(geo.FORTime);
   tx = double(geo.FORTime);
-  ty = tx(30, :) + tcal' * ones(1, nscanGeo);
+  ty = ones(4,1) * tx(30, :) + tcal' * ones(1, nscanGeo);
   geoTime = [tx; ty];
   geoTime = geoTime(:);
 
-  % basic time QC
+  % Geo time QC
   timeOK = ~isnan(geoTime) & tmin <= geoTime & geoTime <= tmax;
-  if sum(timeOK) == 0
-    % if no good obs, clear and continue
+  if sum(timeOK) == 0 || ~isequal(geoTime, unique(geoTime))
+    fprintf(1, 'nextGeo: bad geo time values, skipping geo file %d\n', gi)
     geo = struct([]);
     geoTime = [];
     geoTimeOK = [];

@@ -1,8 +1,8 @@
 %
-% opts_L1a_j1_H4 - wrapper to process NOAA RDR to ccast L1a files
+% opts_L1a04_j1_H4 - wrapper to process NOAA RDR to ccast L1a files
 %
 % SYNOPSIS
-%   opts_L1a_j1_H4(year, doy)
+%   opts_L1a04_j1_H4(year, doy)
 %
 % INPUTS
 %   year  - integer year
@@ -13,10 +13,10 @@
 %   ccast L1a files.  It can be edited as needed to change options
 %   and paths.  Processing is done by RDR_to_L1a.
 %
-%   this version is for early mission runs with 4-scan RDR and Geo.
+%   this version is for 4-scan RDR and Geo data from GRAVITE
 %
 
-function ops_L1a_j1_H4(year, doy)
+function ops_L1a04_j1_H4(year, doy)
 
 % search paths
 addpath ../source
@@ -39,17 +39,7 @@ ghome = '/asl/cris/gravite/CrIS-SDR-GEO';
 rhome = '/asl/cris/gravite/CRIS-SCIENCE-RDR_SPACECRAFT-DIARY-RDR';
 
 % get a CCSDS temp filename
-jobid = str2num(getenv('SLURM_JOB_ID'));         % job ID
-jarid = str2num(getenv('SLURM_ARRAY_TASK_ID'));  % job array ID
-procid = str2num(getenv('SLURM_PROCID'));        % relative process ID
-if isempty(jobid) || isempty(jarid) || isempty(procid) ...
-    || exist(sprintf('/scratch/%d', jobid), 'dir') == 0
-  fprintf(1, 'warning: using current directory for CCSDS temp file\n')
-  rng('shuffle');
-  ctmp = sprintf('ccsds_%05d.tmp', randi(99999));
-else
-  ctmp = sprintf('/scratch/%d/ccsds_%03d_%03d.tmp', jobid, jarid, procid);
-end
+ctmp = ccsds_tmpfile;
 
 % RDR_to_L1a options struct
 opts = struct;
@@ -79,18 +69,12 @@ ds2 = sprintf('%03d', doy);
 % RDR file list
 rdir0 = fullfile(rhome, ds0);
 rdir1 = fullfile(rhome, ds1);
-rlist0 = dir2list(rdir0, 'RCRIS', nscanRDR);
-rlist1 = dir2list(rdir1, 'RCRIS', nscanRDR);
-rlist = [rlist0(end-2:end); rlist1];  % end-2 for 4-scan files
-% rlist = rlist(820:end);  % TEST TEST TEST
+rlist = flist_wrap(rdir0, rdir1, 'RCRIS', nscanRDR);
 
 % Geo file list
 gdir0 = fullfile(ghome, ds0);
 gdir1 = fullfile(ghome, ds1);
-glist0 = dir2list(gdir0, 'GCRSO', nscanGeo);
-glist1 = dir2list(gdir1, 'GCRSO', nscanGeo);
-glist = [glist0(end-2:end); glist1];  % end-2 for 4-scan files
-% glist = glist(820:end);  % TEST TEST TEST
+glist = flist_wrap(gdir0, gdir1, 'GCRSO', nscanGeo);
 
 % L1a output home
 Lhome = '/asl/cris/ccast';
@@ -98,7 +82,6 @@ Ldir = sprintf('L1a%02d_%s_H4', nscanSC, opts.cvers);
 Lfull = fullfile(Lhome, Ldir, ys2, ds2);
 
 % create the output path, if needed
-% unix(['mkdir -p ', Lfull]);
 if exist(Lfull) ~= 7, mkdir(Lfull), end
 
 %-----------------------------------------

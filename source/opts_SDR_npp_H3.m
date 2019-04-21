@@ -1,8 +1,8 @@
 %
-% opts_npp_HR - wrapper to process ccast L1a to SDR files
+% opts_npp_H3 - wrapper to process ccast L1a to SDR files
 %
 % SYNOPSIS
-%   opts_npp_HR(year, doy)
+%   opts_npp_H3(year, doy)
 %
 % INPUTS
 %   year  - integer year
@@ -14,7 +14,7 @@
 %   paths.  Processing is done by L1a_to_SDR.
 %
 
-function opts_npp_HR(year, doy)
+function opts_npp_H3(year, doy)
 
 % search paths
 addpath ../source

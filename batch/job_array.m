@@ -1,19 +1,16 @@
 %
 % NAME
-%   task_sets -- run ccast on doy = job array ID + process ID
+%   job_array -- run ccast on doy = job array ID
 %
 % SYNOPSIS
-%   task_sets(fnx, year)
+%   job_array(fnx, year)
 %
 % fnx values include
 %   SDR_npp_LR, SDR_npp_H2, SDR_npp_H3, SDR_j1_LR, SDR_j1_H4,
 %   L1a_npp_LR, L1a_npp_H2, L1a_npp_H3, L1a_j1_H4
 %
-% sample doy base for 24 task sets starting 1 Jan:
-%   1,25,49,73,97,121,145,169,193,217,241,265,289,313,337,361
-%
 
-function task_sets(fnx, year)
+function job_array(fnx, year)
 
 more off
 addpath ../source
@@ -26,7 +23,7 @@ procid = str2num(getenv('SLURM_PROCID'));        % relative process ID
 nprocs = str2num(getenv('SLURM_NTASKS'));        % number of tasks
 nodeid = sscanf(getenv('SLURMD_NODENAME'), '%s');
 
-doy = jarid + procid;
+doy = jarid;
 
 if isleap(year), yend = 366; else, yend = 365; end
 if doy > yend

@@ -22,7 +22,8 @@
 #SBATCH --account=pi_strow
 #SBATCH --mem-per-cpu=16000
 #SBATCH --oversubscribe
-#SBATCH --ntasks=24
+# #SBATCH --ntasks=24
+#SBATCH --ntasks=23
 #SBATCH --ntasks-per-node=4
 
 # matlab options

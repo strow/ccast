@@ -37,17 +37,7 @@ ghome = '/asl/cris/geo60_j01';
 rhome = '/asl/cris/rdr60_j01';
 
 % get a CCSDS temp filename
-jobid = str2num(getenv('SLURM_JOB_ID'));         % job ID
-jarid = str2num(getenv('SLURM_ARRAY_TASK_ID'));  % job array ID
-procid = str2num(getenv('SLURM_PROCID'));        % relative process ID
-if isempty(jobid) || isempty(jarid) || isempty(procid) ...
-    || exist(sprintf('/scratch/%d', jobid), 'dir') == 0
-  fprintf(1, 'warning: using current directory for CCSDS temp file\n')
-  rng('shuffle');
-  ctmp = sprintf('ccsds_%05d.tmp', randi(99999));
-else
-  ctmp = sprintf('/scratch/%d/ccsds_%03d_%03d.tmp', jobid, jarid, procid);
-end
+ctmp = ccsds_tmpfile;
 
 % RDR_to_L1a options struct
 opts = struct;
@@ -73,18 +63,12 @@ ds1 = sprintf('%03d', doy);
 % RDR file list
 rdir0 = fullfile(rhome, ys0, ds0);
 rdir1 = fullfile(rhome, ys1, ds1);
-rlist0 = dir2list(rdir0, 'RCRIS', nscanRDR);
-rlist1 = dir2list(rdir1, 'RCRIS', nscanRDR);
-rlist = [rlist0(end); rlist1];
-% rlist = rlist(41:50);  % TEST TEST TEST
+rlist = flist_wrap(rdir0, rdir1, 'RCRIS', nscanRDR);
 
 % Geo file list
 gdir0 = fullfile(ghome, ys0, ds0);
 gdir1 = fullfile(ghome, ys1, ds1);
-glist0 = dir2list(gdir0, 'GCRSO', nscanGeo);
-glist1 = dir2list(gdir1, 'GCRSO', nscanGeo);
-glist = [glist0(end); glist1];
-% glist = glist(41:50);  % TEST TEST TEST
+glist = flist_wrap(gdir0, gdir1, 'GCRSO', nscanGeo);
 
 % L1a output home
 Lhome = '/asl/cris/ccast';
@@ -92,7 +76,6 @@ Ldir = sprintf('L1a%02d_%s_H4', nscanSC, opts.cvers);
 Lfull = fullfile(Lhome, Ldir, ys1, ds1);
 
 % create the output path, if needed
-% unix(['mkdir -p ', Lfull]);
 if exist(Lfull) ~= 7, mkdir(Lfull), end
 
 %-----------------------------------------

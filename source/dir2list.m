@@ -27,12 +27,14 @@
 
 function flist = dir2list(rdir, ftype, nscan)
 
+% position of RCRIS and GCRSO filename time strings
 switch(ftype)
   case 'RCRIS', k1 = 17; k2 = 43; s1 = 'RCRIS-RNSCA_*.h5';
   case 'GCRSO', k1 = 11; k2 = 37; s1 = 'GCRSO_*.h5';
   otherwise, error('ftype must be RCRIS or GCRSO');
 end
 
+% acceptable filename time span for 4 and 60 scan files
 switch(nscan)
   case  4, dt1 =  3 * 8; dt2 =  5 * 8;
   case 60, dt1 = 56 * 8; dt2 = 61 * 8;
@@ -51,7 +53,11 @@ end
 n0 = length(flist);
 ix = logical(zeros(n0));
 for j = 1 : n0
+  % get filename start and end times
   [t1, t2] = rstr2tai(flist(j).name(k1:k2));
+  flist(j).t1 = t1; flist(j).t2 = t2;
+
+  % compare filename with expected time span
   dt = mod(t2 - t1, 86400);
   ix(j) = dt1 <= dt & dt <= dt2;
 end

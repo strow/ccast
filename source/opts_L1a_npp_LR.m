@@ -1,8 +1,8 @@
 %
-% opts_L1a_npp_H2 - wrapper to process NOAA RDR to ccast L1a files
+% opts_L1a_npp_LR - wrapper to process NOAA RDR to ccast L1a files
 %
 % SYNOPSIS
-%   opts_L1a_npp_H2(year, doy)
+%   opts_L1a_npp_LR(year, doy)
 %
 % INPUTS
 %   year  - integer year
@@ -14,7 +14,7 @@
 %   and paths.  Processing is done by RDR_to_L1a.
 %
 
-function opts_L1a_npp_H2(year, doy)
+function opts_L1a_npp_LR(year, doy)
 
 % search paths
 addpath ../source
@@ -46,7 +46,7 @@ opts.cctag = '20a';
 opts.ctmp = ctmp;
 
 % load an initial eng packet 
-load('../inst_data/npp_eng_v36_H2')
+load('../inst_data/npp_eng_v36_LR')
 opts.eng = eng;
 
 %------------------
@@ -72,7 +72,7 @@ glist = flist_wrap(gdir0, gdir1, 'GCRSO', nscanGeo);
 
 % L1a output home
 Lhome = '/asl/cris/ccast';
-Ldir = sprintf('L1a%02d_%s_H2', nscanSC, opts.cvers);
+Ldir = sprintf('L1a%02d_%s_LR', nscanSC, opts.cvers);
 Lfull = fullfile(Lhome, Ldir, ys1, ds1);
 
 % create the output path, if needed
