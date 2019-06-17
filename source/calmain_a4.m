@@ -9,7 +9,7 @@
 % INPUTS
 %   inst    - instrument params struct
 %   user    - user grid params struct
-%   rcnt    - n x 9 x 34 x nscan, ES rad count
+%   rcnt    - n x 9 x 34 x nscan, ES rad counts
 %   avgIT   - n x 9 x 2 x nscan, moving avg IT rad count
 %   avgSP   - n x 9 x 2 x nscan, moving avg SP rad count
 %   sci     - struct array, data from 8-sec science packets
@@ -86,13 +86,15 @@ for si = 1 : nscan
   dt = abs(max(geo.FORTime(:, si)) - tai2iet(utc2tai([sci.time]/1000)));
   ic = find(dt == min(dt));
 
+  % sci scan time as TAI, for ICTradModel
+  tscan = utc2tai(sci(ic).time/1000);
+
   % get ICT temperature
   T_ICT = (sci(ic).T_PRT1 + sci(ic).T_PRT2) / 2;
 
   % get expected ICT radiance at the user grid
   ugrid = cris_ugrid(user, 4);
-  B = ICTradModel(inst.band, ugrid, T_ICT, sci(ic), eng.ICT_Param, ...
-                  1, NaN, 1, NaN);
+  B = ICTradModel(inst.band, ugrid, T_ICT, sci(ic), eng.ICT_Param, tscan, opts);
 
   % copy rIT across 30 columns
   rIT = B.total(:) * ones(1, 30);
@@ -168,8 +170,7 @@ for si = 1 : nscan
   %---------------------------
 
   % get expected ICT radiance at the sensor grid
-  B = ICTradModel(inst.band, inst.freq, T_ICT, sci(ic), eng.ICT_Param, ...
-                  1, NaN, 1, NaN);
+  B = ICTradModel(inst.band, inst.freq, T_ICT, sci(ic), eng.ICT_Param, tscan, opts);
   
   % copy rIT across 2 columns
   rIT = B.total(:) * ones(1, 2);
@@ -204,8 +205,20 @@ rcal = rcal(1:mchan, :, :, :);
 rICT = rICT(1:mchan, :, :, :);
 
 % NEdN is the standard deviation of rICT
-nedn = nanstd(real(rICT), 0, 4);
+% nedn = nanstd(real(rICT), 0, 4);
 
 % apply principal component filter to NEdN 
-nedn = nedn_filt(user, opts.nedn_filt, vcal, nedn);
+% nedn = nedn_filt(user, opts.nedn_filt, vcal, nedn);
+
+% unapodized NEdN
+nedn1 = nanstd(real(rICT(:,:,:)), 0, 3);  
+
+% apodized NEdN
+ntmp = real(rICT(:,:));
+ntmp = hamm_app(ntmp);
+ntmp = reshape(ntmp, mchan, 9, 2*nscan);
+nedn2 = nanstd(ntmp, 0, 3);
+
+% return both without filtering
+nedn = cat(3, nedn1, nedn2);
 

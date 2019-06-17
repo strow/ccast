@@ -1,5 +1,8 @@
 
-% function B = ICTradModel(band, wn, T_ICT, T_CRIS, ICT_Param, tscan, opts)
+function B = ICTradModel(band,wn,T_ICT,T_CRIS,ICT_Param,eFlag,eICT,ssmFlag,ssmOffset)
+
+%
+% function B = ICTradModel(band,wn,T_ICT,T_CRIS,ICT_Param,eFlag,eICT,ssmFlag,ssmOffset)
 %
 % Compute CrIS FM1 ICT predicted radiance.
 %
@@ -21,11 +24,18 @@
 %  ICT_Param: A structure of 4 minute engineering packet parameters as read by the MIT LL RDR 
 %             reader and contained in d1.packet.ICT_Param
 %
-%  tscan:     TAI time for the current scan, used for orbital phase
+%    eFlag:   Flag determining source of ICT cavity emissivity: 1: pulled from 4-min-eng packet info, 
+%             or 0: input as eICT (see next input var)
 %
-%  opts:      more input parameters
-%                opts.npole_xing: TAI time for a recent N. Polar crossing
-%                opts.orb_period: orbital period (seconds)
+%    eICT:    vector of ICT cavity emissivity (Nchan x 1).  Only used if eFlag=0.
+%
+%    ssmFlag  Flag determining source of SSM Baffle temperature offset(s): 1: pulled from 4-min-eng 
+%             packet info (with modeled orbital dependence), or 0: input as ssmOffset (see next 
+%             input var)
+%
+%    ssmOffset:  Scalar temperature offset (K) to SSM Baffle temperature.  Only used if ssmFlag=0.
+%                (In TVAC was -0.5K for PQL, -1.5K for MN, -2.1K for PQH, and -3.2K for special 
+%                PQH ICT emis test)
 %
 % Outputs:
 %
@@ -43,8 +53,7 @@
 % 		
 %    4/06/2009: JKT, modded ICTradModelTVAC3.m code to match ccast_ICTradModelTVAC3_dct.m version emailed on 3/17/2009
 %
-%    7 Nov 2011: DCT: renamed to ICTradModel.m and made numerous edits regarding input format and options for ICT emissivity
-%                and SSM Baffle offset temps.
+%    7 Nov 2011: DCT: renamed to ICTradModel.m and made numerous edits regarding input format and options for ICT emissivity and SSM Baffle offset temps.
 %
 % The radiometric model contains radiance contributions from 
 %
@@ -89,8 +98,6 @@
 % d1.packet.ICT_Param.Scan_Baffle_Temp_Orbit                       SSM Baffle Temperature offset vs orbit time
 % d1.packet.ICT_Param.Orbital_Period
 
-function B = ICTradModel(band, wn, T_ICT, T_CRIS, ICT_Param, tscan, opts)
-
 % Spectral band
 switch upper(band)
 case 'LW'
@@ -102,7 +109,7 @@ case 'SW'
 end
 
 % ICT emissivity
-
+if eFlag == 1        % Pull from 4-min-eng packet;
   e_ICT = ICT_Param.Band(iband).ICT.EffEmissivity.Pts;
 
   % check if eng packet emiss and input frequency grid match
@@ -127,14 +134,35 @@ end
     e_ICT = interp1(ftmp, e_ICT, wn, 'linear', 'extrap');
   end
 
+elseif eFlag == 0;   % user input
+  e_ICT = eICT;
+
+end
+
 % SSM Baffle Offset
+if ssmFlag == 1   % Pull offsets from 4-min-eng-packet and interpolate to this time in the orbit.
+
+  % IF we have geolocation information, this could be implemented more robustly.  Currently uses a 
+  % hard-coded North pole crossing time and the orbital period to compute the "orbit time".  Could/should 
+  % be changed to compute the latest North pole crossing time using the TLE and nagivation sw.
+
+  % north_pole_dnum = datenum(2011,11,11,6,23,13.4);   % this was obtained from running Fred' code "when" for the north pole. DCT 11-Nov-2011
+  % north_pole_dnum = datenum(2011,11,20,11,48,53.6);   % this was obtained from running Fred' code "when" for the north pole. DCT 21-Nov-2011
+  north_pole_dnum = datenum(2011,11,30,22,16,56.5);   % this was obtained from running Fred' code "when" for the north pole. DCT 01-Dec-2011
 
   %  orbit_period = ICT.Param.Orbital_Period;
-  orbit_period = opts.orb_period;
+  %  orbit_period = 6084.8727;   % From running when for NP crossing times, DCT 21-Nov-2011.  Orbit altitude is 835.9 km
+  %  orbit_period = 6089.8000;   % From running when for NP crossing times, DCT 01-Dec-2011.  Orbit altitude is 840.7 km
+  %  It is more accurate to compute the orbit period directly from the #-of-orbits-per-day, which is contained directly in the
+  %  TLE files:
+  orbits_per_day = 14.1956987;   % From NPP TLE generated on http:flo.ssec.wisc.edu/orbnav/ on 01-Dec-2011 with Epoch of TLE params: 30-Nov-2011
+  seconds_per_day = 24*60*60;
+  orbit_period = seconds_per_day/orbits_per_day;
+
+  % CHECK ABOVE vs. ICT_Param.Orbital_Period when have real data with updated Eng.Packet (v32), and use ICT_Param value if ok.
 
   % Now compute the "orbit_time" - seconds since last North Pole crossing:
-% orbit_time = mod((north_pole_dnum - T_CRIS.dnum)*seconds_per_day,orbit_period);
-  orbit_time = mod(tscan - opts.npole_xing, orbit_period);
+  orbit_time = mod((north_pole_dnum - T_CRIS.dnum)*seconds_per_day,orbit_period);
 
   % Orbit time values corresponding to the SSM Baffle Temp offset taken from the ATBD.  
   % I've added another (last) point at orbit_period.
@@ -145,6 +173,11 @@ end
   Offsets = [ICT_Param.Scan_Baffle_Temp_Orbit ; ICT_Param.Scan_Baffle_Temp_Orbit(1)];
 
   T_ScanBaffleCorrection = interp1(orbit_time_vector,Offsets,orbit_time,'spline');
+
+elseif ssmFlag == 0    % user input
+  T_ScanBaffleCorrection = ssmOffset;
+
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

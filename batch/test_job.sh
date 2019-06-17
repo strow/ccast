@@ -7,6 +7,8 @@
 #   sbatch --array=<list> test_job.sh
 #
 
+# remote edit test, all reet!
+
 # sbatch options
 #SBATCH --job-name=test
 #SBATCH --partition=batch

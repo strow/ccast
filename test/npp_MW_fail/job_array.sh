@@ -14,9 +14,8 @@
 # sbatch options
 #SBATCH --job-name=ccast
 #SBATCH --partition=batch
-# #SBATCH --constraint=hpcf2009
-#SBATCH --constraint=lustre
-#SBATCH --partition=high_mem
+#SBATCH --constraint=hpcf2009
+# #SBATCH --partition=high_mem
 #SBATCH --qos=medium+
 # #SBATCH --qos=normal+
 #SBATCH --account=pi_strow

@@ -1,8 +1,8 @@
 %
-% opts_npp_LR - wrapper to process ccast L1a to SDR files
+% opts_SDR_npp_LR - wrapper to process ccast L1a to SDR files
 %
 % SYNOPSIS
-%   opts_npp_LR(year, doy)
+%   opts_SDR_npp_LR(year, doy)
 %
 % INPUTS
 %   year  - integer year
@@ -13,13 +13,18 @@
 %   to SDR files.  It can be edited as needed to change options and
 %   paths.  Processing is done by L1a_to_SDR.
 %
+%   this version is for low res user grid SDR from any of the sensor
+%   grid res modes; edit L1a paths, inst_res, and SA invers files as
+%   needed
+%
 
-function opts_npp_LR(year, doy)
+function opts_SDR_npp_LR(year, doy)
 
 % search paths
 addpath ../source
 addpath ../davet
 addpath ../motmsc/time
+addpath /asl/packages/airs_decon/source
 
 %-------------------
 % data path options
@@ -33,8 +38,9 @@ Lhome = '/asl/cris/ccast';  % L1a data
 Shome = '/asl/cris/ccast';  % SDR data
 
 % L1a and SDR directory names
-Ldir = sprintf('L1a%02d_%s_H3', nscanSC, cvers);
-Sdir = sprintf('sdr%02d_%s_LR', nscanSC, cvers);
+% Ldir = sprintf('L1a%02d_%s_LR', nscanSC, cvers);
+  Ldir = sprintf('L1a%02d_%s_H3', nscanSC, cvers);
+  Sdir = sprintf('sdr%02d_%s_LR', nscanSC, cvers);
 
 % full L1a and SDR paths
 dstr = sprintf('%03d', doy);
@@ -59,6 +65,7 @@ opts.cvers = cvers;       % current active CrIS
 opts.cal_fun = 'c5';      % calibration algorithm
 opts.nlc_alg = 'NPP';     % UW NPP nonlin corr alg
 opts.inst_res = 'hires3'; % npp extended res mode
+% opts.inst_res = 'lowres'; % npp initial low res mode
 opts.user_res = 'lowres'; % low resolution user grid
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 opts.resamp = 4;          % resampling algorithm
@@ -68,6 +75,11 @@ opts.neonWL = 703.44835;  % override eng Neon value
 opts.LW_sfile = '../inst_data/SAinv_HR3_Pn_LW.mat';
 opts.MW_sfile = '../inst_data/SAinv_HR3_Pn_MW.mat';
 opts.SW_sfile = '../inst_data/SAinv_HR3_Pn_SW.mat';
+
+% low-res SA inverse files
+% opts.LW_sfile = '../inst_data/SAinv_LR_Pn_ag_LW.mat';
+% opts.MW_sfile = '../inst_data/SAinv_LR_Pn_ag_MW.mat';
+% opts.SW_sfile = '../inst_data/SAinv_LR_Pn_ag_SW.mat';
 
 % time-domain FIR filter 
 opts.NF_file = '../inst_data/FIR_19_Mar_2012.txt';

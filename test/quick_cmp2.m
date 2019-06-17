@@ -6,9 +6,9 @@ addpath ../source
 addpath ../motmsc/time
 addpath ../motmsc/utils
 
-p1 = '/asl/data/cris/ccast/sdr45_j01_HR/2018/060';
-p2 = '/asl/data/cris/ccast/sdr45_j1v4_HR/2018/060';
-gran = 'CrIS_SDR_j01_s45_d20180301_t0118080_g014_v20a.mat';
+  p1 = './ccast_a4_eng_a2_new_ict/sdr45_npp_HR/2019/062';
+  p2 = './ccast_a4_eng_a2_new_ict_X/sdr45_npp_HR/2019/062';
+  gran = 'CrIS_SDR_npp_s45_d20190303_t2342080_g238_v20a.mat';
 
 f1 = fullfile(p1, gran);
 f2 = fullfile(p2, gran);

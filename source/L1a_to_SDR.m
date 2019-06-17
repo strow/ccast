@@ -28,7 +28,7 @@ function L1a_to_SDR(flist, sdir, opts);
 % initialization
 %----------------
 
-% number of RDR files to process
+% number of L1a files to process
 nfile = length(flist);
 
 % moving average span is 2 * mvspan + 1
@@ -52,12 +52,12 @@ for fi = 1 : nfile
   if exist(Lfile, 'file')
     fprintf(1, 'L1a_to_SDR: processing index %d file %s\n', fi, rid)
   else
-    % skip processing if no matlab RDR file
-    fprintf(1, 'L1a_to_SDR: RDR file missing, index %d file %s\n', fi, rid)
+    % skip processing if no matlab L1a file
+    fprintf(1, 'L1a_to_SDR: L1a file missing, index %d file %s\n', fi, rid)
     continue
   end
 
-  % load the RDR data, this defines structures d1 and m1
+  % load the L1a data, this defines structures d1 and m1
   load(Lfile)
 
  % check that we have sci data before we continue
@@ -170,6 +170,13 @@ for fi = 1 : nfile
        'cLW', 'cMW', 'cSW', 'rLW', 'rMW', 'rSW', 'nLW', 'nMW', 'nSW', ...
        'vLW', 'vMW', 'vSW', 'scTime', 'sci', 'eng', 'geo', 'L1a_err', ...
        'L1b_err', 'L1b_stat', 'rid', '-v7.3')
+
+% % drop the complex residuals
+% save(sfile, ...
+%      'instLW', 'instMW', 'instSW', 'userLW', 'userMW', 'userSW', ...
+%      'rLW', 'rMW', 'rSW', 'nLW', 'nMW', 'nSW', ...
+%      'vLW', 'vMW', 'vSW', 'scTime', 'sci', 'eng', 'geo', 'L1a_err', ...
+%      'L1b_err', 'L1b_stat', 'rid', '-v7.3')
 
 end
 

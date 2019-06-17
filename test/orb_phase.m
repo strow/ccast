@@ -1,3 +1,7 @@
+% 
+% compare geo.Asc_Desc_Flag and max lat for north polar 
+% crossing times
+%
 
 addpath /asl/packages/ccast/source
 addpath /asl/packages/ccast/motmsc/time
@@ -48,23 +52,21 @@ for di = dlist
 end % loop on days
 
 mlat = movavg1(lat_list, 3);
-plot(mlat)
+% plot(mlat)
 
 % tax = tai2dnum(tai_list);
 % tax = datetime(tax, 'ConvertFrom', 'datenum');
-
-tax = (tai_list - tai_list(1)) / 6060;
-
+% tax = (tai_list - tai_list(1)) / 6060;
 % tax = (tai_list - tai_list(1)) / 60;
-
 % t1 = tai_list / 6090;
+
 t1 = tai_list;
 t2 = t1 - t1(1);
 dlat = diff(mlat);
-plot(t2, mlat, t2(2:end), 120*dlat)
+% plot(t2, mlat, t2(2:end), 120*dlat)
 % axis([0,28, -90, 90])
-  axis([0,1.73e5, -90, 90])
-grid on
+% axis([0,1.73e5, -90, 90])
+% grid on
 
 nlist = [];
 ilist = [];
@@ -84,7 +86,8 @@ ix1 = ilist(1,:);
 ix2 = ilist(2,:);
 nx1 = nlist(1,:);
 nx2 = nlist(2,:);
-plot(t2, mlat, ... 
+plot(t2, mlat, t2, asc_list * 82, ...
      t2(ix1), mlat(ix1), '+r', t2(ix2), mlat(ix2), '+g', ...
-     t2(nx1), mlat(nx1), 'or', t2(nx2), mlat(nx2), 'og')
+     t2(nx1), mlat(nx1), 'or', t2(nx2), mlat(nx2), 'og');
+
 
