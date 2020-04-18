@@ -248,6 +248,8 @@ axis([1200,1750,-2, 1])
 title(sprintf('%s sarta comparisons, FOV %d', dstr, jFOV))
 legend('noaa a4 eng a2', 'ccast a4 umbc FOV 7', ...
        'ccast a4 uw new FOV 7', 'location', 'southwest')
+xlabel('wavenumber (cm-1)')
+ylabel('dBT (K)')
 
 grid on; zoom on
 s3 = sprintf('MW_%s_sarta_fov%d_sd%d', fstr, jFOV, jdir);

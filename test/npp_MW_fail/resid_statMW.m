@@ -14,7 +14,7 @@ jFOV = 7;   % select a FOV
 % jdir = 1;   % select sweep direction (0 or 1)
 
 if true
-  dstr = '4 Mar 2019'; fstr = 'pre_fail';
+  dstr = '3 Mar 2019'; fstr = 'pre_fail';
   p1 = '/home/motteler/cris/move_data/npp_scrif/2019/063';
 % gn = 'GCRSO-SCRIF_npp_d20190304_t1007039_e1015017_b38080_c20190507191953137970_nobc_ops.h5';
   gn = 'GCRSO-SCRIF_npp_d20190304_t0903039_e0911017_b38079_c20190507191950399251_nobc_ops.h5';
@@ -135,7 +135,7 @@ xlabel('wavenumber (cm-1)')
 ylabel('dBT (K)')
 grid on; zoom on
 
-s1 = sprintf('MW_%s_BT_fov%d_sd%d', fstr, jFOV, jdir);
+% s1 = sprintf('MW_%s_BT_fov%d_sd%d', fstr, jFOV, jdir);
 % saveas(gcf, s1, 'png')
 
 return
@@ -159,6 +159,6 @@ ylabel('mw sr-1 m-2')
 xlabel('wavenumber (cm-1)')
 grid on; zoom on
 
-s2 = sprintf('MW_%s_imag_fov%d_sd%d', fstr, jFOV, jdir);
+% s2 = sprintf('MW_%s_imag_fov%d_sd%d', fstr, jFOV, jdir);
 % saveas(gcf, s2, 'png')
 
