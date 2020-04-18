@@ -7,24 +7,25 @@
 #   sbatch --array=<doy list> job_array.sh <fnx> <year>
 #
 # fnx values include
-#   SDR_npp_LR, SDR_npp_HR, SDR_j1_LR, SDR_j1_HR,
-#   L1a_npp_H2, L1a_npp_H3, L1a_j1_H4
+#   SDR_npp_LR, SDR_npp_H2, SDR_npp_H3, SDR_j1_LR, SDR_j1_H4,
+#   L1a_npp_LR, L1a_npp_H2, L1a_npp_H3, L1a_j1_H4
 #
 
 # sbatch options
 #SBATCH --job-name=ccast
-#SBATCH --partition=batch
-# #SBATCH --constraint=hpcf2009
-#SBATCH --constraint=lustre
 #SBATCH --partition=high_mem
+# #SBATCH --partition=batch
+#SBATCH --constraint=lustre
+# #SBATCH --constraint=hpcf2009
 #SBATCH --qos=medium+
 # #SBATCH --qos=normal+
 #SBATCH --account=pi_strow
-#SBATCH --mem-per-cpu=16000
+#SBATCH --mem-per-cpu=20000
 #SBATCH --oversubscribe
+# #SBATCH --exclusive
 
 # exclude list
-#SBATCH --exclude=cnode[203,204,212,213,236,240,250,260,282,284]
+# #SBATCH --exclude=cnode[007,009]
 
 # matlab options
 MATLAB=/usr/ebuild/software/MATLAB/2018b/bin/matlab

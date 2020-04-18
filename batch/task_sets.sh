@@ -7,21 +7,36 @@
 #   sbatch --array=<doy base> task_sets.sh <fnx> <year>
 #
 # fnx values include
-#   SDR_npp_LR, SDR_npp_HR, SDR_j1_LR, SDR_j1_HR,
-#   L1a_npp_H2, L1a_npp_H3, L1a_j1_H4
+#   SDR_npp_LR, SDR_npp_H2, SDR_npp_H3, SDR_j1_LR, SDR_j1_H4,
+#   L1a_npp_LR, L1a_npp_H2, L1a_npp_H3, L1a_j1_H4
+#
+# The <doy base> spec should normally include a %1 suffix, to run
+# only one job array step at a time, since each step will run ntask
+# tasks, as set below.
+#
+# For example if we have --ntasks=15, we would want something
+# like --array=339,354%1 to run two job array steps of 15 days each.
+# (Actually, the second set will be truncated so as not to run past
+# the end of the year.)  The key idea is simply that the job array
+# steps should be multiples of ntasks.
 #
 
 # sbatch options
 #SBATCH --job-name=ccast
 #SBATCH --partition=high_mem
+# #SBATCH --partition=batch
+#SBATCH --constraint=lustre
+# #SBATCH --constraint=hpcf2009
 #SBATCH --qos=medium+
 # #SBATCH --qos=normal+
 #SBATCH --account=pi_strow
-#SBATCH --mem-per-cpu=16000
+#SBATCH --mem-per-cpu=20000
 #SBATCH --oversubscribe
-# #SBATCH --ntasks=25
-#SBATCH --ntasks=15
+#SBATCH --ntasks=30
 #SBATCH --ntasks-per-node=5
+
+# exclude list
+# #SBATCH --exclude=cnode[007,009]
 
 # matlab options
 MATLAB=/usr/ebuild/software/MATLAB/2018b/bin/matlab

@@ -7,8 +7,6 @@
 #   sbatch --array=<list> test_job.sh
 #
 
-# remote edit test, all reet!
-
 # sbatch options
 #SBATCH --job-name=test
 #SBATCH --partition=batch
@@ -22,7 +20,7 @@
 #SBATCH --oversubscribe
 
 # exclude list
-#SBATCH --exclude=cnode[212,213,240,260,284]
+#SBATCH --exclude=cnode[203,204,260,267]
 
 srun --output=test_%A_%a.out test_aux.sh
 

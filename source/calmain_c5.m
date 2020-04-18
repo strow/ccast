@@ -81,12 +81,14 @@ for si = 1 : nscan
   dt = abs(max(geo.FORTime(:, si)) - tai2iet(utc2tai([sci.time]/1000)));
   ic = find(dt == min(dt));
 
+  % sci scan time as TAI, for ICTradModel
+  tscan = utc2tai(sci(ic).time/1000);
+
   % get ICT temperature
   T_ICT = (sci(ic).T_PRT1 + sci(ic).T_PRT2) / 2;
 
   % get expected ICT radiance at the sensor grid
-  B = ICTradModel(inst.band, inst.freq, T_ICT, sci(ic), eng.ICT_Param, ...
-                  1, NaN, 1, NaN);
+  B = ICTradModel(inst.band, inst.freq, T_ICT, sci(ic), eng.ICT_Param, tscan, opts);
 
   % copy rIT across 30 columns
   rIT = B.total(:) * ones(1, 30);

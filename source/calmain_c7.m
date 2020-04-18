@@ -9,7 +9,7 @@
 % INPUTS
 %   inst    - instrument params struct
 %   user    - user grid params struct
-%   rcnt    - n x 9 x 34 x nscan, ES rad counts
+%   rcnt    - n x 9 x 34 x nscan, rad counts
 %   avgIT   - n x 9 x 2 x nscan, moving avg IT rad count
 %   avgSP   - n x 9 x 2 x nscan, moving avg SP rad count
 %   sci     - struct array, data from 8-sec science packets

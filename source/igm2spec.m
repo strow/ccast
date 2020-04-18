@@ -12,9 +12,6 @@
 % OUTPUTS
 %   spec  - nchan x 9 x 34 x nscan count spectra
 %
-% DISCUSSION
-%   should update to use circshift rather than inst.cind
-%
 % AUTHOR
 %   H. Motteler, 10 Apr 2012
 %
@@ -30,20 +27,18 @@ band = upper(inst.band);
 npts = inst.npts;
 cind = inst.cind;
 
-% truncate and shift for hi3to2 LW and SW
-if strcmp(inst.inst_res, 'hi3to2') && ~strcmp(band, 'MW')
-  igm = igm((1:npts)+4, :, :, :);
-end
+switch inst.inst_res
+  case {'hires3', 'hires4'}  % apodize extended res modes
+    igm = igm_apod(igm, 7);
 
-% truncate and apodize for hi3odd res mode
-if strcmp(inst.inst_res, 'hi3odd')
-  igm = igm(2:npts+1, :, :, :);
-  igm = igm_apod(igm, 7);
-end
-
-% apodize all IGMs for hires3 res mode
-if strcmp(inst.inst_res, 'hires3')
-  igm = igm_apod(igm, 7);
+% case 'hi3odd'  % truncate and apodize
+%   igm = igm(2:npts+1, :, :, :);
+%   igm = igm_apod(igm, 7);
+%
+% case 'hi3to2'  % truncate and shift LW and SW
+%   if ~strcmp(band, 'MW')
+%     igm = igm((1:npts)+4, :, :, :);
+%   end
 end
 
 % do an FFT of shifted data.

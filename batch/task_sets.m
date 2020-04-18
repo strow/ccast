@@ -17,11 +17,11 @@ addpath ../source
 addpath ../motmsc/time
 addpath /asl/packages/airs_decon/source
 
-jobid = str2num(getenv('SLURM_JOB_ID'));         % job ID
-jarid = str2num(getenv('SLURM_ARRAY_TASK_ID'));  % job array ID
-procid = str2num(getenv('SLURM_PROCID'));        % relative process ID
-nprocs = str2num(getenv('SLURM_NTASKS'));        % number of tasks
-nodeid = sscanf(getenv('SLURMD_NODENAME'), '%s');
+jobid = str2num(getenv('SLURM_JOB_ID'));          % job ID
+jarid = str2num(getenv('SLURM_ARRAY_TASK_ID'));   % job array ID
+procid = str2num(getenv('SLURM_PROCID'));         % relative process ID
+nprocs = str2num(getenv('SLURM_NTASKS'));         % number of tasks
+nodeid = sscanf(getenv('SLURMD_NODENAME'), '%s'); % node name
 
 doy = jarid + procid;
 
@@ -40,6 +40,7 @@ fprintf(1, 'process ID %d\n', procid)
 
 switch fnx
   case 'SDR_npp_LR',  opts_SDR_npp_LR(year, doy);
+  case 'SDR_npp_MR',  opts_SDR_npp_MR(year, doy);
   case 'SDR_npp_H2',  opts_SDR_npp_H2(year, doy);
   case 'SDR_npp_H3',  opts_SDR_npp_H3(year, doy);
   case 'SDR_j1_LR',   opts_SDR_j1_LR(year, doy);

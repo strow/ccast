@@ -103,20 +103,20 @@ rUBSW = bt2rad(vSW(ixSW), bUB(3)) * ones(1,9);
 
 % complex residual bounds
 switch(user_res)
-  case 'lowres',
+  case {'lowres', 'midres'}
     cLBLW = -cLR(1); cUBLW = cLR(1); 
     cLBMW = -cLR(2); cUBMW = cLR(2);
     cLBSW = -cLR(3); cUBSW = cLR(3);
-    if userSW.dv ~= 2.5
-      error(sprintf('unexpected userSW.dv value %g', userSW.dv));
-    end
+%   if userSW.dv ~= 2.5
+%     error(sprintf('unexpected userSW.dv value %g', userSW.dv));
+%   end
   case 'hires',
     cLBLW = -cHR(1); cUBLW = cHR(1); 
     cLBMW = -cHR(2); cUBMW = cHR(2);
     cLBSW = -cHR(3); cUBSW = cHR(3);
-    if userSW.dv ~= 0.625
-      error(sprintf('unexpected userSW.dv value %g', userSW.dv));
-    end
+%   if userSW.dv ~= 0.625
+%     error(sprintf('unexpected userSW.dv value %g', userSW.dv));
+%   end
   otherwise
     error(sprintf('unexpected use_res value %s', user_res));
 end

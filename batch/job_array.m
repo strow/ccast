@@ -40,6 +40,7 @@ fprintf(1, 'process ID %d\n', procid)
 
 switch fnx
   case 'SDR_npp_LR',  opts_SDR_npp_LR(year, doy);
+  case 'SDR_npp_MR',  opts_SDR_npp_MR(year, doy);
   case 'SDR_npp_H2',  opts_SDR_npp_H2(year, doy);
   case 'SDR_npp_H3',  opts_SDR_npp_H3(year, doy);
   case 'SDR_j1_LR',   opts_SDR_j1_LR(year, doy);
