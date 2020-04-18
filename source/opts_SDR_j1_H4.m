@@ -13,6 +13,8 @@
 %   to SDR files.  It can be edited as needed to change options and
 %   paths.  Processing is done by L1a_to_SDR.
 %
+%   updated ICT modeling, new orbital phase calc, UW/eng a2 values
+%
 
 function ops_SDR_j1_H4(year, doy)
 
@@ -20,12 +22,14 @@ function ops_SDR_j1_H4(year, doy)
 addpath ../source
 addpath ../davet
 addpath ../motmsc/time
+addpath /asl/packages/airs_decon/source
 
 %-------------------
 % data path options
 %-------------------
 
-cvers = 'j01';  % CrIS version
+cctag = '20d';  % SDR file version
+cvers = 'j01';  % CrIS instrument
 nscanSC = 45;   % scans per file
 
 % data home directories
@@ -47,7 +51,6 @@ s1 = sprintf('CrIS_L1a_%s_s%02d_*.mat', cvers, nscanSC);
 flist = dir(fullfile(Lfull, s1));
 
 % create the output path, if needed
-% unix(['mkdir -p ', Sfull]);
 if exist(Sfull) ~= 7, mkdir(Sfull), end
 
 %-------------------------------
@@ -55,6 +58,7 @@ if exist(Sfull) ~= 7, mkdir(Sfull), end
 %-------------------------------
 
 opts = struct;            % initialize opts
+opts.cctag = cctag;       % SDR file version
 opts.cvers = cvers;       % current active CrIS
 opts.cal_fun = 'c7';      % calibration algorithm
 opts.nlc_alg = 'NPP';     % UW NPP nonlin corr alg
@@ -63,6 +67,7 @@ opts.user_res = 'hires';  % high resolution user grid
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 opts.resamp = 4;          % resampling algorithm
 opts.neonWL = 703.44765;  % override eng Neon value
+opts.orb_period = 6090;   % orbital period (seconds)
 
 % high-res SA inverse files
 opts.LW_sfile = '../inst_data/SAinv_j1v3_LW.mat';
@@ -84,20 +89,12 @@ if year == 2018 && 10 <= doy && doy <= 17
   opts.cpSW = d1.cpSW;
 end
 
-% use the UW a2v4 values
-a2tmp = [
-   0.0119     0       0
-   0.0157     0       0
-   0.0152     0       0
-   0.0128     0       0
-   0.0268     0       0
-   0.0110     0       0
-   0.0091     0       0
-   0.0154     0       0
-   0.0079     0.0811  0
-];
-opts.a2LW = a2tmp(:, 1)';
-opts.a2MW = a2tmp(:, 2)';
+% current eng a2 values
+opts.a2LW = [0.0119 0.0157 0.0152 0.0128 0.0268 0.0110 0.0091 0.0154 0.0079];
+opts.a2MW = [0 0 0 0 0 0 0 0 0.0811];
+
+% use L1a for recent N polar crossing time
+opts.npole_xing = get_npole_xing(flist);
 
 %---------------------------------
 % take ccast L1a to L1b/SDR files
@@ -110,10 +107,5 @@ if isempty(flist)
   return
 end
 
-% profile clear
-% profile on
-
 L1a_to_SDR(flist, Sfull, opts)
-
-% profile report
 
