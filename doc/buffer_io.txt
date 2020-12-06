@@ -1,0 +1,71 @@
+
+  bounded buffer i/o with buffer and file pointers 
+
+
+              n element buffer B
+
+            :..|--|--|- ... -|--|..:
+            0  1  2  3      n-1 n n+1
+
+          valid indices are from 1 to n
+
+
+Bounded Buffer Read 
+--------------------
+
+init:             // initial setup
+  bp = 0          // invalid buffer pointer
+  fp = 0          // invalid file pointer
+  next_buf        // get the first buffer
+
+next_val:         // get the next value
+  bp = bp + 1     // increment the buffer pointer
+  if bp > n       // pointer was at the buffer tail
+    bp = 0        // invalid buffer pointer
+    next_buf      // get the next buffer
+  end
+
+next_buf:          // get the next buffer
+  fp = fp + 1      // increment the file pointer
+  if read(fp) OK   // if the read was successful
+    bp = 1         // the buffer has valid data
+  else
+    bp = 0         // the buffer has no data
+  end
+
+example
+  init             // setup, get first buffer
+  while bp != 0    // while the buffer has valid data
+    x = B(bp)      // read a value from the buffer
+    next_val       // advance buffer pointer
+  end
+
+
+Bounded Buffer Write
+---------------------
+
+init:              // initial setup
+  bp = 1           // first buffer position
+  fp = 1           // first file index
+
+next_val:          // call AFTER B(bp) = x
+  bp = bp + 1      // increment the buffer pointer
+  if bp > n        // pointer was at the buffer tail
+    write(fp)      // write the current buffer
+    bp = 1         // first buffer position
+    fp = fp + 1    // increment the file pointer
+  end
+
+close_buf:         // call after last write
+  if bp > 1        // if there is anything in the buffer
+    write(fp) from 1 to bp - 1   // write what's left
+  end
+
+example
+  init             // initial setup
+  while not_done   // while we want to write 
+    B(bp) = x      // write a value to the buffer
+    next_val       // advance the buffer pointer
+  end
+  close_buf        // write any data that's left
+

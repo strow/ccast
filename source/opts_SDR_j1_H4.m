@@ -66,7 +66,7 @@ opts.inst_res = 'hires4'; % j1 extended res mode
 opts.user_res = 'hires';  % high resolution user grid
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 opts.resamp = 4;          % resampling algorithm
-opts.neonWL = 703.44765;  % override eng Neon value
+opts.neonWL = 703.44765;  % current eng Neon
 opts.orb_period = 6090;   % orbital period (seconds)
 
 % high-res SA inverse files
@@ -93,9 +93,6 @@ end
 opts.a2LW = [0.0119 0.0157 0.0152 0.0128 0.0268 0.0110 0.0091 0.0154 0.0079];
 opts.a2MW = [0 0 0 0 0 0 0 0 0.0811];
 
-% use L1a for recent N polar crossing time
-opts.npole_xing = get_npole_xing(flist);
-
 %---------------------------------
 % take ccast L1a to L1b/SDR files
 %---------------------------------
@@ -106,6 +103,9 @@ if isempty(flist)
   fprintf(1, fullfile(Lfull, s1))
   return
 end
+
+% use L1a for recent N polar crossing time
+opts.npole_xing = get_npole_xing(flist);
 
 L1a_to_SDR(flist, Sfull, opts)
 

@@ -15,12 +15,10 @@
 %
 %   updated ICT modeling, new orbital phase calc, UW/eng a2 values
 %
-%   For processing after the side 2 switch, starting 25 Jun 2019, 
-%   the "post side 1 fail" SA correction matrices and UW NPP new a2
-%   values should be used.  For reprocessing before the pre side 2
-%   switch, the "pre side 1 fail" correction matrices should be used
-%   with the UW NPP new a2 values.  For reprocessing compatible with
-%   the UMBC a2 weights, those values can be used instead.
+%   For processing after the side 2 switch, starting 25 Jun 2019,
+%   the "post side 1 fail" SA correction matrices should be used.
+%   For reprocessing before the pre side 2 switch, the "pre side 1
+%   fail" correction matrices should be used.  
 %
 
 function opts_SDR_npp_H3(year, doy)
@@ -73,7 +71,8 @@ opts.inst_res = 'hires3'; % npp extended res mode
 opts.user_res = 'hires';  % high resolution user grid
 opts.mvspan = 4;          % moving avg span is 2*mvspan + 1
 opts.resamp = 4;          % resampling algorithm
-opts.neonWL = 703.44835;  % override eng Neon value
+% opts.neonWL = 703.44835;  % pre MW fail Neon
+  opts.neonWL = 703.44571;  % post MW fail Neon
 opts.orb_period = 6090;   % orbital period (seconds)
 
 % high-res SA inverse files pre side-1 fail

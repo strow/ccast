@@ -37,9 +37,10 @@
 
 # exclude list
 # #SBATCH --exclude=cnode[007,009]
+#SBATCH --exclude=cnode021
 
 # matlab options
-MATLAB=/usr/ebuild/software/MATLAB/2018b/bin/matlab
+MATLAB=/usr/ebuild/software/MATLAB/2020a/bin/matlab
 MATOPT='-nojvm -nodisplay -nosplash'
 
 srun --output=$1_%A_%a_%t.out \
