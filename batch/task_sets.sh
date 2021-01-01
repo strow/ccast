@@ -36,8 +36,7 @@
 #SBATCH --ntasks-per-node=5
 
 # exclude list
-# #SBATCH --exclude=cnode[007,009]
-#SBATCH --exclude=cnode021
+#SBATCH --exclude=cnode040
 
 # matlab options
 MATLAB=/usr/ebuild/software/MATLAB/2020a/bin/matlab
