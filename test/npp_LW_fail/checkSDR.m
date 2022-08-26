@@ -1,6 +1,6 @@
 %
 % NAME
-%   checkSDR -- SDR validation
+%   checkSDR -- SDR validation, modified to drop LW tests
 %
 % SYNOPSIS
 %   [L1b_err, L1b_stat] = ...
@@ -154,8 +154,8 @@ for j = 1 : nscan
     % check for NaNs
     nanLW(:,i,j) = cOR(isnan(rtmpLW)) | cOR(isnan(ctmpLW));
     nanMW(:,i,j) = cOR(isnan(rtmpMW)) | cOR(isnan(ctmpMW));
-    nanSW(:,i,j) = cOR(isnan(rtmpSW)) | cOR(isnan(ctmpSW));
-    if cOR(nanLW(:,i,j)) | cOR(nanMW(:,i,j)) | cOR(nanSW(:,i,j))
+    nanSW(:,i,j) = cOR(isnan(rtmpMW)) | cOR(isnan(ctmpSW));
+    if cOR(nanMW(:,i,j)) | cOR(nanSW(:,i,j))
       L1b_err(:,i,j) = true;
       L1b_old(:,i,j) = true;
       continue
@@ -178,8 +178,8 @@ for j = 1 : nscan
 
     % set summary flags
     L1b_err(:,i,j) = ...
-      nanLW(:,i,j) | nanMW(:,i,j) | nanSW(:,i,j) | ...
-      negLW(:,i,j) | negMW(:,i,j) | negSW(:,i,j);
+      nanMW(:,i,j) | nanSW(:,i,j) | ...
+      negMW(:,i,j) | negSW(:,i,j);
 
     L1b_old(:,i,j) = ...
       nanLW(:,i,j) | nanMW(:,i,j) | nanSW(:,i,j) | ...

@@ -1,6 +1,6 @@
 %
 % NAME
-%   checkSDR -- SDR validation
+%   checkSDR -- SDR validation, modified to drop MW
 %
 % SYNOPSIS
 %   [L1b_err, L1b_stat] = ...
@@ -153,9 +153,9 @@ for j = 1 : nscan
 
     % check for NaNs
     nanLW(:,i,j) = cOR(isnan(rtmpLW)) | cOR(isnan(ctmpLW));
-    nanMW(:,i,j) = cOR(isnan(rtmpMW)) | cOR(isnan(ctmpMW));
+%   nanMW(:,i,j) = cOR(isnan(rtmpMW)) | cOR(isnan(ctmpMW));
     nanSW(:,i,j) = cOR(isnan(rtmpSW)) | cOR(isnan(ctmpSW));
-    if cOR(nanLW(:,i,j)) | cOR(nanMW(:,i,j)) | cOR(nanSW(:,i,j))
+    if cOR(nanLW(:,i,j)) | cOR(nanSW(:,i,j))
       L1b_err(:,i,j) = true;
       L1b_old(:,i,j) = true;
       continue
@@ -163,34 +163,34 @@ for j = 1 : nscan
 
     % complex residual check
     imgLW(:,i,j) = cOR(ctmpLW < cLBLW | cUBLW < ctmpLW);
-    imgMW(:,i,j) = cOR(ctmpMW < cLBMW | cUBMW < ctmpMW);
+%   imgMW(:,i,j) = cOR(ctmpMW < cLBMW | cUBMW < ctmpMW);
     imgSW(:,i,j) = cOR(ctmpSW < cLBSW | cUBSW < ctmpSW);
 
     % negative radiance check
     negLW(:,i,j) = cOR(rtmpLW < rLBLW);
-    negMW(:,i,j) = cOR(rtmpMW < rLBMW);
+%   negMW(:,i,j) = cOR(rtmpMW < rLBMW);
     negSW(:,i,j) = cOR(rtmpSW < rLBSW);
 
     % hot scene check
     hotLW(:,i,j) = cOR(rUBLW < rtmpLW);
-    hotMW(:,i,j) = cOR(rUBMW < rtmpMW);
+%   hotMW(:,i,j) = cOR(rUBMW < rtmpMW);
     hotSW(:,i,j) = cOR(rUBSW < rtmpSW);
 
     % set summary flags
     L1b_err(:,i,j) = ...
-      nanLW(:,i,j) | nanMW(:,i,j) | nanSW(:,i,j) | ...
-      negLW(:,i,j) | negMW(:,i,j) | negSW(:,i,j);
+      nanLW(:,i,j) | nanSW(:,i,j) | ...
+      negLW(:,i,j) | negSW(:,i,j);
 
     L1b_old(:,i,j) = ...
-      nanLW(:,i,j) | nanMW(:,i,j) | nanSW(:,i,j) | ...
-      negLW(:,i,j) | negMW(:,i,j) | negSW(:,i,j) | ...
-      hotLW(:,i,j) | hotMW(:,i,j) | hotSW(:,i,j);
+      nanLW(:,i,j) | nanSW(:,i,j) | ...
+      negLW(:,i,j) | negSW(:,i,j) | ...
+      hotLW(:,i,j) | hotSW(:,i,j);
 
     % error messages
     if emax > 0
 
       if cOR(nanLW(:,i,j)), err_msg(i,j,'LW NaN'), end
-      if cOR(nanMW(:,i,j)), err_msg(i,j,'MW NaN'), end
+%     if cOR(nanMW(:,i,j)), err_msg(i,j,'MW NaN'), end
       if cOR(nanSW(:,i,j)), err_msg(i,j,'SW NaN'), end
 
 %     if cOR(imgLW(:,i,j)), err_msg(i,j,'LW complex residual too large'), end
@@ -198,7 +198,7 @@ for j = 1 : nscan
 %     if cOR(imgSW(:,i,j)), err_msg(i,j,'SW complex residual too large'), end
 
       if cOR(negLW(:,i,j)), err_msg(i,j,'LW negative radiance'), end
-      if cOR(negMW(:,i,j)), err_msg(i,j,'MW negative radiance'), end
+%     if cOR(negMW(:,i,j)), err_msg(i,j,'MW negative radiance'), end
       if cOR(negSW(:,i,j)), err_msg(i,j,'SW negative radiance'), end
 
 %     if cOR(hotLW(:,i,j)), err_msg(i,j,'LW too hot'), end

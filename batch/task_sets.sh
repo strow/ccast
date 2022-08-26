@@ -25,18 +25,20 @@
 #SBATCH --job-name=ccast
 #SBATCH --partition=high_mem
 # #SBATCH --partition=batch
-#SBATCH --constraint=lustre
+# #SBATCH --constraint=lustre
 # #SBATCH --constraint=hpcf2009
 #SBATCH --qos=medium+
 # #SBATCH --qos=normal+
 #SBATCH --account=pi_strow
 #SBATCH --mem-per-cpu=20000
 #SBATCH --oversubscribe
-#SBATCH --ntasks=30
-#SBATCH --ntasks-per-node=5
+# #SBATCH --ntasks=30
+#SBATCH --ntasks=6
+#SBATCH --ntasks-per-node=3
+#SBATCH --time=09:00:00
 
 # exclude list
-#SBATCH --exclude=cnode040
+# #SBATCH --exclude=cnode025,cnode021,cnode040
 
 # matlab options
 MATLAB=/usr/ebuild/software/MATLAB/2020a/bin/matlab

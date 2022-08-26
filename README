@@ -40,6 +40,23 @@ Features
   directory.  Translation from RDR to L1a and from L1a to L1b/SDR
   each take about 1 second/scan on a single core.
 
+  ccast uses periodic sinc at the decimated sensor grid for the ILS.
+  This is mostly significant for the SW band, and has worked better
+  than simple sinc (including sinc with various matrix extensions)
+  in our tests.  This may raise the question of using periodic sinc
+  for reference truth, but we would argue here that sinc (as we use
+  it) is correct for modeling the optical phenomenon while psinc is
+  correct for modeling the instrument behavior.
+
+Limitations
+------------
+  ccast does not do polarization or Doppler corrections, although we
+  have done Doppler corrections as a post-processing step for tests.
+  These corrections may give the UW processing a small advantage in
+  the SW, but this should be be balanced against their questionable
+  reference truth and use of extended rather than periodic sinc for
+  the ILS.
+
 Top level directories
 ----------------------
   doc        - documentation
@@ -50,7 +67,8 @@ Top level directories
   davet      - Dave Tobin/UW components
   readers    - MIT reader with local mods
   inst_data  - instrument-specific data
-
+  npp_MWx    - hacks for the NPP MW dropout
+  
 Documentation
 --------------
   doc/sdr_format.txt   - ccast SDR field definitions
@@ -59,4 +77,12 @@ Documentation
   doc/nedn_notes       - notes on the ccast NEdN measurement
   doc/finterp          - notes on double-Fourier interpolation
   source/README        - short descriptions of most functions
+
+Focal plane fitting
+--------------------
+  The ccast focal plane fitting is done in another repo, cris_test.
+  See the directories focal_fit_npp and focal_fit_j1 there for more
+  info.  The SA inverse matrices produced there are copied to the
+  ccast directory inst_data and specified in the various opts files
+  in the ccast/source directory.
 
