@@ -13,11 +13,24 @@ Features
 ---------
   Transparent reference truth.  The UMBC calibration algorithm uses
   "flat" reference truth, with a simple sinc basis at the user-grid
-  OPD.  This gives residuals similar to the NOAA and UW algorithms
-  using reference truth convolved with instrument responsivity.  But
-  changing the definition of reference truth in this way amounts to
-  adjusting the ruler to fit the measured quantity.
+  OPD.  This gives residuals similar to the NOAA and UW algorithms,
+  which use reference truth convolved with instrument responsivity.
+  But changing the definition of reference truth in that way amounts
+  to adjusting the ruler to fit the measured quantity.
   
+  Periodic sinc at the decimated sensor grid for the ILS.  This is
+  in contrast with simple sinc and an extended transform matrix, as
+  used by UW and NOAA.  Periodic sinc gives the correct basis, and
+  worked better than simple sinc (including sinc with various matrix
+  extensions) in our tests.  This is mostly significant for the SW
+  band.
+
+  A "ratio first" calibration algorithm as the default.  This takes
+  the ratio (ES - SP) / (IT - SP) before doing the self-apodization
+  correction.  ccast can also do "SA (self apodization correction)
+  first," as an option.  Ratio first allows for better cancellation
+  of instrument artifacts.  See doc/ccast_eqns for more details.
+
   Processing at the full sensor-grid decimated OPD, the "extended
   resolution" point set.  Points between the user- and sensor-grid
   OPD are given a cosine apodization.  This in contrast with the UW
@@ -36,26 +49,17 @@ Features
   large enough that the differences were not significant.
 
   Simplicity and speed.  The package consists of less that 10,000
-  lines of code, with about 5,000 lines of that from the main source
+  lines of code, with about 5,000 lines of that for the main source
   directory.  Translation from RDR to L1a and from L1a to L1b/SDR
   each take about 1 second/scan on a single core.
-
-  ccast uses periodic sinc at the decimated sensor grid for the ILS.
-  This is mostly significant for the SW band, and has worked better
-  than simple sinc (including sinc with various matrix extensions)
-  in our tests.  This may raise the question of using periodic sinc
-  for reference truth, but we would argue here that sinc (as we use
-  it) is correct for modeling the optical phenomenon while psinc is
-  correct for modeling the instrument behavior.
 
 Limitations
 ------------
   ccast does not do polarization or Doppler corrections, although we
-  have done Doppler corrections as a post-processing step for tests.
-  These corrections may give the UW processing a small advantage in
-  the SW, but this should be be balanced against their questionable
-  reference truth and use of extended rather than periodic sinc for
-  the ILS.
+  have tested Doppler corrections as a post-processing step.  These
+  corrections may give the UW processing a small advantage in the SW,
+  but this should be be balanced against questionable reference truth
+  and use of simple rather than periodic sinc for the ILS.
 
 Top level directories
 ----------------------
@@ -85,4 +89,13 @@ Focal plane fitting
   info.  The SA inverse matrices produced there are copied to the
   ccast directory inst_data and specified in the various opts files
   in the ccast/source directory.
+
+To Do
+------
+  - write up
+  - ccast is not currently under active development
+
+  - it might be useful to add doppler and polarization corrections
+  - since psinc is used for the ILS, it would be interesting to try
+    it for reference truth, as well
 

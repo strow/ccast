@@ -6,6 +6,7 @@ addpath ../source
 addpath ../motmsc/time
 addpath ../motmsc/utils
 addpath /asl/packages/airs_decon/source
+addpath /home/motteler/shome/chirp_test
 
 % choose a FOV and FOR
 % jFOV = 5;
@@ -16,29 +17,26 @@ nFOV = length(jFOV);
 nFOR = length(jFOR);
 
 % ccast granule
-% p1 = './ccast_a4_eng_a2_new_ict/sdr45_npp_HR/2019/063';
-% g1 = 'CrIS_SDR_npp_s45_d20190304_t1006080_g102_v20a.mat';
-  p1 = '/asl/cris/ccast_a4_uw_a2_new_ict/sdr45_npp_HR/2019/062';
-  g1 = 'CrIS_SDR_npp_s45_d20190303_t2106080_g212_v20a.mat';
+p1 = '/asl/cris/ccast/sdr45_j01_HR/2023/278/';
+g1 = 'CrIS_SDR_j01_s45_d20231005_t1900080_g191_v20d.mat';
 f1 = fullfile(p1, g1);
 d1 = load(f1);
 
 % noaa granule
-% p2 = '/home/motteler/cris/move_data/npp_scrif/2019/063';
-% g2 = 'GCRSO-SCRIF_npp_d20190304_t1007039_e1015017_b38080_c20190507191953137970_nobc_ops.h5';
-  p2 = '/home/motteler/cris/move_data/npp_scrif/2019/062';
-  g2 = 'GCRSO-SCRIF_npp_d20190303_t2103039_e2111017_b38072_c20190507191924162690_nobc_ops.h5';
-f2 = fullfile(p2, g2);
-d2 = read_SCRIF(f2);
-d2g = read_GCRSO(f2);
+sp2 = '/asl/cris/sdr60_j01/2023/278';
+gp2 = '/asl/cris/geo60_j01/2023/278';
+sf2 = 'SCRIF_j01_d20231005_t1900399_e1908377_b30467_c20231005194137454000_oeac_ops.h5';
+gf2 = 'GCRSO_j01_d20231005_t1900399_e1908377_b30467_c20231005194137882000_oeac_ops.h5';
+sf2 = fullfile(sp2, sf2);
+gf2 = fullfile(gp2, gf2);
+d2  = read_SCRIF(sf2);
+d2g = read_GCRSO(gf2);
 
 % uw granule
-% p3 = '/home/motteler/shome/daac_test/SNPPCrISL1B.2/2019/063';
-% g3 = 'SNDR.SNPP.CRIS.20190304T1006.m06.g102.L1B.std.v02_05.G.190304194948.nc';
-  p3 = '/home/motteler/shome/daac_test/SNPPCrISL1B.2/2019/062';
-  g3 = 'SNDR.SNPP.CRIS.20190303T2106.m06.g212.L1B.std.v02_05.G.190304043806.nc';
+p3 = '/home/motteler/shome/downloads/uw_j1_l1b/2023/278';
+g3 = 'SNDR.J1.CRIS.20231005T1900.m06.g191.L1B.std.v02_11.G.231006013219.nc';
 f3 = fullfile(p3, g3);
-d3 = read_netcdf_lls(f3);
+d3 = read_netcdf_h5(f3);
 
 t1 = d1.geo.FORTime;
 t2 = double(d2g.FORTime);
@@ -102,21 +100,22 @@ ylabel('dBT')
 grid on
 
 subplot(3,1,2)
-plot(v1, b3m - b1m)
+plot(v1, b2m - b3m)
 axis([650, 1100, -0.2, 0.2])
-title('UW minus UMBC')
+title('NOAA minus UW')
 ylabel('dBT')
 grid on
 
 subplot(3,1,3)
-plot(v1, b3m - b2m)
+plot(v1, b3m - b1m)
 axis([650, 1100, -0.2, 0.2])
-title('UW minus NOAA')
+title('UW minus UMBC')
 xlabel('wavenumber (cm-1)')
 ylabel('dBT')
 grid on
 
 % saveas(gcf, sprintf('LW_FOV%d_hamm_SDR_diffs', jFOV), 'png')
+saveas(gcf, sprintf('LW_FOV%d_unap_SDR_diffs', jFOV), 'png')
 
 %---------
 % MW test
@@ -148,21 +147,22 @@ ylabel('dBT')
 grid on
 
 subplot(3,1,2)
-plot(v1, b3m - b1m)
+plot(v1, b2m - b3m)
 axis([1200, 1750, -0.2, 0.2])
-title('UW minus UMBC')
+title('NOAA minus UW ')
 ylabel('dBT')
 grid on
 
 subplot(3,1,3)
-plot(v1, b3m - b2m)
+plot(v1, b3m - b1m)
 axis([1200, 1750, -0.2, 0.2])
-title('UW minus NOAA')
+title('UW minus UMBC')
 xlabel('wavenumber (cm-1)')
 ylabel('dBT')
 grid on
 
 % saveas(gcf, sprintf('MW_FOV%d_hamm_SDR_diffs', jFOV), 'png')
+saveas(gcf, sprintf('MW_FOV%d_unap_SDR_diffs', jFOV), 'png')
 
 %---------
 % SW test
@@ -194,19 +194,19 @@ ylabel('dBT')
 grid on
 
 subplot(3,1,2)
-plot(v1, b3m - b1m)
+plot(v1, b2m - b3m)
 axis([2150, 2550, -0.4, 0.4])
-title('UW minus UMBC')
+title('NOAA minus UW ')
 ylabel('dBT')
 grid on
 
 subplot(3,1,3)
-plot(v1, b3m - b2m)
+plot(v1, b3m - b1m)
 axis([2150, 2550, -0.4, 0.4])
-title('UW minus NOAA')
+title('UW minus UMBC')
 xlabel('wavenumber (cm-1)')
 ylabel('dBT')
 grid on
 
 % saveas(gcf, sprintf('SW_FOV%d_hamm_SDR_diffs', jFOV), 'png')
-
+saveas(gcf, sprintf('SW_FOV%d_unap_SDR_diffs', jFOV), 'png')

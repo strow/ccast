@@ -2,8 +2,12 @@
 % quick look at one ccast granule
 %
 
-p1 = '/asl/cris/ccast/sdr45_npp_HR/2019/176';
-gran = 'CrIS_SDR_npp_s45_d20190625_t0024080_g005_v20a.mat';
+addpath /home/motteler/cris/ccast/source
+addpath /home/motteler/cris/ccast/motmsc/time
+addpath /home/motteler/cris/ccast/motmsc/utils
+
+p1 = '/asl/cris/ccast/sdr45_j02_HR/2023/043';
+gran = 'CrIS_SDR_j02_s45_d20230212_t2112010_g213_v21a.mat';
 
 f1 = fullfile(p1, gran);
 d1 = load(f1);

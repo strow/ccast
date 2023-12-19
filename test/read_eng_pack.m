@@ -1,46 +1,27 @@
-% 
-% sample eng (4 minute) packets from a NOAA RDR file
+%
+% quick RDR read test to get eng packets
 %
 
-addpath ../source
-addpath ../davet
-addpath ../readers/MITreader380b
-addpath ../readers/MITreader380b/CrIS
+addpath /home/motteler/cris/ccast/readers/MITreader380b
+addpath /home/motteler/cris/ccast/readers/MITreader380b/CrIS
 
-% late npp vxx
-  gdir = '/asl/cris/rdr60_npp/2014/221';
-  gran = 'RCRIS-RNSCA_npp_d20140809_t1208120_e1216119_b14416_c20140809181641201792_noaa_ops.h5';
+% path to an RDR granule
+  p1 = '/asl/cris/rdr60_j02/2023/052';
+  g1 = 'RCRIS-RNSCA_j02_d20230221_t0115155_e0123154_b01458_c20230221013917231423_oeau_ops.h5';
+% p1 = '/asl/cris/rdr60_j02/2023/053';
+% g1 = 'RCRIS-RNSCA_j02_d20230222_t0115074_e0123073_b01472_c20230222013322008338_oeau_ops.h5';
+% p1 = '/asl/cris/rdr60_j02/2023/054';
+% g1 = 'RCRIS-RNSCA_j02_d20230223_t0114593_e0122592_b01486_c20230223015250878100_oeau_ops.h5';
+f1 = fullfile(p1, g1);
 
-% early npp v36
-% gdir = '/asl/cris/rdr60_npp/2015/005';
-% gran = 'RCRIS-RNSCA_npp_d20150105_t2244014_e2252013_b16536_c20150106045223758691_noaa_ops.h5';
+% path to some eng packet, to get the reader started
+% (note the eng packet is saved in the struct "eng")
+e1 = '/home/motteler/cris/ccast/inst_data/j1_eng_v115_H4.mat';
+load(e1);
 
-% late npp v36
-% gdir = '/asl/cris/rdr60_npp/2015/221';
-% gran = 'RCRIS-RNSCA_npp_d20150809_t0158576_e0206576_b19588_c20150809080719006119_noaa_ops.h5';
+[DATA META] = read_cris_hdf5_rdr(f1, 'tmpxxx.dat', eng)
 
-% recent npp v37
-% gdir = '/asl/cris/rdr60_npp/2019/061';
-% gran = 'RCRIS-RNSCA_npp_d20190302_t1223140_e1231140_b38053_c20190302163137328422_nobu_ops.h5';
+eng = DATA.packet;
+save(sprintf('j2_eng_v%d', eng.Eng_Packet_Ver), 'eng')
 
-% recent j1 v115
-% gdir = '/asl/cris/rdr60_j01/2019/061';
-% gran = 'RCRIS-RNSCA_j01_d20190302_t1207141_e1215141_b06656_c20190302161537147674_nobu_ops.h5';
-
-rfile = fullfile(gdir, gran);
-ctmp = 'ccsds_test.tmp';
-if exist(ctmp), delete(ctmp), end
-
-% get an eng for the inital read
-opts = struct;
-load('../inst_data/npp_eng_v36_H2')
-
-[d1, m1] = read_cris_hdf5_rdr(rfile, ctmp, eng);
-
-[sci, eng] = scipack(d1, eng);
-
-  save npp_eng_v36_LR eng
-% save npp_eng_v36_H2 eng
-% save npp_eng_v37_H3 eng
-% save j1_eng_v115_H4 eng
 

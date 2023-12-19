@@ -4,18 +4,32 @@
 
 addpath ../source
 addpath ../motmsc/time
+addpath ../motmsc/utils
 
-p1 = '/asl/s1/strow/ADL';
-g1 = 'GCRSO_j01_d20180108_t1527129_e1527427_b00728_c20180112032711274647_ADu_ops.h5';
-f1 = 'SCRIF_j01_d20180108_t1527129_e1527427_b00728_c20180112032711196399_ADu_ops.h5';
-f1 = fullfile(p1, f1);
-g1 = fullfile(p1, g1);
-d1 = read_SCRIF(f1);
-gx = read_GCRSO(g1);
+sp1 = '/asl/cris/sdr60_j01/2023/278';
+gp1 = '/asl/cris/geo60_j01/2023/278';
 
-p2 = '/asl/data/cris/ccast/sdr45_j01_HR/2018/008';
-g2 = 'CrIS_SDR_j01_s45_d20180108_t1524010_g155_v20a.mat';
-f2 = fullfile(p2, g2);
+% sf1 = 'SCRIF_j01_d20231005_t0100479_e0108457_b30456_c20231005014639203000_oeac_ops.h5';
+% gf1 = 'GCRSO_j01_d20231005_t0100479_e0108457_b30456_c20231005014639592000_oeac_ops.h5';
+
+% sf1 = 'SCRIF_j01_d20231005_t1812399_e1820377_b30466_c20231005185033057000_oeac_ops.h5';
+% gf1 = 'GCRSO_j01_d20231005_t1812399_e1820377_b30466_c20231005185033484000_oeac_ops.h5';
+
+sf1 = 'SCRIF_j01_d20231005_t1900399_e1908377_b30467_c20231005194137454000_oeac_ops.h5';
+gf1 = 'GCRSO_j01_d20231005_t1900399_e1908377_b30467_c20231005194137882000_oeac_ops.h5';
+
+sf1 = fullfile(sp1, sf1);
+gf1 = fullfile(gp1, gf1);
+d1 = read_SCRIF(sf1);
+gx = read_GCRSO(gf1);
+
+p2 = '/asl/cris/ccast/sdr45_j01_HR/2023/278/';
+
+% f2 = 'CrIS_SDR_j01_s45_d20231005_t0100080_g011_v20d.mat';
+% f2 = 'CrIS_SDR_j01_s45_d20231005_t1812080_g183_v20d.mat';
+  f2 = 'CrIS_SDR_j01_s45_d20231005_t1900080_g191_v20d.mat';
+
+f2 = fullfile(p2, f2);
 d2 = load(f2);
 
 t1 = double(gx.FORTime);
@@ -32,9 +46,9 @@ r2 = mod(j2-1, 30) + 1;
 c1 = floor((j1-1)/30) + 1;
 c2 = floor((j2-1)/30) + 1;
 
-jLW = 5;
-jMW = 9;
-jSW = 1:9
+jLW = 3;
+jMW = 3;
+jSW = 3;
 vLW = d2.vLW;
 vMW = d2.vMW;
 vSW = d2.vSW;
@@ -78,6 +92,23 @@ for i = 1 : length(c1)
   plot(vMW, b2 - b1)
   axis([1200, 1750, -1, 1])
   title(sprintf('MW FOV %d ccast minus ADL', jMW))
+  grid on
+
+  figure(3)
+  y1 = d1.ES_RealSW(:, jSW, r1(i), c1(i));
+  y2 = d2.rSW(:, jSW, r2(i), c2(i));
+  b1 = rad2bt(vSW, y1);
+  b2 = rad2bt(vSW, y2);
+  subplot(2,1,1)
+  plot(vSW, b2, vSW, b1)
+% axis([1200, 1750, 200, 300])
+  title(sprintf('SW FOV %d', jSW))
+  legend('ccast', 'ADL')
+  grid on
+  subplot(2,1,2)
+  plot(vSW, b2 - b1)
+% axis([1200, 1750, -1, 1])
+  title(sprintf('SW FOV %d ccast minus ADL', jSW))
   grid on
 
   pause
