@@ -1,0 +1,43 @@
+
+CCAST vs NOAA calibration algorithm comparisons
+------------------------------------------------
+      
+ccast_noaa1: CCAST and NOAA relative FOV response, 17 Dec 2014.
+
+ccast_noaa2: CCAST and NOAA 17–19 Feb 2015 SDR Algorithm Tests,
+  15 Apr 2015.
+
+ccast_noaa3: new CrIS calibration algorithm comparisons, 5 Aug 2015.
+
+ccast_noaa4: CrIS extended resolution calibration algorithm
+  comparisons, May 10 2016.  This report interesting because it's
+  an extensive comparison of ccast with flat reference truth and
+  NOAA with reference truth convolved with responsivity, with all
+  other params except the basic algorithm fixed.  The difference
+  between resp and flat reference truth is significant, around 0.2K
+  or more in several places.  To summarize, NOAA needs to convolve
+  its validation tests with instrument responsivity to get results
+  comparable to ccast validated with "flat" (sinc basis) reference
+  truth.
+  
+Other CrIS telecon presentations 
+----------------------------------
+
+nonlin_tests: CrIS Nonlinearity Comparisons, 9 Apr 2014
+
+cris_psinc: Standard and periodic sinc ILS for the CrIS high
+  resolution tests, 8 May 2014
+
+extend_res: apodization of CrIS extended interferograms, 2 Dec 2015
+
+a2feb16: CrIS a2 adjustments from extended resolution data, 16 Feb
+  2016
+
+mw_anom_t1: A preliminary comparison of CrIS processing algorithms
+  after the SNPP CrIS MWIR anomaly,15 May 2019
+
+noaa_rpt: J1 TVAC summary report, 12 Jan 2015   
+
+
+
+

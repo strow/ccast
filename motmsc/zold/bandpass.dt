@@ -1,0 +1,64 @@
+%
+% NAME
+%   bandpass  -- bandpass filter
+%
+% SYNOPSIS
+%   function dout = bandpass(vin, din, v1, v2, vr);
+%
+% INPUTS
+%   vin   - input frequency grid, m-vector
+%   din   - input data, m x n array, column order
+%   v1    - passband start
+%   v2    - passband end
+%   vr    - optional rolloff width
+%
+% OUTPUT
+%   dout  - din rolled off outside of [v1, v2]
+%
+% NOTES
+%   *** TEMPORARY HACKED VERSION JUST RUNS DAVE'S FILTER ***
+%
+%   the rolloff is a cosine, fit to the rolloff width
+%
+%   if the rolloff width vr is not specified, the rolloff is from
+%   vin(1) to v1 and from v2 to vin(end).  If vr is specified and
+%   v1 - vr < vin(1), then vin(1) is the low end of the rolloff,
+%   similarly if vin(end) < v2 + vr then vin(end) is the high end.
+%
+%   the passband is taken as the smallest interval at the vin grid
+%   points that spans [v1, v2].  
+%
+% AUTHOR
+%    H. Motteler, 20 Apr 2012
+%
+
+function dout = bandpass(vin, din, v1, v2, vr)
+
+% make vin a column vector
+vin = vin(:);
+
+switch v1
+  case  650, filt = ITTbandguards('lw');
+  case 1210, filt = ITTbandguards('mw');
+  case 2155, filt = ITTbandguards('sw');
+  otherwise, error('unexpected value for v1')
+end
+
+% check that inputs vin and din conform
+[m, n] = size(din);
+if length(vin) ~= m
+  error('vin length and din rows differ')
+end
+
+% apply the filter
+filt = filt(:);
+
+if length(filt) ~= m
+  fprintf(1, 'wrong filter size?\n')
+  keyboard
+end
+
+for i = 1 : n
+  dout(:,i) = din(:,i) .* filt;
+end
+
